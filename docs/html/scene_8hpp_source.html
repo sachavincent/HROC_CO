@@ -110,28 +110,27 @@ $(function() {
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    </div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_scene.html#aff7defb40994f27a7e4b8be1cc1ab457">renderModelsWithShader</a>(<a class="code hl_class" href="class_shader.html">Shader</a>&amp; _shader);</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; <a class="code hl_function" href="class_scene.html#a63ff34b8a774b4aa6303090dda2ec0a9">addModel</a>(<a class="code hl_class" href="class_model.html">Model</a>&amp; _model);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; <a class="code hl_function" href="class_scene.html#ab1e19c988b94d32317b23ffed53449cb">addLight</a>(<a class="code hl_class" href="class_light.html">Light</a>&amp; _light);</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setCubeMap(<a class="code hl_class" href="class_cube_map.html">CubeMap</a>&amp; _cubeMap);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setCamera(<a class="code hl_class" href="class_camera.html">Camera</a>&amp; _cam);</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setExposure(<span class="keywordtype">float</span> _exposure){exposure = _exposure;<span class="keywordflow">return</span> *<span class="keyword">this</span>;}</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setSSAO(<span class="keywordtype">bool</span> _status){ssaoEnabled = _status;<span class="keywordflow">return</span> *<span class="keyword">this</span>;};</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">float</span> getExposure(){<span class="keywordflow">return</span> exposure;}</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_class" href="class_camera.html">Camera</a>&amp; getCam(){<span class="keywordflow">return</span> cam;}</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_class" href="class_s_s_a_o.html">SSAO</a>* getSSAO(){<span class="keywordflow">return</span> ssao;}</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">bool</span> SSAOstatus();</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    std::vector&lt;Light*&gt;&amp; getLights(){<span class="keywordflow">return</span> lights;}</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    std::vector&lt;Model*&gt;&amp; getModels(){<span class="keywordflow">return</span> models;}</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>};</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_scene.html#aff7defb40994f27a7e4b8be1cc1ab457">renderModelsWithShader</a>(<a class="code hl_class" href="class_shader.html">Shader</a>&amp; _shader);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; <a class="code hl_function" href="class_scene.html#a63ff34b8a774b4aa6303090dda2ec0a9">addModel</a>(<a class="code hl_class" href="class_model.html">Model</a>&amp; _model);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; <a class="code hl_function" href="class_scene.html#ab1e19c988b94d32317b23ffed53449cb">addLight</a>(<a class="code hl_class" href="class_light.html">Light</a>&amp; _light);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setCubeMap(<a class="code hl_class" href="class_cube_map.html">CubeMap</a>&amp; _cubeMap);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setCamera(<a class="code hl_class" href="class_camera.html">Camera</a>&amp; _cam);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setExposure(<span class="keywordtype">float</span> _exposure){exposure = _exposure;<span class="keywordflow">return</span> *<span class="keyword">this</span>;}</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="class_scene.html">Scene</a>&amp; setSSAO(<span class="keywordtype">bool</span> _status){ssaoEnabled = _status;<span class="keywordflow">return</span> *<span class="keyword">this</span>;};</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordtype">float</span> getExposure(){<span class="keywordflow">return</span> exposure;}</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <a class="code hl_class" href="class_camera.html">Camera</a>&amp; getCam(){<span class="keywordflow">return</span> cam;}</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_class" href="class_s_s_a_o.html">SSAO</a>* getSSAO(){<span class="keywordflow">return</span> ssao;}</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">bool</span> SSAOstatus();</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    std::vector&lt;Light*&gt;&amp; getLights(){<span class="keywordflow">return</span> lights;}</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    std::vector&lt;Model*&gt;&amp; getModels(){<span class="keywordflow">return</span> models;}</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>};</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclass_camera_html"><div class="ttname"><a href="class_camera.html">Camera</a></div><div class="ttdoc">A perspective camera with parameters that can be updated, outputs a view matrix.</div><div class="ttdef"><b>Definition:</b> camera.hpp:11</div></div>
-<div class="ttc" id="aclass_cube_map_html"><div class="ttname"><a href="class_cube_map.html">CubeMap</a></div><div class="ttdef"><b>Definition:</b> model.hpp:223</div></div>
+<div class="ttc" id="aclass_cube_map_html"><div class="ttname"><a href="class_cube_map.html">CubeMap</a></div><div class="ttdef"><b>Definition:</b> model.hpp:219</div></div>
 <div class="ttc" id="aclass_light_html"><div class="ttname"><a href="class_light.html">Light</a></div><div class="ttdef"><b>Definition:</b> light.hpp:10</div></div>
 <div class="ttc" id="aclass_model_html"><div class="ttname"><a href="class_model.html">Model</a></div><div class="ttdef"><b>Definition:</b> model.hpp:32</div></div>
 <div class="ttc" id="aclass_s_s_a_o_html"><div class="ttname"><a href="class_s_s_a_o.html">SSAO</a></div><div class="ttdef"><b>Definition:</b> ssao.hpp:11</div></div>

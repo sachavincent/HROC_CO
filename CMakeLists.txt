@@ -1,46 +1,75 @@
 cmake_minimum_required(VERSION 3.0)
-project(HROC_CO)
+
+project(HROC_APP)
+
+set(ZLIB_LIBRARIES zlibstatic)
+set(ENABLE_BOOST_WORKAROUND OFF)
+set(ASSIMP_BUILD_SAMPLES OFF)
+set(BUILD_ASSIMP_TOOLS  OFF)
+set(ASSIMP_BUILD_DOCS OFF)
+set(ASSIMP_BUILD_STATIC_LIB ON)
+set(ASSIMP_NO_EXPORT ON)
+set(ASSIMP_BUILD_TESTS OFF)
+set(ASSIMP_INSTALL_PDB OFF)
 
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
-add_subdirectory(libs/glfw)
 
-option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-option(ASSIMP_BUILD_SAMPLES OFF)
-option(ASSIMP_BUILD_TESTS OFF)
-add_subdirectory(libs/assimp)
+add_subdirectory(external/glfw)
+add_subdirectory(external/assimp)
 
-option(BUILD_CPU_DEMOS OFF)
-option(BUILD_EXTRAS OFF)
-option(BUILD_OPENGL3_DEMOS OFF)
-option(BUILD_UNIT_TESTS OFF)
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 
+        /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -std=c++17")
+endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++17")
+include_directories(include/
+                    external/glad/include/
+                    external/glfw/include/
+                    external/glm/
+                    external/stb/
+					external/zlib/
+                    external/imgui/
+                    external/imgui/backends/
+                    external/assimp/include/
+					)
 
-include_directories(src
-                    libs/assimp/include/
-                    libs/glad/include/
-                    libs/glfw/include/
-                    libs/glm/
-                    libs/stb/)
+file(GLOB VENDORS_SOURCES external/glad/src/glad.c)
+file(GLOB PROJECT_HEADERS include/*.hpp)
+file(GLOB PROJECT_SOURCES src/*.cpp
+                          src/model/*.cpp
+                          external/imgui/*.cpp
+                          external/imgui/backends/*opengl3.cpp
+                          external/imgui/backends/*glfw.cpp
+                        )
 
-file(GLOB libsS_SOURCES libs/glad/src/glad.c)
-file(GLOB PROJECT_HEADERS src/*.h)
-file(GLOB PROJECT_SOURCES src/*.cpp)
-file(GLOB PROJECT_CONFIGS CMakeLists.txt)
+file(GLOB PROJECT_SHADERS shaders/*.frag
+                          shaders/*.vert)
 
-source_group("Headers" FILES ${PROJECT_HEADERS})
-source_group("Shaders" FILES ${PROJECT_SHADERS})
-source_group("Sources" FILES ${PROJECT_SOURCES})
-source_group("libss" FILES ${libsS_SOURCES})
+file(GLOB PROJECT_CONFIGS CMakeLists.txt
+                          Readme.md
+                         .gitignore
+                         .gitmodules)                         
 
 add_definitions(-DGLFW_INCLUDE_NONE
                 -DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
-                               ${libsS_SOURCES})
-target_link_libraries(${PROJECT_NAME} assimp glfw
+                               ${VENDORS_SOURCES}  "src/main.cpp")
+
+target_link_libraries(${PROJECT_NAME} glfw assimp
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
+
+
+message("### Moving assets next to binary dir ####")
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    DEPENDS ${PROJECT_SHADERS})

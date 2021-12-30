@@ -1,105 +1,101 @@
-#include "utils.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "headers.hpp"
 
-static void OnWindowResize(GLFWwindow* window, int width, int height)
-{
-    AppState* app = static_cast<AppState*>(glfwGetWindowUserPointer(window));
-    assert(app);
-    WIDTH = width;
-    HEIGHT = height;
+#include <iostream>
+// Local includes
+#include "mainLoop.hpp"
+#include "camera.hpp"
+#include "scene.hpp"
 
-    glViewport(0, 0, width, height);
-}
+#include <glm/glm.hpp>
 
-static void OnMouseMove(GLFWwindow* window, double xpos, double ypos)
-{
-    AppState* app = static_cast<AppState*>(glfwGetWindowUserPointer(window));
-    assert(app);
-    app->camera.on_mouse_move(float(xpos), float(ypos));
-}
-
-static void OnMouseScroll(GLFWwindow* window, double xoffset, double yoffset)
-{
-    (void)xoffset;
-    AppState* app = static_cast<AppState*>(glfwGetWindowUserPointer(window));
-    assert(app);
-    app->camera.on_mouse_scroll(float(yoffset));
-}
-
-static void OnKeyFun(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+int main(int argc, char* argv[]) {
     
+    int windowWidth = 1200;
+    int windowHeight = 800;
+
+    //init the interface/camera/scene
+    Ui interface{};
+    Camera cam{glm::vec3{0,4,-8}, 50.0f, windowWidth, windowHeight};
+
+    Scene scene{cam};
+    // enable SSAO for this scene
+    scene.setSSAO(false).setExposure(1.0);
+
+
+    // ######################### adding lights ###########################
+    
+    // create a grid of lights for the scene (good to see reflections)
+   
+    DistantLight light3{glm::vec3{-0.2,0.25,-0.8},glm::vec3{0.8f}};
+    light3.enableShadowMap(2048,10.0f);
+    scene.addLight(light3);
+
+    //create a cubemap and add it to the scene
+    CubeMap cubemap{"textures/cubemaps/yokohama/"};
+    scene.setCubeMap(cubemap);
+
+
+    //####################### creating models ###########################
+
+    Cube cube0{1.0f};
+    cube0.setPosition({1.1f,0.6f,0.0f}).setDiffuse({0.0f,1.0f,0.0f}).setSpecular(glm::vec3{0.9})
+        .setShaderType(PHONG);
+
+    Cube cube1{1.0f};
+    cube1.setPosition({0.0f,0.6f,0.0f}).setAlbedo({0.0f,1.0f,0.0f}).setRoughness(0.4).setMetallic(0.0)
+        .setShaderType(PBR);
+
+    Cube cube2(1.0f);
+    cube2.setPosition({-2.5f,0.6f,0.5f}).setScale({3.0,0.2,3.0}).enableTesselation(HIGH)
+                .setTexAlbedo("textures/tiles/basecolor.jpg")
+                .setTexRoughness("textures/tiles/roughness.png")
+                .setTexHeight("textures/tiles/height.png").setShaderType(PBR);
+
+
+    scene.addModel(cube0).addModel(cube1).addModel(cube2);
+
+
+    UVSphere sphere1(1.0,25,20);
+    sphere1.setPosition({3.5,0.7,3.5}).setRotation(-90,{1,0,0}).
+    setAlbedo({0.08,0,0.3}).setRoughness(0.52).setMetallic(1.0).setShaderType(PBR).enableTesselation(HIGH);
+
+    //scene.addModel(sphere1);
+
+
+    Plane plane1{{20,20},30,30};
+    plane1.setRotation(-90,{1,0,0}).setTexAlbedo("textures/stoneWall/diffuse.png")
+                .setTexRoughness("textures/stoneWall/roughness.png")
+                .setTexHeight("textures/stoneWall/height.png").displacementStrength(0.1f)
+                .setTexNormal("textures/stoneWall/normal.png")
+                .setTexAO("textures/stoneWall/ao.png")
+                .setTexScaling({4,4}).enableTesselation(LOW).setShaderType(PBR);
+    scene.addModel(plane1);
+
+
+    //gold-ish utah teapot
+    FileModel teapot{"models/teapot.obj",SMOOTH_NORMAL_ENABLE};
+    teapot.setScale(glm::vec3{0.45f}).setPosition({0.0f,1.2f,-1.8f})
+       .setAlbedo({1.0f,0.18f,0.0f}).setRoughness(0.24).setMetallic(01.0)
+       .enableTesselation(HIGH).setShaderType(PBR);
+
+    scene.addModel(teapot);
+
+
+    // ########## start the render loop, give it the scene/cameras #########
+
+    MainLoop renderLoop{scene,interface,cam};
+    // first, load scene objects to GPU
+    scene.load();
+    //start the render loop
+    renderLoop.run();
+
+    return 0;
 }
 
-static void HandleInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-        return;
-    }
 
-    AppState* app = static_cast<AppState*>(glfwGetWindowUserPointer(window));
-    assert(app);
-    FreeCamera& camera = app->camera;
-    Mode& mode = app->mode;
 
-    const struct KeyDelta
-    {
-        int key;
-        glm::vec3 delta;
-    };
-    KeyDelta key_delta[] =
-    {
-        {GLFW_KEY_W, +camera._front},
-        {GLFW_KEY_S, -camera._front},
-        {GLFW_KEY_D, +camera._right},
-        {GLFW_KEY_A, -camera._right},
-        {GLFW_KEY_E, +camera._up},
-        {GLFW_KEY_Q, -camera._up},
-    };
-    for (KeyDelta keyDelta : key_delta)
-    {
-        if (glfwGetKey(window, keyDelta.key) == GLFW_PRESS)
-        {
-            camera.on_keyboard_move(keyDelta.delta);
-            break;
-        }
-    }
-}
 
-int main()
-{
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
 
-    AppState app;
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "HROC", nullptr, nullptr);
-    assert(window && "Failed to create window.");
-    glfwSetWindowUserPointer(window, &app);
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, OnWindowResize);
-    glfwSetCursorPosCallback(window, OnMouseMove);
-    glfwSetScrollCallback(window, OnMouseScroll);
-    glfwSetKeyCallback(window, OnKeyFun);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    const int glad_ok = gladLoadGL();
-    assert(glad_ok > 0);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
 
-    app.camera.force_refresh();
-
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-    glfwTerminate();
-}

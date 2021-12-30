@@ -1,134 +1,132 @@
-﻿#include "shader.h"
+#include "shader.hpp"
 
-const std::string Shader::SHADER_PATH = "../../../../src/shaders/";
+const char* Shader::loadShader(std::string path) {
+	std::ifstream file(path);
 
-Shader::Shader(std::string vertexPath, std::string fragmentPath): _started(false), _deleted(false) {
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    try {
-        vShaderFile.open(Shader::SHADER_PATH + vertexPath, std::ios::binary);
-        fShaderFile.open(Shader::SHADER_PATH + fragmentPath, std::ios::binary);
-        std::stringstream vShaderStream, fShaderStream;
+	std::string str((std::istreambuf_iterator<char>(file)),
+		std::istreambuf_iterator<char>());
+	int fSize = str.length();
 
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
+	char* cstr = new char[fSize + 1];
 
-        vShaderFile.close();
-        fShaderFile.close();
-
-        vertexCode   = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-    } catch(std::ifstream::failure e) {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-    }
-
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
-
-	int success;
-	char infoLog[512];
-	
-	this->_vertexID = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(this->_vertexID, 1, &vShaderCode, NULL);
-    glCompileShader(this->_vertexID);
-
-    glGetShaderiv(this->_vertexID, GL_COMPILE_STATUS, &success);
-	if(!success) {
-        glGetShaderInfoLog(this->_vertexID, 512, NULL, infoLog);
-	    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	if(fSize==0){
+		std::cout << "failed to load shader with path : " <<path<<std::endl;
 	}
+	strcpy(cstr, str.c_str());
+	file.close();
+	return cstr;
+
+}
+
+Shader::Shader(std::string vertexPath, std::string fragmentPath,
+		std::string tessControlPath, std::string tessEvalPath) {
 	
-    this->_fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(this->_fragmentID, 1, &fShaderCode, NULL);
-    glCompileShader(this->_fragmentID);
-    glGetShaderiv(this->_fragmentID, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(this->_fragmentID, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
+	const char* vs_src = loadShader(vertexPath);
+	const char* fs_src = loadShader(fragmentPath);
+	const char* tc_src = loadShader(tessControlPath);
+	const char* te_src = loadShader(tessEvalPath);
+
+	//vertex shader creation and compilation
+	unsigned int vertexShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vs_src, NULL);
+	glCompileShader(vertexShader);
+
+	//fragment shader creation and compilation
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fs_src, NULL);
+	glCompileShader(fragmentShader);
 	
-	this->ID = glCreateProgram();
-    glAttachShader(this->ID, this->_vertexID);
-    glAttachShader(this->ID, this->_fragmentID);
-    glLinkProgram(this->ID);
+	//tesselation control shader
+	unsigned int tessCtlShader;
+	tessCtlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+	glShaderSource(tessCtlShader, 1, &tc_src, NULL);
+	glCompileShader(tessCtlShader);
 
-    glGetProgramiv(this->ID, GL_LINK_STATUS, &success);
-	if(!success) {
-        glGetProgramInfoLog(this->ID, 512, NULL, infoLog);
-	    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	
-    glDeleteShader(this->_vertexID);
-    glDeleteShader(this->_fragmentID);
+	// tesselation evaluation shader
+	unsigned int tessEvalShader;
+	tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+	glShaderSource(tessEvalShader, 1, &te_src, NULL);
+	glCompileShader(tessEvalShader);
+
+	//shader program creation
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glAttachShader(shaderProgram, tessCtlShader);
+	glAttachShader(shaderProgram, tessEvalShader);
+	glLinkProgram(shaderProgram);
+
+	//shader program creation
+	glUseProgram(shaderProgram);
+
+	//temp shader deletion
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	glDeleteShader(tessCtlShader);
+	glDeleteShader(tessEvalShader);
+
+	ID = shaderProgram;
 }
 
-void Shader::start() 
+
+Shader::Shader(std::string vertexPath, std::string fragmentPath) {
+	const char* vertexShaderSource = loadShader(vertexPath);
+	const char* fragmentShaderSource = loadShader(fragmentPath);
+
+	//vertex shader creation and compilation
+	unsigned int vertexShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+	//fragment shader creation and compilation
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+	//shader program creation
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+	//shader program creation
+	glUseProgram(shaderProgram);
+	//temp shader deletion
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	ID = shaderProgram;
+}
+
+
+
+void Shader::use() {
+	glUseProgram(ID);
+}
+
+void Shader::setBool(const std::string& name, bool value) const
 {
-    if(!this->_started)
-    {
-        this->_started = true;
-        glUseProgram(this->ID);
-    }
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
-
-void Shader::stop() 
+void Shader::setInt(const std::string& name, int value) const
 {
-    if(this->_started)
-    {
-        this->_started = false;
-        glUseProgram(0);
-    }
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
-
-void Shader::cleanUp() 
+void Shader::setFloat(const std::string& name, float value) const
 {
-    if(_deleted)
-        return;
-
-    stop();
-
-    glDetachShader(this->ID, this->_vertexID);
-    glDetachShader(this->ID, this->_fragmentID);
-
-    glDeleteShader(this->_vertexID);
-    glDeleteShader(this->_fragmentID);
-
-    glDeleteProgram(this->ID);
-
-    this->_deleted = true;
+	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
-
-
-void Shader::loadInt(const std::string& name, int value) const
+void Shader::setMat4(const std::string& name, glm::mat4 value) const
 {
-    glUniform1i(glGetUniformLocation(this->ID, name.c_str()), value);
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
-
-void Shader::loadBool(const std::string& name, bool value) const
-{         
-    loadInt(name, (int) value);
+void Shader::setVec3(const std::string& name, glm::vec3 value) const {
+	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
-
-void Shader::loadFloat(const std::string& name, float value) const
-{
-    glUniform1f(glGetUniformLocation(this->ID, name.c_str()), value);
-}
-
-void Shader::loadMatrix4(const std::string& name, glm::f32* value, int nb) const
-{
-    glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), nb, GL_FALSE, value);
-}
-
-void Shader::loadMatrix2x4(const std::string& name, glm::mat2x4 value, int nb) const
-{
-    glUniformMatrix2x4fv(glGetUniformLocation(this->ID, name.c_str()), nb, GL_FALSE, &value[0][0]);
-}
-
-void Shader::loadVec3(const std::string& name, glm::vec3 value) const
-{
-    glUniform3f(glGetUniformLocation(this->ID, name.c_str()), value[0], value[1], value[2]);
+void Shader::setVec2(const std::string& name, glm::vec2 value) const {
+	glUniform2f(glGetUniformLocation(ID, name.c_str()), value.x, value.y);
 }

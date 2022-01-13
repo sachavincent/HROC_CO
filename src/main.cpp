@@ -30,10 +30,10 @@ int main(int argc, char* argv[]) {
     light3.enableShadowMap(2048,10.0f);
     scene.addLight(light3);
 
+
     //create a cubemap and add it to the scene
     CubeMap cubemap{"textures/cubemaps/yokohama/"};
     scene.setCubeMap(cubemap);
-
 
     //####################### creating models ###########################
 

@@ -1,4 +1,4 @@
-#version 410 core
+#version 460 core
 
 #define NR_LIGHTS 100
 #define gamma 2.2
@@ -69,7 +69,6 @@ float roughness;
 float metallic;
 vec3 normal;
 float AO;
-
 
 
 void main()

@@ -21,7 +21,7 @@ static unsigned int loadTexture(const char* path) {
 
     
 
-    //load a texture only if it has not been laoded previously (avoid duplicates)
+    //load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (texturePathMap.find(path) == texturePathMap.end()){
         glGenTextures(1, &textureID);
         texturePathMap[path] = textureID;

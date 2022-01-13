@@ -28,3 +28,5 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+//TODO: remove this an cleanup includes of project

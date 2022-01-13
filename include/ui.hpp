@@ -30,11 +30,5 @@ public:
 
 };
 
-// scenes exemple :
-// - scene avec grid de lights et tous les objets
-// - scene avec 1 light + spheres PHONG
-// - scene avec 1 light + spheres PBR
-// - scene avec tessellation
-
 
 #endif

@@ -1,4 +1,4 @@
-#version 460 core
+#version 440 core
 
 #define NR_LIGHTS 100
 #define gamma 2.2

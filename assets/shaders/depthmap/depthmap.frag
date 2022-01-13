@@ -1,4 +1,4 @@
-#version 460 core
+#version 440 core
 
 layout(location = 0) out float fragmentdepth;
 

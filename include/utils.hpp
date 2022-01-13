@@ -19,8 +19,6 @@ static std::map<std::string,unsigned int> texturePathMap;
 static unsigned int loadTexture(const char* path) {
     unsigned int textureID;
 
-    
-
     //load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (texturePathMap.find(path) == texturePathMap.end()){
         glGenTextures(1, &textureID);

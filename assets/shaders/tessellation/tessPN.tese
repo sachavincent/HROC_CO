@@ -1,4 +1,4 @@
-#version 460 core
+#version 440 core
 
 // PN TRIANGLES TESSELLATION SHADER
 

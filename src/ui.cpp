@@ -14,7 +14,7 @@ void Ui::load(GLFWwindow* _window){
     (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplOpenGL3_Init("#version 460");
 }
 void Ui::render(Scene* _scene){
     scene = _scene;

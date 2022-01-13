@@ -16,8 +16,13 @@ option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
 
+#set(gtest_force_shared_crt 1 CACHE BOOL "")
+
 add_subdirectory(external/glfw)
 add_subdirectory(external/assimp)
+add_subdirectory(external/googletest)
+
+add_subdirectory(test)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 
@@ -66,7 +71,6 @@ target_link_libraries(${PROJECT_NAME} glfw assimp
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
-
 
 message("### Moving assets next to binary dir ####")
 add_custom_command(

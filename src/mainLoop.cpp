@@ -90,17 +90,21 @@ void MainLoop::run() {
 }
 
 //! Shows fps on window title, update rate in ms
-void MainLoop::updateFpsCounter(uint32_t _updateRateMs){
+void MainLoop::updateFpsCounter(double _updateRateMs){
     using namespace std::chrono;
-    if ((int)(glfwGetTime()*1000)%_updateRateMs == 0.0) {
+    static double counter;
+    static std::once_flag flag;
+    std::call_once(flag, [](double& c){c = 1.0;},counter);
+
+    if(counter >= _updateRateMs/1000) {
+        counter = 0;
         std::stringstream sstr;
-        sstr << windowName<<"  |  FPS : " << std::fixed << 
+        sstr << windowName <<"  |  FPS : " << std::fixed << 
         std::setprecision(1) << 1/deltaTime;
 
-        std::string titleStr = sstr.str();
-        const char* title = (char*)titleStr.c_str();
-        glfwSetWindowTitle(window, title);
+        glfwSetWindowTitle(window, sstr.str().c_str());
     }
+    counter += deltaTime;
 }
 
 // end of render loop

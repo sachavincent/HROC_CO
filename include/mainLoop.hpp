@@ -2,6 +2,7 @@
 #define MAINLOOP_H
 
 #include <chrono>
+#include <mutex>
 
 #include "scene.hpp"
 #include "ui.hpp"
@@ -27,7 +28,7 @@ private:
 
     std::string windowName = "HROC App";
 
-    void updateFpsCounter(uint32_t _updateRateMs);
+    void updateFpsCounter(double _updateRateMs);
 
 public:
     /**

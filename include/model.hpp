@@ -6,7 +6,6 @@
 #include "headers.hpp"
 #include "shader.hpp"
 #include "light.hpp"
-#include "ssao.hpp"
 #include "camera.hpp"
 #include "utils.hpp"
 

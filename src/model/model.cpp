@@ -73,7 +73,6 @@ void Model::load(){
 
 void Model::render(Scene* _scene)  {
 	Camera& cam = _scene->getCam();
-	SSAO* ssao =  _scene->getSSAO();
 	std::vector<Light*>& lights =  _scene->getLights();
 
     m.shader.use();
@@ -141,18 +140,6 @@ void Model::render(Scene* _scene)  {
 		m.shader.setFloat("dispStrength", m.displacementStrength);
         glBindTexture(GL_TEXTURE_2D, m.heightMap);
     } else {
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
-
-	// bind SSAO texture if enabled
-	glActiveTexture(GL_TEXTURE4);
-	if (_scene->SSAOstatus()){
-		glBindTexture(GL_TEXTURE_2D, ssao->getSSAOBlurTexture());
-		m.shader.setInt("SSAOTexture", 4);
-		m.shader.setBool("SSAOenabled", true);
-	} else {
-		m.shader.setBool("SSAOenabled", false);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

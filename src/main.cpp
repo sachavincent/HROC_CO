@@ -19,8 +19,7 @@ int main(int argc, char* argv[]) {
     Camera cam{glm::vec3{0,4,-8}, 50.0f, windowWidth, windowHeight};
 
     Scene scene{cam};
-    // enable SSAO for this scene
-    scene.setSSAO(false).setExposure(1.0);
+    scene.setExposure(1.0);
 
 
     // ######################### adding lights ###########################

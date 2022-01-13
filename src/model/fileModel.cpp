@@ -179,7 +179,6 @@ void FileModel::load(){
 
 void FileModel::render(Scene* _scene)  {
 	Camera& cam = _scene->getCam();
-	SSAO* ssao =  _scene->getSSAO();
 	std::vector<Light*>& lights =  _scene->getLights();
 	for(auto& subModel : subModels){
 		
@@ -211,16 +210,6 @@ void FileModel::render(Scene* _scene)  {
 			sh.setFloat("material.roughness", subModel.roughness);
 			sh.setFloat("material.metallic",subModel.metallic);
 		}	
-
-		// bind SSAO texture if enabled
-		if (_scene->SSAOstatus()){
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, ssao->getSSAOBlurTexture());
-			sh.setInt("SSAOTexture", 0);
-			sh.setBool("SSAOenabled",true);
-		} else {
-			sh.setBool("SSAOenabled", false);
-		}
 
 		// point lights properties
 		int j = 0;

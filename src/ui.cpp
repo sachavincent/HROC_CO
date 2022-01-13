@@ -23,10 +23,7 @@ void Ui::render(Scene* _scene){
     ImGui::NewFrame();
 
     ImGui::Begin("Scene parameters");
-    bool oldSSAOstatus = SSAOstatus;
-    ImGui::Checkbox("SSAO Technique",&SSAOstatus);
-    if(SSAOstatus!=oldSSAOstatus)
-        scene->setSSAO(SSAOstatus);
+
     float exposure = scene->getExposure();
     ImGui::DragFloat("exposure",&exposure,0.01,0.01,10.0);
     scene->setExposure(exposure);

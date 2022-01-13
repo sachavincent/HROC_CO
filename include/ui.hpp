@@ -15,7 +15,6 @@ private:
     float nlMult;
     bool staticmultSet = false;
     bool smEnabled;
-    bool SSAOstatus = true;
 
     void lightsParams();
     void objectsParams();

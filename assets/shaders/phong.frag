@@ -50,9 +50,6 @@ uniform vec2 screenSize;
 uniform float exposure;
 uniform vec2 texScaling;
 
-// SSAO
-uniform bool SSAOenabled;
-uniform sampler2D SSAOTexture;
 
 uniform sampler2D shadowMap[5];
 
@@ -118,15 +115,13 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular = light.specular * spec * specularColor *vec3(material.specularStrength);
 
 
-    if(SSAOenabled){
-        float AOfactor;
-        if(material.hasAOMap){
-            AOfactor = texture(material.AOmap,TexCoords_in).r;
-        } else {
-            AOfactor = texture(SSAOTexture,vec2(gl_FragCoord.x/screenSize.x,gl_FragCoord.y/screenSize.y)).r;
-        }
-        ambient *= vec3(AOfactor);
-    }
+  
+    float AOfactor = 1.0;
+    if(material.hasAOMap){
+        AOfactor = texture(material.AOmap,TexCoords_in).r;
+    } 
+    ambient *= vec3(AOfactor);
+
 
     // calculate attenuation ( constant < 0 to bypass) and distant light have no falloff
     if (light.shadowMapId<0 || !light.distant){

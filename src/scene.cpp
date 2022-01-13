@@ -5,9 +5,6 @@ Scene::Scene(Camera& _cam) : cam(_cam) {
     lights = {};
 }
 
-Scene::~Scene(){
-    delete ssao;
-}
 
 //! Load the scene models on GPU before rendering
 void Scene::load() {
@@ -24,8 +21,6 @@ void Scene::load() {
     for (uint32_t i = 0; i < models.size(); i++) {
         models[i]->load();
     }
-    //load ssao
-    if(ssaoEnabled) ssao = new SSAO{cam};
 }
 
 //! render cubeMap, this is the first object to render
@@ -57,19 +52,6 @@ void Scene::depthMaps_pass() {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
     }
-}
-
-void Scene::SSAO_Pass(){
-    if(ssaoEnabled){
-        Shader& sh = ssao->setupGeometryPass(cam);
-        renderModelsWithShader(sh);
-        ssao->SSAOPass(cam);
-        ssao->blurPass();
-    }
-}
-
-bool Scene::SSAOstatus(){
-    return ssaoEnabled;
 }
 
 //! Render all objects of scene

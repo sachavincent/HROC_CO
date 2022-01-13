@@ -78,7 +78,6 @@ void MainLoop::run() {
 
         scene.renderCubeMap();
 
-        scene.SSAO_Pass();
         // final rendering of scene
         scene.renderModels();
 

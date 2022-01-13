@@ -47,9 +47,6 @@ uniform vec2 screenSize;
 uniform float exposure;
 uniform vec2 texScaling;
 
-// SSAO
-uniform bool SSAOenabled;
-uniform sampler2D SSAOTexture;
 
 uniform sampler2D shadowMap[5];
 
@@ -95,13 +92,9 @@ void main()
         metallic = material.metallic;
     }
 
-    if(SSAOenabled){
-        if(material.hasAOMap){
-            AO = texture(material.AOmap,TexCoords_in*texScaling).r;
-        } else {
-            vec2 ScreenCoords = vec2(gl_FragCoord.x/screenSize.x,gl_FragCoord.y/screenSize.y);
-            AO = texture(SSAOTexture,ScreenCoords).r;
-        }
+    
+    if(material.hasAOMap){
+        AO = texture(material.AOmap,TexCoords_in*texScaling).r;
     } else {
         AO = 1.0;
     }

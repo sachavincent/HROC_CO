@@ -20,7 +20,7 @@ public:
     vec3 getSize();
     vec3 getCenter();
     // abstraite
-    BoundingBox merge(BoundingBox &A);
+    BoundingBox merge(BoundingBox &A){return *this;};
     static float distance(BoundingBox &A, BoundingBox &B);
 };
 

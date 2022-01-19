@@ -22,18 +22,18 @@ class BvhNode
 private:
     NodeType type;
     Visiblity tag;
-    BvhNode &leftChild;
-    BvhNode &rightChild;
-    BvhNode &parent;
-    BoundingBox &boundingBox;
+    BvhNode * leftChild;
+    BvhNode * rightChild;
+    BvhNode * parent;
+    BoundingBox * boundingBox;
 
 public:
     BvhNode(BoundingBox &bb);
-    BvhNode leftChild();
-    BvhNode rightChild();
+    BvhNode getLeftChild();
+    BvhNode getRightChild();
     BvhNode sibling();
-    BvhNode parent();
-    BvhNode getChild(NodeType &type);
+    BvhNode getParent();
+    BvhNode getChild(const NodeType &type);
     void setType(NodeType &type);
     bool isRoot();
     BoundingBox getBoundingBox();

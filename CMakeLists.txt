@@ -1,25 +1,29 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.2)
+
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 project(HROC_APP)
 
 set(ZLIB_LIBRARIES zlibstatic)
-set(ENABLE_BOOST_WORKAROUND OFF)
+set(ENABLE_BOOST_WORKAROUND ON)
 set(ASSIMP_BUILD_SAMPLES OFF)
+set(ASSIMP_BUILD_ZLIB ON)
 set(BUILD_ASSIMP_TOOLS  OFF)
 set(ASSIMP_BUILD_DOCS OFF)
 set(ASSIMP_BUILD_STATIC_LIB ON)
 set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL_PDB OFF)
+set(BUILD_SHARED_LIBS OFF)
+add_subdirectory(external/assimp)
 
-option(GLFW_BUILD_DOCS OFF)
-option(GLFW_BUILD_EXAMPLES OFF)
-option(GLFW_BUILD_TESTS OFF)
-
+set(GLFW_BUILD_DOCS OFF)
+set(GLFW_BUILD_EXAMPLES OFF)
+set(GLFW_BUILD_TESTS OFF)
+set(BUILD_SHARED_LIBS OFF)
+add_subdirectory(external/glfw)
 #set(gtest_force_shared_crt 1 CACHE BOOL "")
 
-add_subdirectory(external/glfw)
-add_subdirectory(external/assimp)
 add_subdirectory(external/googletest)
 
 add_subdirectory(test)

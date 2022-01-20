@@ -88,10 +88,10 @@ void Model::render(Scene* _scene)  {
 	m.shader.setFloat("exposure",_scene->getExposure());
     m.shader.setVec2("texScaling" , m.texScaling);
 	
-	if(m.shaderType == PHONG){
-		m.shader.setFloat("material.specularStrength", 0.5f);
-		m.shader.setFloat("material.shininess", m.shininess);
-	}
+	
+	m.shader.setFloat("material.specularStrength", 0.5f);
+	m.shader.setFloat("material.shininess", m.shininess);
+	
 	
 	// bind diffuse/albedo texture
 	glActiveTexture(GL_TEXTURE0);
@@ -119,18 +119,8 @@ void Model::render(Scene* _scene)  {
 	}
 	//bind mellatlic texture (if PBR)
 	glActiveTexture(GL_TEXTURE2);
-	if(m.shaderType == PBR){
-		if(m.metallicMap != -1){
-			m.shader.setBool("material.hasMetallicTex",true);
-			m.shader.setInt("material.metallicTex", 2);
-			glBindTexture(GL_TEXTURE_2D, m.metallicMap);
-		} else {
-			m.shader.setFloat("material.metallic",m.metallic);
-			m.shader.setBool("material.hasMetallicTex",false);
-		}
-	} else {
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	
 
 	// bind displacement map texture
@@ -187,18 +177,15 @@ void Model::render(Scene* _scene)  {
 		m.shader.setBool("lights["+   std::to_string(i) + "].enabled",1);
 
         m.shader.setVec3("lights["+   std::to_string(i) + "].position",  lights[i]->getPos());
-		if(m.shaderType == PHONG){
-			m.shader.setVec3("lights[" +  std::to_string(i) + "].ambient",   lights[i]->getAmbiant());
-	    	m.shader.setVec3("lights[" +  std::to_string(i) + "].diffuse",   lights[i]->getDiffuse());
-	    	m.shader.setVec3("lights[" +  std::to_string(i) + "].specular",  lights[i]->getSpecular());
 
-	    	m.shader.setFloat("lights[" + std::to_string(i) + "].constant",  lights[i]->getConstant());
-	    	m.shader.setFloat("lights[" + std::to_string(i) + "].linear",    lights[i]->getLinear());
-	    	m.shader.setFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
-		} 
-		else if (m.shaderType == PBR){
-			m.shader.setVec3("lights[" +  std::to_string(i) + "].color",   lights[i]->getDiffuse());
-		}
+		m.shader.setVec3("lights[" +  std::to_string(i) + "].ambient",   lights[i]->getAmbiant());
+	    m.shader.setVec3("lights[" +  std::to_string(i) + "].diffuse",   lights[i]->getDiffuse());
+	    m.shader.setVec3("lights[" +  std::to_string(i) + "].specular",  lights[i]->getSpecular());
+
+	    m.shader.setFloat("lights[" + std::to_string(i) + "].constant",  lights[i]->getConstant());
+	    m.shader.setFloat("lights[" + std::to_string(i) + "].linear",    lights[i]->getLinear());
+	    m.shader.setFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
+	
         
     }
 	if (lights.size()<MAXLIGHTS){
@@ -206,30 +193,11 @@ void Model::render(Scene* _scene)  {
 			m.shader.setBool("lights["+   std::to_string(i) + "].enabled",0);
 		}
 	}
-	
-	if(m.tqual != DISABLED){
-		if(m.tqual == LOW){
-				m.shader.setInt("tes_lod0", 16); //under 2 unit distance
-				m.shader.setInt("tes_lod1", 4); //2 to 5 distance
-				m.shader.setInt("tes_lod2", 2);  // farther than 5
-			} else if (m.tqual == MEDIUM){
-				m.shader.setInt("tes_lod0", 32); //under 2 unit distance
-				m.shader.setInt("tes_lod1", 8); //2 to 5 distance
-				m.shader.setInt("tes_lod2", 2);  // farther than 5
-			} else if(m.tqual == HIGH){
-				m.shader.setInt("tes_lod0", 64); //under 2 unit distance
-				m.shader.setInt("tes_lod1", 16); //2 to 5 distance
-				m.shader.setInt("tes_lod2", 4);  // farther than 5
-			}
-	} 
 
     glBindVertexArray(m.vao);
     
-	if(m.tqual != DISABLED){
-		glDrawElements(GL_PATCHES , m.indices.size(), GL_UNSIGNED_INT, nullptr);
-	} else {
-		glDrawElements(GL_TRIANGLES , m.indices.size(), GL_UNSIGNED_INT, nullptr);
-	}
+	glDrawElements(GL_TRIANGLES , m.indices.size(), GL_UNSIGNED_INT, nullptr);
+	
 	glBindVertexArray(0);
 
 }
@@ -249,27 +217,7 @@ void Model::renderForDepth(Shader& _shader){
 }
 
 void Model::loadShaders(){
-	std::string frag;
-	if(m.shaderType == PHONG){
-		frag = "shaders/phong.frag";
-	} else if (m.shaderType == PBR){
-		frag = "shaders/pbr.frag";
-	}
-	// load right shader
-	if(m.tqual != DISABLED){
-		if (m.heightMapPath != ""){
-			m.shader = {"shaders/tessellation/tess.vert", frag,
-				 "shaders/tessellation/tessBump.tesc",
-				 "shaders/tessellation/tessBump.tese"};
-		} else {
-			m.shader = {"shaders/tessellation/tess.vert", frag,
-				 "shaders/tessellation/tessPN.tesc",
-				 "shaders/tessellation/tessPN.tese"};
-		}
-		
-	} else {
-		m.shader = {"shaders/default.vert", frag};
-	}
+	m.shader = {"shaders/default.vert", "shaders/phong.frag"};
 }
 
 
@@ -327,7 +275,6 @@ Model& Model::setTexMetallic(std::string _path){
 
 Model& Model::setTexHeight( std::string _heightPath){
     m.heightMapPath = _heightPath;
-    m.tqual = MEDIUM;
     return *this;
 }
 
@@ -341,19 +288,6 @@ Model& Model::setTexAO( std::string _AOPath){
     return *this;
 }
 
-Model& Model::enableTesselation(TESS_QUALITY _quality){
-    m.tqual = _quality;
-    return *this;
-}
-
-Model& Model::enableTesselation(){
-    m.tqual = MEDIUM;
-    return *this;
-}
-Model& Model::disableTesselation(){
-    m.tqual = DISABLED;
-    return *this;
-}
 
 Model& Model::setDiffuse(glm::vec3 _color){
 	m.diffuseColor = _color;
@@ -388,12 +322,4 @@ Model& Model::displacementStrength(float _strength){
 Model& Model::setTexScaling( glm::vec2 _scale){
     m.texScaling = _scale;
     return *this;
-}
-
-Model& Model::setShaderType(SHADER_TYPE _type){
-	m.shaderType = _type;
-	if(m.shaderLoaded){
-		loadShaders();
-	}
-	return *this;
 }

@@ -18,60 +18,6 @@ const char* Shader::loadShader(std::string path) {
 
 }
 
-Shader::Shader(std::string vertexPath, std::string fragmentPath,
-		std::string tessControlPath, std::string tessEvalPath) {
-	
-	const char* vs_src = loadShader(vertexPath);
-	const char* fs_src = loadShader(fragmentPath);
-	const char* tc_src = loadShader(tessControlPath);
-	const char* te_src = loadShader(tessEvalPath);
-
-	//vertex shader creation and compilation
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vs_src, NULL);
-	glCompileShader(vertexShader);
-
-	//fragment shader creation and compilation
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fs_src, NULL);
-	glCompileShader(fragmentShader);
-	
-	//tesselation control shader
-	unsigned int tessCtlShader;
-	tessCtlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
-	glShaderSource(tessCtlShader, 1, &tc_src, NULL);
-	glCompileShader(tessCtlShader);
-
-	// tesselation evaluation shader
-	unsigned int tessEvalShader;
-	tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
-	glShaderSource(tessEvalShader, 1, &te_src, NULL);
-	glCompileShader(tessEvalShader);
-
-	//shader program creation
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glAttachShader(shaderProgram, tessCtlShader);
-	glAttachShader(shaderProgram, tessEvalShader);
-	glLinkProgram(shaderProgram);
-
-	//shader program creation
-	glUseProgram(shaderProgram);
-
-	//temp shader deletion
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	glDeleteShader(tessCtlShader);
-	glDeleteShader(tessEvalShader);
-
-	ID = shaderProgram;
-}
-
-
 Shader::Shader(std::string vertexPath, std::string fragmentPath) {
 	const char* vertexShaderSource = loadShader(vertexPath);
 	const char* fragmentShaderSource = loadShader(fragmentPath);

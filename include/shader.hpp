@@ -26,10 +26,6 @@ private:
 public:
 	unsigned int ID;
 	Shader(){};
-	// with tesselation shader
-	Shader(std::string vertexPath, std::string fragmentPath,
-		std::string tessControlPath, std::string tessEvalPath);
-	// without tesselation
 	Shader(std::string vertexPath, std::string fragmentPath);
 
 	void use();

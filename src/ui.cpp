@@ -147,67 +147,17 @@ void Ui::objectsParams(){
         ImGui::DragFloat3("Scale",&scale[0],0.01,0.01,10.0);
         model->setScale(scale);
 
-        // diffuse
-        if(model->getShaderType() == PHONG){
-            glm::vec3 diffuse = model->getDiffuse();
-            ImGui::ColorEdit3("Diffuse",&diffuse[0]);
-            model->setDiffuse(diffuse);
-            glm::vec3 specular = model->getSpecular();
-            ImGui::ColorEdit3("Specular",&specular[0]);
-            model->setSpecular(specular);
-            float shininess = model->getShininess();
-            ImGui::DragFloat("Shininess",&shininess,1.0,5.0,256.0);
-            model->setShininess(shininess);
-        } 
-        else if (model->getShaderType() == PBR){
-            glm::vec3 albedo = model->getDiffuse();
-            ImGui::ColorEdit3("Albedo",&albedo[0]);
-            model->setDiffuse(albedo);
-            float roughness = model->getRoughness();
-            ImGui::DragFloat("Roughness",&roughness,0.01,0.00,1.0);
-            model->setRoughness(roughness);
-            float metallic = model->getMetallic();
-            ImGui::DragFloat("Metallic",&metallic,0.01,0.00,1.0);
-            model->setMetallic(metallic);
-        }
 
-        // tessellation
-        ImGui::Text("Tessellation Parameters:");
-        TESS_QUALITY tqual = model->getTesselationStatus();
-
-        ImGui::Text("Presets:");
-        std::string textBtn = std::string("Disabled");
-        (tqual==DISABLED)?ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(32,32,128,255)):0;
-        if(ImGui::Button(textBtn.c_str())){
-            model->enableTesselation(DISABLED);
-            model->loadShaders();
-        }
-        (tqual==DISABLED)?ImGui::PopStyleColor():0;
-
-        textBtn = std::string("Low");
-        (tqual==LOW)?ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(32,32,128,255)):0;
-        if(ImGui::Button(textBtn.c_str())){
-            model->enableTesselation(LOW);
-            model->loadShaders();
-        }
-        (tqual==LOW)?ImGui::PopStyleColor():0;
-
-        textBtn = std::string("Medium");
-        (tqual==MEDIUM)?ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(32,32,128,255)):0;
-        if(ImGui::Button(textBtn.c_str())){
-            model->enableTesselation(MEDIUM);
-            model->loadShaders();
-        }
-        (tqual==MEDIUM)?ImGui::PopStyleColor():0;
-
-
-        textBtn = std::string("High");
-        (tqual==HIGH)?ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(32,32,128,255)):0;
-        if(ImGui::Button(textBtn.c_str())){
-            model->enableTesselation(HIGH);
-            model->loadShaders();
-        }
-        (tqual==HIGH)?ImGui::PopStyleColor():0;
+        glm::vec3 diffuse = model->getDiffuse();
+        ImGui::ColorEdit3("Diffuse",&diffuse[0]);
+        model->setDiffuse(diffuse);
+        glm::vec3 specular = model->getSpecular();
+        ImGui::ColorEdit3("Specular",&specular[0]);
+        model->setSpecular(specular);
+        float shininess = model->getShininess();
+        ImGui::DragFloat("Shininess",&shininess,1.0,5.0,256.0);
+        model->setShininess(shininess);
+        
 
         ImGui::Text("Texture Parameters:");
         if(model->hasTextures()){

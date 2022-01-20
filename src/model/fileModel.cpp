@@ -200,16 +200,12 @@ void FileModel::render(Scene* _scene)  {
 		sh.setBool("material.hasMetallicTex",false);
 
 		
-		if(subModel.shaderType == PHONG){
-			sh.setFloat("material.specularStrength", 1.0f);
-			sh.setFloat("material.shininess", subModel.shininess);
-			sh.setVec3("material.diffuse", subModel.diffuseColor);
-			sh.setVec3("material.specular", subModel.specularColor);
-		} else if (subModel.shaderType == PBR){
-			sh.setVec3("material.albedo", subModel.diffuseColor);
-			sh.setFloat("material.roughness", subModel.roughness);
-			sh.setFloat("material.metallic",subModel.metallic);
-		}	
+		
+		sh.setFloat("material.specularStrength", 1.0f);
+		sh.setFloat("material.shininess", subModel.shininess);
+		sh.setVec3("material.diffuse", subModel.diffuseColor);
+		sh.setVec3("material.specular", subModel.specularColor);
+
 
 		// point lights properties
 		int j = 0;
@@ -236,7 +232,7 @@ void FileModel::render(Scene* _scene)  {
 			sh.setBool("lights["+   std::to_string(i) + "].enabled",1);
 
     	    sh.setVec3("lights["+   std::to_string(i) + "].position",  lights[i]->getPos());
-			if(subModel.shaderType == PHONG){
+			
     	    sh.setVec3("lights[" +  std::to_string(i) + "].ambient",   lights[i]->getAmbiant());
 		    sh.setVec3("lights[" +  std::to_string(i) + "].diffuse",   lights[i]->getDiffuse());
 		    sh.setVec3("lights[" +  std::to_string(i) + "].specular",  lights[i]->getSpecular());
@@ -244,10 +240,7 @@ void FileModel::render(Scene* _scene)  {
 		    sh.setFloat("lights[" + std::to_string(i) + "].constant",  lights[i]->getConstant());
 		    sh.setFloat("lights[" + std::to_string(i) + "].linear",    lights[i]->getLinear());
 		    sh.setFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
-			} 
-			else if (subModel.shaderType == PBR){
-				sh.setVec3("lights[" +  std::to_string(i) + "].color",   lights[i]->getDiffuse());
-			}
+			
 		}
 		if (lights.size()<MAXLIGHTS){
 			for (size_t i = lights.size(); i<MAXLIGHTS; i++){
@@ -255,31 +248,11 @@ void FileModel::render(Scene* _scene)  {
 			}
 		}
 
-		if(subModel.tqual != DISABLED){
-			//level of detail based on distance , adapts to any triangle size
-			if(subModel.tqual == LOW){
-				sh.setInt("tes_lod0", 16); //under 2 unit distance
-				sh.setInt("tes_lod1", 4); //2 to 5 distance
-				sh.setInt("tes_lod2", 2);  // farther than 5
-			} else if (subModel.tqual == MEDIUM){
-				sh.setInt("tes_lod0", 32); //under 2 unit distance
-				sh.setInt("tes_lod1", 8); //2 to 5 distance
-				sh.setInt("tes_lod2", 2);  // farther than 5
-			} else if(subModel.tqual == HIGH){
-				sh.setInt("tes_lod0", 64); //under 2 unit distance
-				sh.setInt("tes_lod1", 16); //2 to 5 distance
-				sh.setInt("tes_lod2", 4);  // farther than 5
-			}
-		}
 		
     	glBindVertexArray(subModel.vao);
 		
-		if(subModel.tqual != DISABLED){
-			glDrawElements( GL_PATCHES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
-		} else {
-			glDrawElements( GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
-		}
-    	
+		glDrawElements( GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
+		
 		glBindVertexArray(0);
 	}
 }
@@ -299,21 +272,9 @@ void FileModel::renderForDepth(Shader& _shader){
 }
 
 void FileModel::loadShaders(modelDescription& model){
-	// load right shader
-	std::string frag;
-	if(model.shaderType == PHONG){
-		frag = "shaders/phong.frag";
-	} else if (model.shaderType == PBR){
-		frag = "shaders/pbr.frag";
-	}
-	if(model.tqual != DISABLED){
-		model.shader = {"shaders/tessellation/tess.vert",frag,
-				 	"shaders/tessellation/tessPN.tesc",
-				 	"shaders/tessellation/tessPN.tese"};
-		
-	} else {
-		model.shader = {"shaders/default.vert", frag};
-	}
+
+	model.shader = {"shaders/default.vert", "shaders/phong.frag"};
+
 }
 
 void FileModel::loadShaders(){
@@ -383,33 +344,6 @@ FileModel& FileModel::setMetallic(float _metallic){
 	return *this;
 }
 
-FileModel& FileModel::enableTesselation(){
-	for(auto& subModel : subModels){
-    	subModel.tqual = MEDIUM;
-	}
-    return *this;
-}
-
-FileModel& FileModel::disableTesselation(){
-	for(auto& subModel : subModels){
-    	subModel.tqual = DISABLED;
-	}
-    return *this;
-}
-
-FileModel& FileModel::enableTesselation(TESS_QUALITY _quality){
-	for(auto& subModel : subModels){
-		subModel.tqual = _quality;
-	}
-    return *this;
-}
-
-FileModel& FileModel::setShaderType(SHADER_TYPE _type){
-	for(auto& subModel : subModels){
-		subModel.shaderType = _type;
-	}
-	return *this;
-}
 
 FileModel& FileModel::setShininess(float _shininess){
 	for(auto& subModel : subModels){

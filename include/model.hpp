@@ -13,14 +13,6 @@
 #include <vector>
 #include <string>
 
-
-enum TESS_QUALITY{
-    DISABLED,
-    LOW,
-    MEDIUM,
-    HIGH
-};
-
 typedef enum {
     SMOOTH_NORMAL_ENABLE = true,
     SMOOTH_NORMAL_DISABLE = false
@@ -43,7 +35,6 @@ protected:
         // shading
         Shader shader;
         bool shaderLoaded = false;
-        SHADER_TYPE shaderType = PHONG;
 
         std::string shaderVertPath = "";
         std::string shaderFragPath = "";
@@ -78,8 +69,6 @@ protected:
         float displacementStrength = 0.01f;
 
         glm::mat4 scale, rotation, translate;
-
-        TESS_QUALITY tqual = DISABLED;
     };
 
     modelDescription m;
@@ -105,7 +94,6 @@ public:
     virtual Model& setRotation(float _angle, glm::vec3 _axis);
     virtual Model& setPosition(glm::vec3 _pos);
 
-    //! Set textures for this model. When bump map is given, tesselation is enabled automatically.
     Model& setTexDiffuse(std::string _path);
     Model& setTexSpecular(std::string _path);
 
@@ -118,15 +106,6 @@ public:
     Model& setTexAO( std::string _path);
 
     virtual Model& setTexScaling( glm::vec2 _scale);
-    virtual Model& setShaderType(SHADER_TYPE _type);
-
-    //! Enable tessellation for this model default quality = medium
-    virtual Model& enableTesselation();
-    //! Enable tessellation for this model with set \param _quality
-
-    virtual Model& enableTesselation(TESS_QUALITY _quality);
-    //! Disable tessellation for this model.
-    virtual Model& disableTesselation();
 
     //! Set color of object (unused if textures are defined)
     virtual Model& setDiffuse(glm::vec3 _color);
@@ -145,10 +124,8 @@ public:
     virtual float getShininess() {return m.shininess;}
     virtual glm::vec2 getTexScaling(){return m.texScaling;}
     virtual std::string getName() = 0;
-    virtual TESS_QUALITY getTesselationStatus(){return m.tqual;}
     virtual bool hasTextures(){return m.diffuseMap != -1;}
 
-    virtual SHADER_TYPE getShaderType(){return m.shaderType;}
 
     //! Set the displacement mutiplier factor to control displacement amount
     Model& displacementStrength(float _strength);
@@ -189,10 +166,6 @@ public:
     FileModel& setPosition(glm::vec3 _pos);
     FileModel& setDiffuse(glm::vec3 _color);
     FileModel& setSpecular(glm::vec3 _color);
-    FileModel& enableTesselation();
-    FileModel& disableTesselation();
-    FileModel& enableTesselation(TESS_QUALITY _quality);
-    FileModel& setShaderType(SHADER_TYPE _type);
     FileModel& setRoughness(float _roughness);
     FileModel& setMetallic(float _metallic);
     FileModel& setAlbedo(glm::vec3 _color);
@@ -208,8 +181,6 @@ public:
     float getRoughness(){return subModels[0].roughness;}
     float getMetallic(){return subModels[0].metallic;}
     float getShininess() {return subModels[0].shininess;}
-    SHADER_TYPE getShaderType(){return subModels[0].shaderType;}
-    virtual TESS_QUALITY getTesselationStatus(){return subModels[0].tqual;}
     bool hasTextures(){return false;}
 
 };

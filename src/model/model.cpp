@@ -153,21 +153,8 @@ void Model::render(Scene* _scene)  {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	
-	int j = 0;
     for(uint32_t i = 0; i<std::min(lights.size(),(size_t)MAXLIGHTS); i++){
-		if(lights[i]->hasShadowMap()){
-			glActiveTexture(GL_TEXTURE7+j);
-			DistantLight* li = dynamic_cast<DistantLight*>(lights[i]);
-			glBindTexture(GL_TEXTURE_2D, li->getDepthTexture());
 
-			m.shader.setMat4("lightSpaceMatrix["+std::to_string(j)+"]", li->getLightSpacematrix());
-			m.shader.setInt("shadowMap["+std::to_string(j)+"]", 7+j);
-			m.shader.setInt("lights["+   std::to_string(i) + "].shadowMapId", j);
-			j++;
-		} else {
-			m.shader.setInt("lights["+   std::to_string(i) + "].shadowMapId", -1);
-		}
 		if(lights[i]->isDistant()){
 			m.shader.setBool("lights["+   std::to_string(i) + "].distant",true);
 		} else {

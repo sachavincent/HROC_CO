@@ -26,7 +26,6 @@ public:
 
     void load();
     void renderCubeMap();
-    void depthMaps_pass();
     void renderModels();
 
     

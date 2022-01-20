@@ -73,8 +73,6 @@ void MainLoop::run() {
         // cubemap is rendered first
         
         scene.setCamera(cam);
-        // step for shadow maps
-        scene.depthMaps_pass();
 
         scene.renderCubeMap();
 

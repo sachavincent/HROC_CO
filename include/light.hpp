@@ -61,10 +61,8 @@ class Light {
     float getQuadratic() { return quadratic; }
     std::string getName(){return name;}
 
-    virtual bool hasShadowMap() = 0;
     virtual bool isDistant() = 0;
 };
-
 
 
 class PointLight : public Light {
@@ -91,32 +89,14 @@ class PointLight : public Light {
         position = _pos;
     }
 
-    bool hasShadowMap() {return false;}
     bool isDistant(){return false;}
 };
 
 class DistantLight : public Light {
-   private:
-    // shadow map
-    bool shadowMapEnabled = false;
-    uint32_t depthTexture;
-    uint32_t textureRes;
-    uint32_t fbo;
-    float domainSize;
-
+private:
     glm::mat4 lightSpaceMatrix;
 
-    void updateLightMatrix(){
-        glm::mat4 projection =
-                glm::ortho(-domainSize, domainSize, -domainSize, domainSize, 0.1f, domainSize*2);
-        glm::mat4 view = glm::lookAt(glm::normalize(position)*(domainSize/2), glm::vec3(0.0f),
-                                         glm::vec3(0.0, 1.0, 0.0));
-
-        lightSpaceMatrix = projection * view;
-    }
-
-   public:
-  
+public:
     DistantLight(glm::vec3 _position, glm::vec3 _color) {
         name = "DistantLight_"+std::to_string(instance);
         position = 10000.0f*glm::normalize(_position);
@@ -129,79 +109,15 @@ class DistantLight : public Light {
         linear = -1.0f;
         quadratic = -1.0f;
 
-        updateLightMatrix();
     }
     
     DistantLight(const DistantLight& l) : Light(l,"DistantLight_") {}
     ~DistantLight(){};
 
-    DistantLight& enableShadowMap(int _resolution,float _domainSize) {
-        shadowMapEnabled = true;
-        textureRes = _resolution;
-        domainSize = _domainSize;
-
-        updateLightMatrix();
-        return *this;
-    }
-
-    DistantLight& disableShadowMap() {
-        shadowMapEnabled = false;
-        return *this;
-    }
-
-    
-
-    DistantLight& updateShadowMap(int _resolution,float _domainSize,bool _shadowMapEnabled) {
-        shadowMapEnabled = _shadowMapEnabled;
-        textureRes = _resolution;
-        domainSize = _domainSize;
-
-        if(shadowMapEnabled){
-            updateLightMatrix();
-            createDepthBuffer();
-        }
-        return *this;
-    }
-
-
-    void createDepthBuffer() {
-        glGenFramebuffers(1, &fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-        // create depth texture
-        glGenTextures(1, &depthTexture);
-        glBindTexture(GL_TEXTURE_2D, depthTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, textureRes,
-                     textureRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture,
-                             0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    uint32_t getDepthTexture() { return depthTexture; }
-
-    bool hasShadowMap() { return shadowMapEnabled; }
-    
-    uint32_t getSMRes() { return textureRes; }
-
-    float getSMDomainSize() { return domainSize; }
-    
-    uint32_t getFbo(){return fbo;}
-
-    glm::mat4 getLightSpacematrix(){
-        return lightSpaceMatrix;
-    }
-
     void setPosition(glm::vec3 _pos){
         position = 10000.0f*glm::normalize(_pos);
-        updateLightMatrix();
     }
+
     bool isDistant(){return true;}
 };
 

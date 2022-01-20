@@ -207,22 +207,8 @@ void FileModel::render(Scene* _scene)  {
 		sh.setVec3("material.specular", subModel.specularColor);
 
 
-		// point lights properties
-		int j = 0;
     	for(uint32_t i = 0; i<std::min(lights.size(),(size_t)MAXLIGHTS); i++){
-			if(lights[i]->hasShadowMap()){
-				glActiveTexture(GL_TEXTURE1+j);
-				DistantLight* li = dynamic_cast<DistantLight*>(lights[i]);
-				glBindTexture(GL_TEXTURE_2D, li->getDepthTexture());
-
-				sh.setMat4("lightSpaceMatrix["+std::to_string(j)+"]", li->getLightSpacematrix());
-				sh.setInt("shadowMap["+std::to_string(j)+"]", 1+j);
-				sh.setInt("lights["+   std::to_string(i) + "].shadowMapId", j);
-				j++;
-			} else {
-				sh.setInt("lights["+   std::to_string(i) + "].shadowMapId", -1);
-			}
-
+		
 			if(lights[i]->isDistant()){
 				sh.setBool("lights["+   std::to_string(i) + "].distant",1);
 			} else {

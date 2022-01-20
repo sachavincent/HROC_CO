@@ -89,19 +89,6 @@ void Ui::lightsParams(){
         }
         light->setPosition({pos[0],pos[1],pos[2]});
         
-        //shadowmap params
-        if(light->isDistant()){
-            DistantLight* dl = dynamic_cast<DistantLight*>(light);
-            if(light->hasShadowMap()){
-                int res = dl->getSMRes();
-                int res_tmp = res;
-                ImGui::DragInt("ShadowMap Res", &res,32,128,4096);
-                if(res_tmp != res){
-                    dl->updateShadowMap(res,10.0,true);
-                }
-            }
-        }
-        
         // delete the light
         ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255,30,30,255));
         std::string deltext = "Delete "+ light->getName();
@@ -210,22 +197,13 @@ void Ui::newPointLight(){
 void Ui::newDistantLight(){
     static glm::vec3 nlPos;
     static glm::vec3 nlColor;
-    static bool shadowMap;
-    static int shadowMapRes;
 
     ImGui::DragFloat3("Incoming Position",&nlPos[0],0.01,-1.0,1.0);
     ImGui::DragFloat("Light Power Multiplier",&nlMult,0.1,0.0,100.0);
     ImGui::ColorEdit3("Color",&nlColor[0]);
-    ImGui::Checkbox("Enable Shadow Map", &shadowMap);
-    if(shadowMap){
-        ImGui::DragInt("resolution",&shadowMapRes,32,256,4096);
-    }
 
     if(ImGui::Button("Add")){
         DistantLight* dl = new DistantLight{nlPos,nlColor*nlMult};
-        if(shadowMap){
-            dl->updateShadowMap(shadowMapRes,10.0f,true);
-        }
             
         scene->addLight(*dl);
         newLightWindowActive = false;

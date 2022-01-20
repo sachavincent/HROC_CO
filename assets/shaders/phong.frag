@@ -27,8 +27,7 @@ struct Material {
 
 struct Light {  
     bool enabled;
-    bool distant;
-    int shadowMapId;   
+    bool distant;  
     vec3 position; 
 
     vec3 ambient;
@@ -43,15 +42,12 @@ struct Light {
 in vec3 FragPos_in;
 in vec2 TexCoords_in;
 in vec3 Normal_in;
-in vec4 FragPos_lightSpace_in[5];
   
 uniform vec3 viewPos;
 uniform vec2 screenSize;
 uniform float exposure;
 uniform vec2 texScaling;
 
-
-uniform sampler2D shadowMap[5];
 
 uniform Light lights[NR_LIGHTS];
 uniform Material material;
@@ -124,7 +120,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 
     // calculate attenuation ( constant < 0 to bypass) and distant light have no falloff
-    if (light.shadowMapId<0 || !light.distant){
+    if (!light.distant){
         float distance    = length(light.position - fragPos);
         float attenuation = 1.0 / (light.constant + light.linear * distance + 
   			    light.quadratic * (distance*distance));
@@ -134,45 +130,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
         specular *= attenuation;
     }
 
-    float shadow = 0;
-    if(light.shadowMapId>=0){
-        shadow = ComputeShadow(lightDir,light.shadowMapId);
-    }
-
-    return (ambient + (1.0-shadow)*(diffuse + specular));
-}
-
-
-float rand(vec2 co){
-  return 1/exp(fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453));
-}
-
-float ComputeShadow(vec3 lightDir, int sMapId){
-    vec3 projCoords = FragPos_lightSpace_in[sMapId].xyz / FragPos_lightSpace_in[sMapId].w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    //depth bias against acne
-    float bias = max(0.006 * (1.0 - dot(Normal_in, lightDir)), 0.006);
-
-
-    //get half of tex res for sampling
-    float offset = textureSize(shadowMap[sMapId],0).x*0.25;
-    
-    float lightDepth;
-    float shadow = 0;
-    // test for each sample point
-    int samples = 16;
-    for(int i = 0; i<samples; i++){
-
-        vec2 rnd = vec2(rand(projCoords.xy*float(i)), rand(projCoords.yx*float(i+1)));
-
-        lightDepth = texture(shadowMap[sMapId], projCoords.xy+(rnd/offset) ).x;
-        if(projCoords.z > lightDepth  + bias){
-            shadow += 1/float(samples);
-        }
-    }
-
-    return shadow;  
+    return (ambient + diffuse + specular);
 }
 
 vec3 CalcNormalMap(vec3 normal, vec3 viewDir){

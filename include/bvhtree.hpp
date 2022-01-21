@@ -6,16 +6,18 @@
 #include <vector>
 #include "bvhnode.hpp"
 #include <utility>
-using namespace std;
 class BvhTree
 {
 private:
     BvhNode *root;
 
 public:
-    BvhTree(vector<BoundingBox> &objs);
-    vector<BvhNode> extractOccludees(vector<long int> &indices);
-    void mergeAll(vector<BvhNode> &list);
-    pair<int, int> orderNodes(vector<BvhNode> &nodes);
+    BvhTree(std::vector<BoundingBox> &objs);
+
+    std::vector<BvhNode> extractOccludees(std::vector<long int> &indices);
+
+    void mergeAll(std::vector<BvhNode> &list);
+    
+    std::pair<int, int> orderNodes(std::vector<BvhNode> &nodes);
 };
 #endif

@@ -20,23 +20,47 @@ enum Visiblity
 class BvhNode
 {
 private:
-    NodeType type;
-    Visiblity tag;
-    BvhNode *leftChild;
-    BvhNode *rightChild;
-    BvhNode *parent;
-    BoundingBox *boundingBox;
+    NodeType _type;
+    Visiblity _tag;
+    BvhNode *_leftChild;
+    BvhNode *_rightChild;
+    BvhNode *_parent;
+    const BoundingBox *_boundingBox;
 
 public:
-    BvhNode(BoundingBox &bb);
-    BvhNode &getLeftChild();
-    BvhNode &getRightChild();
-    BvhNode &sibling();
-    BvhNode &getParent();
-    BvhNode &getChild(const NodeType &type);
-    void setType(NodeType &type);
+    BvhNode(const BoundingBox *boundingBox);
+
+    inline const BvhNode &BvhNode::getLeftChild() const
+    {
+        return *_leftChild;
+    }
+
+    inline const BvhNode &BvhNode::getRightChild() const
+    {
+        return *_rightChild;
+    }
+
+    inline const BvhNode &BvhNode::getParent() const
+    {
+        return *_parent;
+    }
+
+    const BvhNode &sibling() const; 
+    
+    const BvhNode &getChild(const NodeType &type) const;
+
+    inline void BvhNode::setType(const NodeType &type)
+    {
+        _type = type;
+    }
+    
     bool isRoot();
-    BoundingBox &getBoundingBox();
+    
+    inline const BoundingBox &BvhNode::getBoundingBox() const
+    {
+        return *_boundingBox;
+    }
+
     static BvhNode merge(BvhNode &left, BvhNode &right);
 };
 #endif

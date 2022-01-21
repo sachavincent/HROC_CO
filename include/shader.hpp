@@ -21,21 +21,23 @@ enum SHADER_TYPE{
 
 class Shader {
 private:
-	const char* loadShader(std::string path);
+	static const char* loadShader(std::string path);
 
 public:
 	unsigned int ID;
 	Shader(){};
+	Shader(std::string computePath);
 	Shader(std::string vertexPath, std::string fragmentPath);
 
-	void use();
+	void start();
+	void stop();
 
-	void setBool(const std::string &name, bool value) const;
-	void setInt(const std::string &name, int value) const;
-	void setFloat(const std::string &name, float value) const;
-	void setMat4(const std::string &name, glm::mat4 value) const;
-	void setVec3(const std::string& name, glm::vec3 value) const;
-	void setVec2(const std::string& name, glm::vec2 value) const;
+	void loadBool(const std::string &name, bool value) const;
+	void loadInt(const std::string &name, int value) const;
+	void loadFloat(const std::string &name, float value) const;
+	void loadMat4(const std::string &name, glm::mat4 value) const;
+	void loadVec3(const std::string& name, glm::vec3 value) const;
+	void loadVec2(const std::string& name, glm::vec2 value) const;
 };
 
 

@@ -72,14 +72,14 @@ void CubeMap::load(){
 
 void CubeMap::render(Scene* _scene){
 
-    Camera& cam = _scene->getCam();
+    Camera& cam = _scene->getCamera();
     glDepthMask(GL_FALSE);
 
-    m.shader.use();
+    m.shader.start();
 
-    m.shader.setMat4("view", glm::mat4(glm::mat3(cam.getView())));
-    m.shader.setMat4("projection", cam.getProj());
-    m.shader.setInt("skybox",0);
+    m.shader.loadMat4("view", glm::mat4(glm::mat3(cam.getView())));
+    m.shader.loadMat4("projection", cam.getProj());
+    m.shader.loadInt("skybox",0);
     
     glBindVertexArray(m.vao);
 
@@ -88,8 +88,9 @@ void CubeMap::render(Scene* _scene){
 
     glBindVertexArray(0);
 
-    glDepthMask(GL_TRUE);
+    m.shader.stop();
 
+    glDepthMask(GL_TRUE);
 }
 
 void CubeMap::loadShaders(){

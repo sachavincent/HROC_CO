@@ -5,42 +5,46 @@
 #include <map>
 
 #include "headers.hpp"
-
 #include "object.hpp"
 
-using namespace glm;
 class BoundingBox
 {
 private:
-    vec3 size;
-    vec3 center;
+    glm::vec3 _size;
+    glm::vec3 _center;
 
 public:
+    BoundingBox(){};
     BoundingBox(Object &o);
-    vec3 getSize();
-    vec3 getCenter();
-    // abstraite
-    BoundingBox merge(BoundingBox &A){return *this;};
+    virtual ~BoundingBox() = 0;
+
+    inline const glm::vec3 &getSize() const { return _size; }
+    inline const glm::vec3 &getCenter() const { return _center; }
+
+    virtual const BoundingBox *merge(const BoundingBox &A) const = 0;
+
     static float distance(BoundingBox &A, BoundingBox &B);
 };
-
-class OrientedBoundingBox : BoundingBox
+class OrientedBoundingBox : public BoundingBox
 {
 private:
-    mat3 transform;
+    glm::mat3 _transform;
 
 public:
-    OrientedBoundingBox(Object &o, mat3 transform);
-    mat3 getTransform();
-    OrientedBoundingBox merge(OrientedBoundingBox A);
+    OrientedBoundingBox(Object &o, glm::mat3 &transform);
+    ~OrientedBoundingBox() override = 0;
+    inline const glm::mat3 &getTransform() const { return _transform; }
+
+    const BoundingBox *merge(const BoundingBox &A) const override;
 };
 
-class AxisBoundingBox : OrientedBoundingBox
+class AxisBoundingBox : public OrientedBoundingBox
 {
 private:
-    mat3 transform = mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    static glm::mat3 DEFAULT_TRANSFORM;
 
 public:
     AxisBoundingBox(Object &o);
+    ~AxisBoundingBox() override = 0;
 };
 #endif

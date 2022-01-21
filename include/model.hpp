@@ -8,6 +8,7 @@
 #include "light.hpp"
 #include "camera.hpp"
 #include "utils.hpp"
+#include "texture.hpp"
 
 
 #include <vector>
@@ -41,12 +42,12 @@ protected:
         std::string shaderTescPath = "";
         std::string shaderTesePath = "";
 
-        int diffuseMap = -1;
-        int specularMap = -1;
-        int metallicMap = -1;
-        int heightMap = -1;
-        int normalMap = -1;
-        int AOMap = -1;
+        Texture diffuseMap = Texture::DEFAULT_TEXTURE;
+        Texture specularMap = Texture::DEFAULT_TEXTURE;
+        Texture metallicMap = Texture::DEFAULT_TEXTURE;
+        Texture heightMap = Texture::DEFAULT_TEXTURE;
+        Texture normalMap = Texture::DEFAULT_TEXTURE;
+        Texture AOMap = Texture::DEFAULT_TEXTURE;
 
         std::string diffuseMapPath = "";
         std::string specularMapPath = "";
@@ -124,7 +125,7 @@ public:
     virtual float getShininess() {return m.shininess;}
     virtual glm::vec2 getTexScaling(){return m.texScaling;}
     virtual std::string getName() = 0;
-    virtual bool hasTextures(){return m.diffuseMap != -1;}
+    virtual bool hasTextures(){return m.diffuseMap != Texture::DEFAULT_TEXTURE;}
 
 
     //! Set the displacement mutiplier factor to control displacement amount

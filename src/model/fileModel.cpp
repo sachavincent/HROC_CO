@@ -6,333 +6,360 @@
 
 int FileModel::instance = 0;
 
-FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals){
+FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
+{
 
-	name = _path.substr(_path.find_last_of("/")+1)+"_"+std::to_string(instance);
+	name = _path.substr(_path.find_last_of("/") + 1) + "_" + std::to_string(instance);
 	instance++;
-	
+
 	Assimp::Importer importer;
 
-	std::cout << "loading model from file : " 
-	<<_path<< " ..." << std::endl;
-	
-	const aiScene *scene = _smoothNormals?
-		importer.ReadFile(_path, 
-			  aiProcess_Triangulate 
-			| aiProcess_FlipUVs
-			| aiProcess_GenSmoothNormals):
-		importer.ReadFile(_path, 
-			  aiProcess_Triangulate 
-			| aiProcess_FlipUVs
-			| aiProcess_GenNormals);
+	std::cout << "loading model from file : "
+			  << _path << " ..." << std::endl;
 
+	const aiScene *scene = _smoothNormals ? importer.ReadFile(_path,
+															  aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
+										  : importer.ReadFile(_path,
+															  aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
-	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
-    {
-        std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-        return;
-    }
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+		return;
+	}
 
 	//std::string directory = _path.substr(0, _path.find_last_of('/'));
 
-	
 	subModels.resize(scene->mNumMeshes);
 	//process each mesh of the model
 
-	std::cout << "processing "<< subModels.size()<< " submeshes ..." << std::endl;
+	std::cout << "processing " << subModels.size() << " submeshes ..." << std::endl;
 
 	// configure each mesh
-    for(size_t i = 0; i < scene->mNumMeshes; i++)
-    {
+	for (size_t i = 0; i < scene->mNumMeshes; i++)
+	{
 		aiMesh *mesh = scene->mMeshes[i];
 		subModels[i].translate = glm::mat4{1.0};
-		subModels[i].scale     = glm::mat4{1.0};
-		subModels[i].rotation  = glm::mat4{1.0};
-        processMesh(mesh, scene,i);
+		subModels[i].scale = glm::mat4{1.0};
+		subModels[i].rotation = glm::mat4{1.0};
+		processMesh(mesh, scene, i);
 	}
 
 	//center objects vertices
 	double meanX = 0, meanY = 0, meanZ = 0;
 	size_t count = 0;
-	for(auto& subModel :subModels){
-		for(size_t i = 0; i< subModel.vertices.size();i+=3){
+	for (auto &subModel : subModels)
+	{
+		for (size_t i = 0; i < subModel.vertices.size(); i += 3)
+		{
 			count++;
-			meanX+=subModel.vertices[i];
-			meanY+=subModel.vertices[i+1];
-			meanZ+=subModel.vertices[i+2];
+			meanX += subModel.vertices[i];
+			meanY += subModel.vertices[i + 1];
+			meanZ += subModel.vertices[i + 2];
 		}
 	}
-	
+
 	meanX /= count;
 	meanY /= count;
 	meanZ /= count;
-	for(auto& subModel :subModels){
-		for(size_t i = 0; i<subModel.vertices.size();i+=3){
+	for (auto &subModel : subModels)
+	{
+		for (size_t i = 0; i < subModel.vertices.size(); i += 3)
+		{
 			count++;
 			subModel.vertices[i] -= (GLfloat)meanX;
-			subModel.vertices[i+1] -= (GLfloat)meanY;
-			subModel.vertices[i+2] -= (GLfloat)meanZ;
+			subModel.vertices[i + 1] -= (GLfloat)meanY;
+			subModel.vertices[i + 2] -= (GLfloat)meanZ;
 		}
 	}
 
 	//subtract min
-
 }
 
 //void FileModel::processMaterial(){
 //
 //}
 
-void FileModel::processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx){
-	auto& vert = subModels[_meshIdx].vertices;
-	auto& ind = subModels[_meshIdx].indices;
-	auto& norm = subModels[_meshIdx].normals;
+void FileModel::processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx)
+{
+	auto &vert = subModels[_meshIdx].vertices;
+	auto &ind = subModels[_meshIdx].indices;
+	auto &norm = subModels[_meshIdx].normals;
 	//auto& tex = subModels[_meshIdx].textureCoord;
 
 	// add vertices
-	for(size_t i = 0; i < _mesh->mNumVertices; i++){
+	for (size_t i = 0; i < _mesh->mNumVertices; i++)
+	{
 		vert.insert(vert.end(),
-			{_mesh->mVertices[i].x,_mesh->mVertices[i].y,_mesh->mVertices[i].z});
-    }
-	// add normals
-	for(size_t i = 0; i < _mesh->mNumVertices; i++){
-		norm.insert(norm.end(),
-			{_mesh->mNormals[i].x,_mesh->mNormals[i].y,_mesh->mNormals[i].z});
-    }
-	// add indices
-	for(size_t i = 0; i < _mesh->mNumFaces; i++){
-    	aiFace face = _mesh->mFaces[i];
-    	for(size_t j = 0; j < face.mNumIndices; j++)
-        ind.push_back(face.mIndices[j]);
+					{_mesh->mVertices[i].x, _mesh->mVertices[i].y, _mesh->mVertices[i].z});
 	}
-
+	// add normals
+	for (size_t i = 0; i < _mesh->mNumVertices; i++)
+	{
+		norm.insert(norm.end(),
+					{_mesh->mNormals[i].x, _mesh->mNormals[i].y, _mesh->mNormals[i].z});
+	}
+	// add indices
+	for (size_t i = 0; i < _mesh->mNumFaces; i++)
+	{
+		aiFace face = _mesh->mFaces[i];
+		for (size_t j = 0; j < face.mNumIndices; j++)
+			ind.push_back(face.mIndices[j]);
+	}
 }
 
 //! Load vertex buffers and shader of cube
-void FileModel::load(){
-	for(auto& subModel : subModels){
+void FileModel::load()
+{
+	for (auto &subModel : subModels)
+	{
 
 		// gen geometry buffers
-    	glGenBuffers(1, &subModel.vbo);
-    	glGenBuffers(1, &subModel.nbo);
-    	glGenBuffers(1, &subModel.tbo);
+		glGenBuffers(1, &subModel.vbo);
+		glGenBuffers(1, &subModel.nbo);
+		glGenBuffers(1, &subModel.tbo);
 		glGenBuffers(1, &subModel.ebo);
-    	glGenVertexArrays(1, &subModel.vao);
+		glGenVertexArrays(1, &subModel.vao);
 
 		// Bind the vao
-    	glBindVertexArray(subModel.vao);
+		glBindVertexArray(subModel.vao);
 
 		//copy indices to vbo
-    	glBindBuffer(GL_ARRAY_BUFFER, subModel.vbo);
-    	glBufferData(GL_ARRAY_BUFFER, subModel.vertices.size() * sizeof(GLfloat), subModel.vertices.data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, subModel.vbo);
+		glBufferData(GL_ARRAY_BUFFER, subModel.vertices.size() * sizeof(GLfloat), subModel.vertices.data(), GL_STATIC_DRAW);
 		// define array for vertices
-    	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    	glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+		glEnableVertexAttribArray(0);
 
-
-    	// copy normals to nbo
-    	glBindBuffer(GL_ARRAY_BUFFER, subModel.nbo);
-    	glBufferData(GL_ARRAY_BUFFER, subModel.normals.size() * sizeof(GLfloat), subModel.normals.data(), GL_STATIC_DRAW);
-    	// define array for normals
-    	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    	glEnableVertexAttribArray(1);
+		// copy normals to nbo
+		glBindBuffer(GL_ARRAY_BUFFER, subModel.nbo);
+		glBufferData(GL_ARRAY_BUFFER, subModel.normals.size() * sizeof(GLfloat), subModel.normals.data(), GL_STATIC_DRAW);
+		// define array for normals
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+		glEnableVertexAttribArray(1);
 
 		//// Copy texture coordinates array in element buffer
-    	//glBindBuffer(GL_ARRAY_BUFFER, subModel.tbo);
-    	//glBufferData(GL_ARRAY_BUFFER, subModel.textureCoord.size() * sizeof(GLfloat), subModel.textureCoord.data(), GL_STATIC_DRAW);
+		//glBindBuffer(GL_ARRAY_BUFFER, subModel.tbo);
+		//glBufferData(GL_ARRAY_BUFFER, subModel.textureCoord.size() * sizeof(GLfloat), subModel.textureCoord.data(), GL_STATIC_DRAW);
 		//// define array for texture coordinates
-    	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    	//glEnableVertexAttribArray(2);
-		
-		
+		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+		//glEnableVertexAttribArray(2);
+
 		//copy indices to ebo
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subModel.ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, subModel.ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, subModel.indices.size() * sizeof(GLfloat), subModel.indices.data(), GL_STATIC_DRAW);
 
-    	// Unbind the VAO
-    	glBindVertexArray(0);
+		// Unbind the VAO
+		glBindVertexArray(0);
 
 		// load right shader
 
-		if ((subModel.diffuseMapPath != "") ){
-			subModel.diffuseMap = loadTexture(subModel.diffuseMapPath.c_str());
+		if ((subModel.diffuseMapPath != ""))
+		{
+			subModel.diffuseMap = Texture::loadTexture(subModel.diffuseMapPath.c_str());
 		}
-		if(subModel.specularMapPath != ""){
-			subModel.specularMap = loadTexture(subModel.specularMapPath.c_str());
+		if (subModel.specularMapPath != "")
+		{
+			subModel.specularMap = Texture::loadTexture(subModel.specularMapPath.c_str());
 		}
-		if (subModel.heightMapPath != ""){
-			subModel.heightMap = loadTexture(subModel.heightMapPath.c_str());
+		if (subModel.heightMapPath != "")
+		{
+			subModel.heightMap = Texture::loadTexture(subModel.heightMapPath.c_str());
 		}
-		if (subModel.normalMapPath != ""){
-			subModel.normalMap = loadTexture(subModel.normalMapPath.c_str());
+		if (subModel.normalMapPath != "")
+		{
+			subModel.normalMap = Texture::loadTexture(subModel.normalMapPath.c_str());
 		}
-		if (subModel.AOMapPath != ""){
-			subModel.AOMap = loadTexture(subModel.AOMapPath.c_str());
+		if (subModel.AOMapPath != "")
+		{
+			subModel.AOMap = Texture::loadTexture(subModel.AOMapPath.c_str());
 		}
-		if(subModel.metallicMapPath != ""){
-			subModel.metallicMap = loadTexture(subModel.metallicMapPath.c_str());
+		if (subModel.metallicMapPath != "")
+		{
+			subModel.metallicMap = Texture::loadTexture(subModel.metallicMapPath.c_str());
 		}
 		loadShaders(subModel);
 	}
 }
 
+void FileModel::render(Scene *_scene)
+{
+	Camera &cam = _scene->getCamera();
+	std::vector<Light *> &lights = _scene->getLights();
+	for (auto &subModel : subModels)
+	{
 
-void FileModel::render(Scene* _scene)  {
-	Camera& cam = _scene->getCam();
-	std::vector<Light*>& lights =  _scene->getLights();
-	for(auto& subModel : subModels){
-		
-		auto& sh = subModel.shader;
-    	sh.use();
-	
-    	glm::mat4 model = subModel.translate*subModel.rotation*subModel.scale;
+		auto &sh = subModel.shader;
+		sh.start();
 
-		sh.setMat4("model", model);
-    	sh.setMat4("view",cam.getView());
-    	sh.setMat4("projection", cam.getProj());
-		sh.setVec2("screenSize", glm::vec2(cam.getResWidth(),cam.getResHeight()));
-    	sh.setVec3("viewPos", cam.getPos());
-		sh.setFloat("exposure",_scene->getExposure());
-		sh.setVec2("texScaling", subModel.texScaling);
+		glm::mat4 model = subModel.translate * subModel.rotation * subModel.scale;
 
-		sh.setBool("material.hasTexture",false);
-		sh.setBool("material.hasNormalMap",false);
-		sh.setBool("material.hasMetallicTex",false);
+		sh.loadMat4("model", model);
+		sh.loadMat4("view", cam.getView());
+		sh.loadMat4("projection", cam.getProj());
+		sh.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
+		sh.loadVec3("viewPos", cam.getPos());
+		sh.loadFloat("exposure", _scene->getExposure());
+		sh.loadVec2("texScaling", subModel.texScaling);
 
-		
-		
-		sh.setFloat("material.specularStrength", 1.0f);
-		sh.setFloat("material.shininess", subModel.shininess);
-		sh.setVec3("material.diffuse", subModel.diffuseColor);
-		sh.setVec3("material.specular", subModel.specularColor);
+		sh.loadBool("material.hasTexture", false);
+		sh.loadBool("material.hasNormalMap", false);
+		sh.loadBool("material.hasMetallicTex", false);
 
+		sh.loadFloat("material.specularStrength", 1.0f);
+		sh.loadFloat("material.shininess", subModel.shininess);
+		sh.loadVec3("material.diffuse", subModel.diffuseColor);
+		sh.loadVec3("material.specular", subModel.specularColor);
 
-    	for(uint32_t i = 0; i<std::min(lights.size(),(size_t)MAXLIGHTS); i++){
-		
-			if(lights[i]->isDistant()){
-				sh.setBool("lights["+   std::to_string(i) + "].distant",1);
-			} else {
-				sh.setBool("lights["+   std::to_string(i) + "].distant",0);
+		for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
+		{
+
+			if (lights[i]->isDistant())
+			{
+				sh.loadBool("lights[" + std::to_string(i) + "].distant", 1);
 			}
-			
-			sh.setBool("lights["+   std::to_string(i) + "].enabled",1);
+			else
+			{
+				sh.loadBool("lights[" + std::to_string(i) + "].distant", 0);
+			}
 
-    	    sh.setVec3("lights["+   std::to_string(i) + "].position",  lights[i]->getPos());
-			
-    	    sh.setVec3("lights[" +  std::to_string(i) + "].ambient",   lights[i]->getAmbiant());
-		    sh.setVec3("lights[" +  std::to_string(i) + "].diffuse",   lights[i]->getDiffuse());
-		    sh.setVec3("lights[" +  std::to_string(i) + "].specular",  lights[i]->getSpecular());
+			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
 
-		    sh.setFloat("lights[" + std::to_string(i) + "].constant",  lights[i]->getConstant());
-		    sh.setFloat("lights[" + std::to_string(i) + "].linear",    lights[i]->getLinear());
-		    sh.setFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
-			
+			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPos());
+
+			sh.loadVec3("lights[" + std::to_string(i) + "].ambient", lights[i]->getAmbiant());
+			sh.loadVec3("lights[" + std::to_string(i) + "].diffuse", lights[i]->getDiffuse());
+			sh.loadVec3("lights[" + std::to_string(i) + "].specular", lights[i]->getSpecular());
+
+			sh.loadFloat("lights[" + std::to_string(i) + "].constant", lights[i]->getConstant());
+			sh.loadFloat("lights[" + std::to_string(i) + "].linear", lights[i]->getLinear());
+			sh.loadFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
 		}
-		if (lights.size()<MAXLIGHTS){
-			for (size_t i = lights.size(); i<MAXLIGHTS; i++){
-				sh.setBool("lights["+   std::to_string(i) + "].enabled",0);
+		if (lights.size() < MAXLIGHTS)
+		{
+			for (size_t i = lights.size(); i < MAXLIGHTS; i++)
+			{
+				sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
 			}
 		}
 
-		
-    	glBindVertexArray(subModel.vao);
-		
-		glDrawElements( GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
-		
+		glBindVertexArray(subModel.vao);
+
+		glDrawElements(GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
+
 		glBindVertexArray(0);
+		sh.stop();
 	}
 }
 
-void FileModel::renderForDepth(Shader& _shader){
-	for(auto& subModel : subModels){
-	_shader.use();
-	glm::mat4 model = subModel.translate*subModel.rotation*subModel.scale;
+void FileModel::renderForDepth(Shader &_shader)
+{
+	for (auto &subModel : subModels)
+	{
+		_shader.start();
+		glm::mat4 model = subModel.translate * subModel.rotation * subModel.scale;
 
-	_shader.setMat4("model", model);
+		_shader.loadMat4("model", model);
 
-	glBindVertexArray(subModel.vao);
-	
-	glDrawElements(GL_TRIANGLES , subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
+		glBindVertexArray(subModel.vao);
+
+		glDrawElements(GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 	glBindVertexArray(0);
+	_shader.stop();
 }
 
-void FileModel::loadShaders(modelDescription& model){
+void FileModel::loadShaders(modelDescription &model)
+{
 
 	model.shader = {"shaders/default.vert", "shaders/phong.frag"};
-
 }
 
-void FileModel::loadShaders(){
-	for(auto& subModel: subModels)
+void FileModel::loadShaders()
+{
+	for (auto &subModel : subModels)
 		loadShaders(subModel);
 }
 
-
-FileModel& FileModel::setScale(glm::vec3  _scale){
-	for(auto& subModel : subModels){
-    subModel.scale = glm::mat4(1.0);
-    subModel.scale = glm::scale(subModel.scale,_scale);
-	}
-    return *this;
-}
-
-FileModel& FileModel::setRotation(float _angle,glm::vec3 _axis){
-	for(auto& subModel : subModels){
-    subModel.rotation = glm::mat4(1.0);
-    subModel.rotation = glm::rotate(subModel.rotation, glm::radians(_angle),_axis);
-	}
-    return *this;
-}
-
-FileModel& FileModel::setPosition(glm::vec3 _pos){
-	for(auto& subModel : subModels){
-    subModel.translate = glm::mat4{1.0};
-    subModel.translate = glm::translate(subModel.translate, _pos);
-	}
-    return *this;
-}
-
-
-
-FileModel& FileModel::setDiffuse(glm::vec3 _color){
-	for(auto& subModel : subModels){
-    subModel.diffuseColor =_color;
+FileModel &FileModel::setScale(glm::vec3 _scale)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.scale = glm::mat4(1.0);
+		subModel.scale = glm::scale(subModel.scale, _scale);
 	}
 	return *this;
 }
 
-FileModel& FileModel::setSpecular(glm::vec3 _color){
-	for(auto& subModel : subModels){
-    subModel.specularColor = _color;
+FileModel &FileModel::setRotation(float _angle, glm::vec3 _axis)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.rotation = glm::mat4(1.0);
+		subModel.rotation = glm::rotate(subModel.rotation, glm::radians(_angle), _axis);
 	}
 	return *this;
 }
 
-FileModel& FileModel::setAlbedo(glm::vec3 _color){
-	for(auto& subModel : subModels){
-	subModel.diffuseColor = _color;
+FileModel &FileModel::setPosition(glm::vec3 _pos)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.translate = glm::mat4{1.0};
+		subModel.translate = glm::translate(subModel.translate, _pos);
 	}
 	return *this;
 }
 
-FileModel& FileModel::setRoughness(float _roughness){
-	for(auto& subModel : subModels){
+FileModel &FileModel::setDiffuse(glm::vec3 _color)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.diffuseColor = _color;
+	}
+	return *this;
+}
+
+FileModel &FileModel::setSpecular(glm::vec3 _color)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.specularColor = _color;
+	}
+	return *this;
+}
+
+FileModel &FileModel::setAlbedo(glm::vec3 _color)
+{
+	for (auto &subModel : subModels)
+	{
+		subModel.diffuseColor = _color;
+	}
+	return *this;
+}
+
+FileModel &FileModel::setRoughness(float _roughness)
+{
+	for (auto &subModel : subModels)
+	{
 		subModel.roughness = _roughness;
 	}
 	return *this;
 }
 
-FileModel& FileModel::setMetallic(float _metallic){
-	for(auto& subModel : subModels){
+FileModel &FileModel::setMetallic(float _metallic)
+{
+	for (auto &subModel : subModels)
+	{
 		subModel.metallic = _metallic;
 	}
 	return *this;
 }
 
-
-FileModel& FileModel::setShininess(float _shininess){
-	for(auto& subModel : subModels){
+FileModel &FileModel::setShininess(float _shininess)
+{
+	for (auto &subModel : subModels)
+	{
 		subModel.shininess = _shininess;
 	}
 	return *this;

@@ -1,30 +1,27 @@
 #include "texture.hpp"
 
 std::map<std::string, int> Texture::cache = {};
-Texture Texture::DEFAULT_TEXTURE = Texture::loadTexture("default.jpg");
 
-Texture Texture::loadTexture(const std::string &file)
+Texture::Texture(const std::string &file)
 {
-    unsigned int textureID;
-
     std::string path = "" + file;
     //load a texture only if it has not been loaded previously (avoids loading duplicates)
-    if (cache.find(path) == cache.end())
+    if (Texture::cache.find(path) == Texture::cache.end())
     {
-        glGenTextures(1, &textureID);
-        cache[path] = textureID;
+        glGenTextures(1, &_id);
+        Texture::cache[path] = _id;
     }
     else
     {
-        return cache.find(path)->second;
+        _id = Texture::cache.find(path)->second;
     }
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (!data)
     {
-        fprintf(stderr, "Cannot load file image %s\nSTB Reason: %s\n", path.c_str(), stbi_failure_reason());
-        exit(0);
+        std::cerr << "Cannot load file image: " << path.c_str() << ", STB Reason: " << stbi_failure_reason() << std::endl;
+        return;
     }
 
     size_t numPixels = width * height * nrComponents;
@@ -64,7 +61,7 @@ Texture Texture::loadTexture(const std::string &file)
         GLenum format = GL_RGBA16F;
         GLenum iformat = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        glBindTexture(GL_TEXTURE_2D, _id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, iformat, GL_FLOAT, &dataf[0]);
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -79,8 +76,11 @@ Texture Texture::loadTexture(const std::string &file)
         std::cout << "Texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
+}
 
-    return textureID;
+Texture Texture::loadTexture(const std::string &file)
+{
+    return Texture(file);
 }
 
 void Texture::load()

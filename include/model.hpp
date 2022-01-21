@@ -42,12 +42,12 @@ protected:
         std::string shaderTescPath = "";
         std::string shaderTesePath = "";
 
-        Texture diffuseMap = Texture::DEFAULT_TEXTURE;
-        Texture specularMap = Texture::DEFAULT_TEXTURE;
-        Texture metallicMap = Texture::DEFAULT_TEXTURE;
-        Texture heightMap = Texture::DEFAULT_TEXTURE;
-        Texture normalMap = Texture::DEFAULT_TEXTURE;
-        Texture AOMap = Texture::DEFAULT_TEXTURE;
+        Texture diffuseMap = Texture::DEFAULT_TEXTURE();
+        Texture specularMap = Texture::DEFAULT_TEXTURE();
+        Texture metallicMap = Texture::DEFAULT_TEXTURE();
+        Texture heightMap = Texture::DEFAULT_TEXTURE();
+        Texture normalMap = Texture::DEFAULT_TEXTURE();
+        Texture AOMap = Texture::DEFAULT_TEXTURE();
 
         std::string diffuseMapPath = "";
         std::string specularMapPath = "";
@@ -125,7 +125,7 @@ public:
     virtual float getShininess() {return m.shininess;}
     virtual glm::vec2 getTexScaling(){return m.texScaling;}
     virtual std::string getName() = 0;
-    virtual bool hasTextures(){return m.diffuseMap != Texture::DEFAULT_TEXTURE;}
+    virtual bool hasTextures(){return m.diffuseMap != Texture::DEFAULT_TEXTURE();}
 
 
     //! Set the displacement mutiplier factor to control displacement amount

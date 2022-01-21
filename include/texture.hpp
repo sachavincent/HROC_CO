@@ -11,15 +11,22 @@ class Texture
 {
 private:
     Texture(int id) : _id(id) {}
+    Texture(const std::string &file);
 
 public:
+    static Texture& DEFAULT_TEXTURE()
+    {
+        static Texture tex("default.png");
+        return tex;
+    }
+
     static Texture loadTexture(const std::string &file);
 
     void load();
 
     void unload();
 
-    inline const int &getId() const { return _id; }
+    inline const GLuint &getId() const { return _id; }
 
     bool operator==(const Texture &t)
     {
@@ -34,10 +41,7 @@ public:
 private:
     static std::map<std::string, int> cache;
 
-    int _id;
-
-public:
-    static Texture DEFAULT_TEXTURE;
+    GLuint _id;
 };
 
 #endif

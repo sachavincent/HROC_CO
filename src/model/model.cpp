@@ -97,7 +97,7 @@ void Model::render(Scene *_scene)
 
 	// bind diffuse/albedo texture
 	glActiveTexture(GL_TEXTURE0);
-	if (m.diffuseMap != Texture::DEFAULT_TEXTURE)
+	if (m.diffuseMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.diffuseTex", 0);
 		m.shader.loadInt("material.albedoTex", 0);
@@ -113,7 +113,7 @@ void Model::render(Scene *_scene)
 	}
 	// bind specular/roughness texture
 	glActiveTexture(GL_TEXTURE1);
-	if (m.specularMap != Texture::DEFAULT_TEXTURE)
+	if (m.specularMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.specularTex", 1);
 		m.shader.loadInt("material.roughnessTex", 1);
@@ -131,7 +131,7 @@ void Model::render(Scene *_scene)
 
 	// bind displacement map texture
 	glActiveTexture(GL_TEXTURE3);
-	if (m.heightMap != Texture::DEFAULT_TEXTURE)
+	if (m.heightMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("dispMap", 3);
 		m.shader.loadFloat("dispStrength", m.displacementStrength);
@@ -143,7 +143,7 @@ void Model::render(Scene *_scene)
 	}
 
 	glActiveTexture(GL_TEXTURE5);
-	if (m.normalMap != Texture::DEFAULT_TEXTURE)
+	if (m.normalMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.normalMap", 5);
 		m.shader.loadBool("material.hasNormalMap", true);
@@ -157,7 +157,7 @@ void Model::render(Scene *_scene)
 	}
 
 	glActiveTexture(GL_TEXTURE6);
-	if (m.AOMap != Texture::DEFAULT_TEXTURE)
+	if (m.AOMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.AOmap", 6);
 		m.shader.loadBool("material.hasAOMap", true);

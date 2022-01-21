@@ -1,13 +1,25 @@
 #ifndef UI_H
 #define UI_H
 
-#include "headers.hpp"
+#include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_internal.h>
 
 class Scene;
 
-class Ui{
+class Ui
+{
 private:
-    Scene* scene;
+    void lightsParams();
+    void objectsParams();
+    void newLightWindow();
+    void newPointLight();
+    void newDistantLight();
+
+private:
+    Scene *scene;
     int lightListIndex = 0;
     int lastlightListIndex = 0;
     int modelListIndex = 0;
@@ -15,20 +27,11 @@ private:
     float nlMult;
     bool staticmultSet = false;
     bool smEnabled;
-
-    void lightsParams();
-    void objectsParams();
-    void newLightWindow();
-    void newPointLight();
-    void newDistantLight();
-
+    
 public:
     Ui();
-    void load(GLFWwindow* _window);
-    void render(Scene* _scene);
-    
-
+    void load(GLFWwindow *_window);
+    void render(Scene *_scene);
 };
-
 
 #endif

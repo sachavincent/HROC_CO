@@ -27,13 +27,14 @@ struct Material {
 
 struct Light {  
     bool enabled;
-    bool distant;  
     vec3 position; 
 
     vec3 ambient;
-    vec3 diffuse;
+    vec3 color;
     vec3 specular;
     
+    vec3 attenuation;
+
     float constant;
     float linear;
     float quadratic; 
@@ -107,7 +108,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specularColor = vec3(1.0) - exp(-specularColor * exposure);
 
     ambient  = light.ambient  * diffuseColor;
-    diffuse  = light.diffuse  * diff * diffuseColor;
+    diffuse  = light.color  * diff * diffuseColor;
     specular = light.specular * spec * specularColor *vec3(material.specularStrength);
 
 
@@ -119,16 +120,12 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= vec3(AOfactor);
 
 
-    // calculate attenuation ( constant < 0 to bypass) and distant light have no falloff
-    if (!light.distant){
-        float distance    = length(light.position - fragPos);
-        float attenuation = 1.0 / (light.constant + light.linear * distance + 
-  			    light.quadratic * (distance*distance));
+    float distance    = length(light.position - fragPos);
+    float attenuation = light.attenuation.x + (light.attenuation.y * distance) + (light.attenuation.z * distance * distance);
 
-        ambient  *= attenuation;
-        diffuse  *= attenuation;
-        specular *= attenuation;
-    }
+    ambient  /= attenuation;
+    diffuse  /= attenuation;
+    specular /= attenuation;
 
     return (ambient + diffuse + specular);
 }

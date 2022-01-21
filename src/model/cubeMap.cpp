@@ -77,8 +77,8 @@ void CubeMap::render(Scene* _scene){
 
     m.shader.start();
 
-    m.shader.loadMat4("view", glm::mat4(glm::mat3(cam.getView())));
-    m.shader.loadMat4("projection", cam.getProj());
+    m.shader.loadMat4("view", glm::mat4(glm::mat3(cam.getViewMatrix())));
+    m.shader.loadMat4("projection", cam.getProjectionMatrix());
     m.shader.loadInt("skybox",0);
     
     glBindVertexArray(m.vao);

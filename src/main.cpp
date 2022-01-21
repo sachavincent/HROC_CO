@@ -1,11 +1,9 @@
-
-#include "headers.hpp"
-
 #include <iostream>
-// Local includes
+
 #include "mainLoop.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
+#include "light.hpp"
 #include "texture.hpp"
 
 #include <glm/glm.hpp>
@@ -28,7 +26,7 @@ int main(int argc, char *argv[])
     MainLoop renderLoop{scene, interface, cam};
     // ######################### adding lights ###########################
 
-    DistantLight light3{glm::vec3{-0.2, 0.25, -0.8}, glm::vec3{0.8f}};
+    Light light3{glm::vec3{-0.2, 0.25, -0.8}, glm::vec3{0.8f}};
     scene.addLight(light3);
 
     //create a cubemap and add it to the scene

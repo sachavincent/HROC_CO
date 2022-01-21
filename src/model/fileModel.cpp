@@ -195,10 +195,10 @@ void FileModel::render(Scene *_scene)
 		glm::mat4 model = subModel.translate * subModel.rotation * subModel.scale;
 
 		sh.loadMat4("model", model);
-		sh.loadMat4("view", cam.getView());
-		sh.loadMat4("projection", cam.getProj());
+		sh.loadMat4("view", cam.getViewMatrix());
+		sh.loadMat4("projection", cam.getProjectionMatrix());
 		sh.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
-		sh.loadVec3("viewPos", cam.getPos());
+		sh.loadVec3("viewPos", cam.getPosition());
 		sh.loadFloat("exposure", _scene->getExposure());
 		sh.loadVec2("texScaling", subModel.texScaling);
 
@@ -213,27 +213,10 @@ void FileModel::render(Scene *_scene)
 
 		for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
 		{
-
-			if (lights[i]->isDistant())
-			{
-				sh.loadBool("lights[" + std::to_string(i) + "].distant", 1);
-			}
-			else
-			{
-				sh.loadBool("lights[" + std::to_string(i) + "].distant", 0);
-			}
-
-			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-
-			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPos());
-
-			sh.loadVec3("lights[" + std::to_string(i) + "].ambient", lights[i]->getAmbiant());
-			sh.loadVec3("lights[" + std::to_string(i) + "].diffuse", lights[i]->getDiffuse());
-			sh.loadVec3("lights[" + std::to_string(i) + "].specular", lights[i]->getSpecular());
-
-			sh.loadFloat("lights[" + std::to_string(i) + "].constant", lights[i]->getConstant());
-			sh.loadFloat("lights[" + std::to_string(i) + "].linear", lights[i]->getLinear());
-			sh.loadFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
+			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1); //TODO
+			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPosition());
+			sh.loadVec3("lights[" + std::to_string(i) + "].color", lights[i]->getColor());
+			sh.loadVec3("lights[" + std::to_string(i) + "].attenuation", lights[i]->getAttenuation());
 		}
 		if (lights.size() < MAXLIGHTS)
 		{
@@ -245,7 +228,7 @@ void FileModel::render(Scene *_scene)
 
 		glBindVertexArray(subModel.vao);
 
-		glDrawElements(GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
 		sh.stop();

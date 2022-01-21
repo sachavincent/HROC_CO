@@ -85,10 +85,10 @@ void Model::render(Scene *_scene)
 	glm::mat4 model = m.translate * m.rotation * m.scale;
 
 	m.shader.loadMat4("model", model);
-	m.shader.loadMat4("view", cam.getView());
-	m.shader.loadMat4("projection", cam.getProj());
+	m.shader.loadMat4("view", cam.getViewMatrix());
+	m.shader.loadMat4("projection", cam.getProjectionMatrix());
 	m.shader.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
-	m.shader.loadVec3("viewPos", cam.getPos());
+	m.shader.loadVec3("viewPos", cam.getPosition());
 	m.shader.loadFloat("exposure", _scene->getExposure());
 	m.shader.loadVec2("texScaling", m.texScaling);
 
@@ -171,27 +171,12 @@ void Model::render(Scene *_scene)
 
 	for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
 	{
-
-		if (lights[i]->isDistant())
-		{
-			m.shader.loadBool("lights[" + std::to_string(i) + "].distant", true);
-		}
-		else
-		{
-			m.shader.loadBool("lights[" + std::to_string(i) + "].distant", false);
-		}
-
 		m.shader.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
 
-		m.shader.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPos());
+		m.shader.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPosition());
 
-		m.shader.loadVec3("lights[" + std::to_string(i) + "].ambient", lights[i]->getAmbiant());
-		m.shader.loadVec3("lights[" + std::to_string(i) + "].diffuse", lights[i]->getDiffuse());
-		m.shader.loadVec3("lights[" + std::to_string(i) + "].specular", lights[i]->getSpecular());
-
-		m.shader.loadFloat("lights[" + std::to_string(i) + "].constant", lights[i]->getConstant());
-		m.shader.loadFloat("lights[" + std::to_string(i) + "].linear", lights[i]->getLinear());
-		m.shader.loadFloat("lights[" + std::to_string(i) + "].quadratic", lights[i]->getQuadratic());
+		m.shader.loadVec3("lights[" + std::to_string(i) + "].color", lights[i]->getColor());
+		m.shader.loadVec3("lights[" + std::to_string(i) + "].attenuation", lights[i]->getAttenuation());
 	}
 	if (lights.size() < MAXLIGHTS)
 	{

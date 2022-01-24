@@ -1,18 +1,21 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#define MAXLIGHTS 100
-
-#include "headers.hpp"
-#include "shader.hpp"
-#include "light.hpp"
-#include "camera.hpp"
-#include "utils.hpp"
-#include "texture.hpp"
-
+#define MAXLIGHTS 10
 
 #include <vector>
 #include <string>
+#include <fstream>
+
+#include <glad/glad.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include "shader.hpp"
+#include "light.hpp"
+#include "camera.hpp"
+#include "texture.hpp"
 
 typedef enum {
     SMOOTH_NORMAL_ENABLE = true,
@@ -185,28 +188,6 @@ public:
     bool hasTextures(){return false;}
 
 };
-
-
-class CubeMap : public Cube{
-private:
-    int cubeMap;
-    std::string cubeMapDir;
-    void loadShaders();
-    
-public:
-    CubeMap(){};
-    /**
-    *  Create a Cubemap to be added to a scene.
-    *  File extensions are found automatically (png,jpg,jpeg are supported).
-    * \param _directory The texture files directory
-    **/
-    CubeMap(std::string _directory);
-
-    std::string getName(){return m.name;}
-    void load();
-    void render(Scene* _scene);
-};
-
 
 class UVSphere : public Model{
 private:

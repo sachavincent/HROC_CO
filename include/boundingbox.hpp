@@ -4,7 +4,7 @@
 #include <iostream>
 #include <map>
 
-#include "headers.hpp"
+#include <glm/glm.hpp>
 #include "object.hpp"
 
 class BoundingBox

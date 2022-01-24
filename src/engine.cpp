@@ -1,19 +1,140 @@
 #include "engine.hpp"
+#include "scene.hpp"
+#include "ioutils.hpp"
 
-Engine::Engine(float width, float height): _width(width), _height(height) {}
+#include <chrono>
+#include <sstream>
+#include <mutex>
+#include <iomanip>
 
-void Engine::clear() {}
-
-void Engine::loadScene(const std::string &file)
+Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr), _camera(new Camera(width, height))
 {
+    glfwInit();
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
+    _window = glfwCreateWindow(_width, _height, _windowName.c_str(), nullptr, nullptr);
+    glfwMakeContextCurrent(_window);
+    glfwSwapInterval(0);
+    // Callbacks binding
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(_window, IOUtils::mouseCallback);
+    glfwSetScrollCallback(_window, IOUtils::scrollCallback);
+    glfwSetFramebufferSizeCallback(_window, IOUtils::framebufferSizeCallback);
+    glfwSetWindowSizeCallback(_window, IOUtils::updateScreenRes);
+
+    // GLAD
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    glViewport(0, 0, _width, _height);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
+
+    // ImGui Setup
+    _ui.load(_window);
+
+    _deltaTime = 0.0;
+    _lastFrame = 0.0;
 }
 
-void Engine::loadScene()
+Engine::~Engine()
 {
+    delete _scene;
+    delete _camera;
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwTerminate();
 }
 
-void Engine::loop()
+void Engine::clear()
 {
-    
+    // TODO:
+    //  unload()
+    delete _scene;
+}
+
+Scene Engine::loadScene(const std::string &file)
+{
+    if (_scene)
+    {
+        delete _scene;
+    }
+    _scene = new Scene(*_camera, file);
+
+    return *_scene;
+}
+
+Scene Engine::loadScene()
+{
+    if (_scene)
+    {
+        clear();
+    }
+    _scene = new Scene(*_camera);
+
+    return *_scene;
+}
+
+void Engine::startLoop()
+{
+    while (!glfwWindowShouldClose(_window))
+    {
+        double currentFrame = glfwGetTime();
+        _deltaTime = currentFrame - _lastFrame;
+        _lastFrame = currentFrame;
+        
+        IOUtils::processInput(_window, _deltaTime, _camera);
+
+        glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        updateFpsCounter(500);
+
+        // final rendering of scene
+        _scene->renderModels();
+
+        // imgui part
+        _ui.render(_scene);
+
+        glfwSwapBuffers(_window);
+        glfwPollEvents();
+    }
+}
+
+void Engine::endLoop()
+{
+    glfwSetWindowShouldClose(_window, true);
+}
+
+//! Shows fps on window title, update rate in ms
+void Engine::updateFpsCounter(double _updateRateMs)
+{
+    using namespace std::chrono;
+    static double counter;
+    static std::once_flag flag;
+    std::call_once(
+        flag, [](double &c)
+        { c = 1.0; },
+        counter);
+
+    if (counter >= _updateRateMs / 1000)
+    {
+        counter = 0;
+        std::stringstream sstr;
+        sstr << _windowName << "  |  FPS : " << std::fixed << std::setprecision(1) << 1 / _deltaTime;
+
+        glfwSetWindowTitle(_window, sstr.str().c_str());
+    }
+    counter += _deltaTime;
+}
+// oui je mange mais la batterie décharge plus vite qu'elle charge donc ça va bientot crash
+void Engine::setResolution(int width, int height)
+{
+    _width = width;
+    _height = height;
 }

@@ -1,6 +1,6 @@
 #version 440 core
 
-#define NR_LIGHTS 100
+#define NR_LIGHTS 10
 #define gamma 2.2
 
 // PHONG SHADER

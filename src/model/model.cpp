@@ -77,7 +77,7 @@ void Model::load()
 void Model::render(Scene *_scene)
 {
 	Camera &cam = _scene->getCamera();
-	std::vector<Light *> &lights = _scene->getLights();
+	auto &lights = _scene->getLights();
 
 	m.shader.start();
 	//glm::vec3 axis{0,1,0};

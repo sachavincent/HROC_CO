@@ -45,11 +45,11 @@ void Ui::lightsParams()
     if (ImGui::TreeNode("Lights Parameters"))
     {
 
-        //display the light of light to choose from
+        // display the light of light to choose from
         const char *items[100];
-        std::vector<Light *> &lights = scene->getLights();
+        auto lights = scene->getLights();
         std::vector<std::string> lightsNames;
-        for (Light *li : lights)
+        for (auto &li : lights)
             lightsNames.push_back("Light");
 
         for (int i = 0; i < lightsNames.size(); i++)
@@ -65,13 +65,13 @@ void Ui::lightsParams()
         ImGui::PopStyleColor();
 
         ImGui::ListBox("Select a Light to modify", &lightListIndex, items, lightsNames.size(), 5);
-        Light *light = lights[lightListIndex];
+        auto light = lights[lightListIndex];
 
         std::string lightText = "\nLight parameters:\n";
         ImGui::Text(lightText.c_str());
         // Change parameters for selected light
 
-        //diffuse color
+        // diffuse color
         static float staticmult;
         if (lightListIndex != lastlightListIndex)
             staticmultSet = false;
@@ -117,9 +117,9 @@ void Ui::objectsParams()
     if (ImGui::TreeNode("Objects Parameters"))
     {
         const char *items[200];
-        std::vector<Model *> &models = scene->getModels();
+        auto &models = scene->getModels();
         std::vector<std::string> modelsNames;
-        for (auto *mo : models)
+        for (auto &mo : models)
             modelsNames.push_back(mo->getName());
 
         for (int i = 0; i < modelsNames.size(); i++)
@@ -128,7 +128,7 @@ void Ui::objectsParams()
         }
 
         ImGui::ListBox("Select a Model", &modelListIndex, items, modelsNames.size(), 5);
-        Model *model = models[modelListIndex];
+        auto model = models[modelListIndex];
 
         std::string modelText = "\n" + model->getName() + " parameters:\n";
         ImGui::Text(modelText.c_str());
@@ -195,9 +195,9 @@ void Ui::newPointLight()
 
     if (ImGui::Button("Add"))
     {
-        Light *pl = new Light(nlPos, nlColor * nlMult);
+        auto pl = std::make_shared<Light>(nlPos, nlColor * nlMult);
         nlMult = 1.0;
-        scene->addLight(*pl);
+        scene->addLight(pl);
         newLightWindowActive = false;
     }
 }
@@ -213,9 +213,8 @@ void Ui::newDistantLight()
 
     if (ImGui::Button("Add"))
     {
-        Light *dl = new Light{nlPos, nlColor * nlMult};
-
-        scene->addLight(*dl);
+        auto dl = std::make_shared<Light>(nlPos, nlColor * nlMult);
+        scene->addLight(dl);
         newLightWindowActive = false;
     }
 }

@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -40,7 +42,7 @@ public:
 	 * \param width The camera viewport width in pixels
 	 * \param height The camera viewport height in pixels
 	 **/
-	Camera(glm::vec3 position, float fov, int width, int height);
+	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 1.0f, 5.0f}, float fov = 45.0f);
 
 	//! Get current camera position
 	inline const glm::vec3 &getPosition() const
@@ -114,7 +116,7 @@ public:
 	//! Move camera in Z axis my an offset
 	void moveZ(float _offset);
 	//! change
-	void setRes(int w, int h);
+	void setResolution(int w, int h);
 
 	inline const Frustum *getFrustum() const { return _frustum; }
 };

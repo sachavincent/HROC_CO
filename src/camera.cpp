@@ -1,7 +1,8 @@
 #include "camera.hpp"
 #include "frustum.hpp"
 
-Camera::Camera(glm::vec3 position, float fov, int width, int height) : _fov(fov), _position(position), _width(width), _height(height), _frustum(new Frustum())
+
+Camera::Camera(int width, int height, glm::vec3 position, float fov) : _fov(fov), _position(position), _width(width), _height(height), _frustum(new Frustum())
 {
 	_yaw = 90.0;
 	_pitch = 0.0;
@@ -11,7 +12,8 @@ Camera::Camera(glm::vec3 position, float fov, int width, int height) : _fov(fov)
 	_up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-//direction
+
+// direction
 void Camera::updateDirection()
 {
 	glm::vec3 front;
@@ -24,6 +26,7 @@ void Camera::updateDirection()
 	_right = glm::normalize(glm::cross(_front, {0, 1, 0}));
 	_up = glm::normalize(glm::cross(_right, _front));
 }
+
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
 {
@@ -41,6 +44,7 @@ float Camera::offsetPitch(float _offset, float _sensitivity)
 	return _pitch;
 }
 
+
 float Camera::offsetYaw(float _offset, float _sensitivity)
 {
 	_yaw += _offset * _sensitivity;
@@ -52,12 +56,13 @@ float Camera::offsetYaw(float _offset, float _sensitivity)
 	return _yaw;
 }
 
+
 //_fov
 float Camera::offsetFov(float _offset)
 {
-	if (_fov + _offset > 90)
+	if (_fov + _offset > 180)
 	{
-		_fov = 90.0f;
+		_fov = 180.0f;
 	}
 	else if (_fov + _offset < 1)
 	{
@@ -67,36 +72,41 @@ float Camera::offsetFov(float _offset)
 	return _fov;
 }
 
-//position
+// position
 void Camera::moveX(float _offset)
 {
 	_position += glm::normalize(glm::cross(_front, _up)) * _offset;
 }
+
 
 void Camera::moveY(float _offset)
 {
 	_position += glm::normalize(_up) * _offset;
 }
 
+
 void Camera::moveZ(float _offset)
 {
 	_position += _front * _offset;
 }
 
-void Camera::setRes(int w, int h)
+
+void Camera::setResolution(int w, int h)
 {
 	_width = w;
 	_height = h;
-	_lastX = h / 2.0;
-	_lastY = w / 2.0;
+	_lastX = (float)h / 2.0;
+	_lastY = (float)w / 2.0;
 }
+
 
 void Camera::move(const glm::vec3 delta)
 {
-	//TODO
+	// TODO
 }
+
 
 void Camera::rotate(const glm::vec3 delta)
 {
-	//TODO
+	// TODO
 }

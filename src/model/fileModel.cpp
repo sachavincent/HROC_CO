@@ -1,8 +1,8 @@
 #include "model.hpp"
 #include "scene.hpp"
-#include "glm/ext.hpp"
-#include "glm/gtx/string_cast.hpp"
-#include <fstream>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 int FileModel::instance = 0;
 
@@ -17,10 +17,9 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 	std::cout << "loading model from file : "
 			  << _path << " ..." << std::endl;
 
-	const aiScene *scene = _smoothNormals ? importer.ReadFile(_path,
-															  aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
-										  : importer.ReadFile(_path,
-															  aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+	const aiScene *scene = _smoothNormals ? 
+	importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
+	  : importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -28,10 +27,10 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 		return;
 	}
 
-	//std::string directory = _path.substr(0, _path.find_last_of('/'));
+	// std::string directory = _path.substr(0, _path.find_last_of('/'));
 
 	subModels.resize(scene->mNumMeshes);
-	//process each mesh of the model
+	// process each mesh of the model
 
 	std::cout << "processing " << subModels.size() << " submeshes ..." << std::endl;
 
@@ -45,7 +44,7 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 		processMesh(mesh, scene, i);
 	}
 
-	//center objects vertices
+	// center objects vertices
 	double meanX = 0, meanY = 0, meanZ = 0;
 	size_t count = 0;
 	for (auto &subModel : subModels)
@@ -73,19 +72,19 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 		}
 	}
 
-	//subtract min
+	// subtract min
 }
 
-//void FileModel::processMaterial(){
+// void FileModel::processMaterial(){
 //
-//}
+// }
 
 void FileModel::processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx)
 {
 	auto &vert = subModels[_meshIdx].vertices;
 	auto &ind = subModels[_meshIdx].indices;
 	auto &norm = subModels[_meshIdx].normals;
-	//auto& tex = subModels[_meshIdx].textureCoord;
+	// auto& tex = subModels[_meshIdx].textureCoord;
 
 	// add vertices
 	for (size_t i = 0; i < _mesh->mNumVertices; i++)
@@ -124,7 +123,7 @@ void FileModel::load()
 		// Bind the vao
 		glBindVertexArray(subModel.vao);
 
-		//copy indices to vbo
+		// copy indices to vbo
 		glBindBuffer(GL_ARRAY_BUFFER, subModel.vbo);
 		glBufferData(GL_ARRAY_BUFFER, subModel.vertices.size() * sizeof(GLfloat), subModel.vertices.data(), GL_STATIC_DRAW);
 		// define array for vertices
@@ -139,13 +138,13 @@ void FileModel::load()
 		glEnableVertexAttribArray(1);
 
 		//// Copy texture coordinates array in element buffer
-		//glBindBuffer(GL_ARRAY_BUFFER, subModel.tbo);
-		//glBufferData(GL_ARRAY_BUFFER, subModel.textureCoord.size() * sizeof(GLfloat), subModel.textureCoord.data(), GL_STATIC_DRAW);
+		// glBindBuffer(GL_ARRAY_BUFFER, subModel.tbo);
+		// glBufferData(GL_ARRAY_BUFFER, subModel.textureCoord.size() * sizeof(GLfloat), subModel.textureCoord.data(), GL_STATIC_DRAW);
 		//// define array for texture coordinates
-		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-		//glEnableVertexAttribArray(2);
+		// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+		// glEnableVertexAttribArray(2);
 
-		//copy indices to ebo
+		// copy indices to ebo
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, subModel.ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, subModel.indices.size() * sizeof(GLfloat), subModel.indices.data(), GL_STATIC_DRAW);
 
@@ -185,7 +184,7 @@ void FileModel::load()
 void FileModel::render(Scene *_scene)
 {
 	Camera &cam = _scene->getCamera();
-	std::vector<Light *> &lights = _scene->getLights();
+	auto &lights = _scene->getLights();
 	for (auto &subModel : subModels)
 	{
 
@@ -213,7 +212,7 @@ void FileModel::render(Scene *_scene)
 
 		for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
 		{
-			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1); //TODO
+			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1); // TODO
 			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPosition());
 			sh.loadVec3("lights[" + std::to_string(i) + "].color", lights[i]->getColor());
 			sh.loadVec3("lights[" + std::to_string(i) + "].attenuation", lights[i]->getAttenuation());

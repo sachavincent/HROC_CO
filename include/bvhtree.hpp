@@ -1,5 +1,6 @@
 #ifndef BVHTREE_HPP
 #define BVHTREE_HPP
+
 #include <stdlib.h>
 #include <iostream>
 #include <map>
@@ -20,4 +21,5 @@ public:
     
     std::pair<int, int> orderNodes(std::vector<BvhNode> &nodes);
 };
+
 #endif

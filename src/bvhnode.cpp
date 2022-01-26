@@ -15,6 +15,7 @@ const BvhNode &BvhNode::getChild(const NodeType &t) const
     }
 }
 
+
 const BvhNode &BvhNode::sibling() const
 {
     BvhNode *p = _parent;

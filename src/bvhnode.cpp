@@ -19,11 +19,11 @@ const BvhNode &BvhNode::sibling() const
     BvhNode *p = _parent;
     if (_type == LEFT)
     {
-        return p->getLeftChild();
+        return p->getRightChild();
     }
     else
     {
-        return p->getRightChild();
+        return p->getLeftChild();
     }
 }
 

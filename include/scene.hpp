@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <memory>
 
 #include "model.hpp"
 #include "camera.hpp"

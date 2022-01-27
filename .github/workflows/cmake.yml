@@ -24,7 +24,7 @@ jobs:
         
     - name: Install dependencies
       shell: bash
-      run : sudo apt install build-dep build-essential && sudo apt install libxrandr-dev - f
+      run : sudo apt install build-essential && sudo apt install libxrandr-dev - f
 
     - name: Configure CMake
       shell: bash

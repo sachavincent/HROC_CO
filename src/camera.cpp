@@ -2,14 +2,15 @@
 #include "frustum.hpp"
 
 
-Camera::Camera(int width, int height, glm::vec3 position, float fov) : _fov(fov), _position(position), _width(width), _height(height), _frustum(new Frustum())
+Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(width), _height(height), _position(position), _fov(fov)
 {
+	_frustum = new Frustum();
 	_yaw = 90.0;
 	_pitch = 0.0;
-	_lastX = height / 2.0;
-	_lastY = width / 2.0;
 	_front = glm::vec3(0.0f, 0.0f, 1.0f);
 	_up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	setResolution(width,height);
 }
 
 
@@ -95,8 +96,8 @@ void Camera::setResolution(int w, int h)
 {
 	_width = w;
 	_height = h;
-	_lastX = (float)h / 2.0;
-	_lastY = (float)w / 2.0;
+	_lastX = (float)w / 2.0;
+	_lastY = (float)h / 2.0;
 }
 
 

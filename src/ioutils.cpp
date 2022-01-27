@@ -22,7 +22,7 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
     else
     {
         _lastMouseX = _camera->getResWidth() / 2;
-        _lastMouseX = _camera->getResHeight() / 2;
+        _lastMouseY = _camera->getResHeight() / 2;
         glfwSetCursorPos(window, _lastMouseX, _lastMouseY);
         _resetFocus = false;
     }
@@ -105,4 +105,8 @@ void IOUtils::updateScreenRes(GLFWwindow *window, int width, int height)
 
     glfwSetWindowSize(window, width, height);
     glViewport(0, 0, width, height);
+}
+
+void IOUtils::setEngine(Engine &engine){
+    _engine = &engine;
 }

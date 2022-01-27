@@ -26,7 +26,7 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     glfwSetScrollCallback(_window, IOUtils::scrollCallback);
     glfwSetFramebufferSizeCallback(_window, IOUtils::framebufferSizeCallback);
     glfwSetWindowSizeCallback(_window, IOUtils::updateScreenRes);
-
+    IOUtils::setEngine(*this);
     // GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glViewport(0, 0, _width, _height);

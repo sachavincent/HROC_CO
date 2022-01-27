@@ -37,12 +37,12 @@ private:
 public:
 	/**
 	 * Create a camera with the following parameters :
-	 * \param position Its position
-	 * \param fov The field of view (in degrees)
 	 * \param width The camera viewport width in pixels
 	 * \param height The camera viewport height in pixels
+	 * \param position Its position
+	 * \param fov The field of view (in degrees)
 	 **/
-	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 1.0f, 5.0f}, float fov = 45.0f);
+	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 2.0f, -5.0f}, float fov = 50.0f);
 
 	//! Get current camera position
 	inline const glm::vec3 &getPosition() const
@@ -75,7 +75,7 @@ public:
 	// ! Get projection perspective frustum
 	inline glm::mat4 getProjectionMatrix() const
 	{
-		return glm::perspective(glm::radians(_fov), (float)_width / _height, 0.3f, 100.0f);
+		return glm::perspective(glm::radians(_fov), (float)_width/_height, 0.3f, 100.0f);
 	}
 
 	//! Get current field of view (in degrees)

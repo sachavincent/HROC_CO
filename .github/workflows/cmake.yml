@@ -24,7 +24,7 @@ jobs:
         
     - name: Install dependencies
       shell: bash
-      run : sudo apt install build-essential && sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev
+      run : sudo apt install build-essential && sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
     - name: Configure CMake
       shell: bash

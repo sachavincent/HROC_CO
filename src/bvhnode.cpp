@@ -1,6 +1,9 @@
 #include "bvhnode.hpp"
 BvhNode::BvhNode(const BoundingBox *boundingBox) : _boundingBox(boundingBox), _leftChild(nullptr), _rightChild(nullptr), _parent(nullptr)
 {
+    static int _val = 0;
+    id = _val;
+    _val+=1;
 }
 
 const BvhNode &BvhNode::getChild(const NodeType &t) const

@@ -9,17 +9,25 @@
 #include <utility>
 class BvhTree
 {
-private:
-    BvhNode *root;
 
+
+private:
+
+    typedef std::pair<float,std::pair<BvhNode,BvhNode>> PairDistanceNode;
+    typedef std::pair<BvhNode,BvhNode> PairNode;
+    BvhNode *root;
+    std::multimap<float,PairNode> * map;
 public:
     BvhTree(std::vector<BoundingBox> &objs);
 
     std::vector<BvhNode> extractOccludees(std::vector<long int> &indices);
-
-    void mergeAll(std::vector<BvhNode> &list);
+    void createMap(std::vector<BvhNode> &nodes);
+    void mergeAll(std::vector<BvhNode> &nodes);
     
-    std::pair<int, int> orderNodes(std::vector<BvhNode> &nodes);
+    PairNode requestMap();
+    void removeFromMap(BvhNode &node);
+    void addToMap(BvhNode & node, std::vector<BvhNode> &nodesToCompare);
+
 };
 
 #endif

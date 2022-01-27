@@ -23,7 +23,11 @@ public:
 
     virtual const BoundingBox *merge(const BoundingBox &A) const = 0;
 
-    static float distance(BoundingBox &A, BoundingBox &B);
+    inline static float distance(const BoundingBox &A, const BoundingBox &B){ 
+        glm::vec3 centerA = A.getCenter();
+        glm::vec3 centerB = B.getCenter();
+        return  glm::distance(centerA,centerB);
+    };
 };
 class OrientedBoundingBox : public BoundingBox
 {

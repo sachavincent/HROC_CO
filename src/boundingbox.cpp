@@ -20,3 +20,4 @@ const BoundingBox *OrientedBoundingBox::merge(const BoundingBox &A) const
     //TODO
     return &A;
 }
+

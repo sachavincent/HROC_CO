@@ -20,6 +20,7 @@ enum Visiblity
 class BvhNode
 {
 private:
+    int id;
     NodeType _type;
     Visiblity _tag;
     BvhNode *_leftChild;
@@ -29,7 +30,7 @@ private:
 
 public:
     BvhNode(const BoundingBox *boundingBox);
-
+    inline const int BvhNode::getId() const {return id;};
     inline const BvhNode &BvhNode::getLeftChild() const
     {
         return *_leftChild;

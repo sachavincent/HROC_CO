@@ -30,34 +30,34 @@ private:
 
 public:
     BvhNode(const BoundingBox *boundingBox);
-    inline const int BvhNode::getId() const {return id;};
-    inline const BvhNode &BvhNode::getLeftChild() const
+    inline const int getId() const {return id;};
+    inline const BvhNode& getLeftChild() const
     {
         return *_leftChild;
     }
 
-    inline const BvhNode &BvhNode::getRightChild() const
+    inline const BvhNode getRightChild() const
     {
         return *_rightChild;
     }
 
-    inline const BvhNode &BvhNode::getParent() const
+    inline const BvhNode& getParent() const
     {
         return *_parent;
     }
 
-    const BvhNode &sibling() const; 
+    const BvhNode& sibling() const; 
     
-    const BvhNode &getChild(const NodeType &type) const;
+    const BvhNode& getChild(const NodeType &type) const;
 
-    inline void BvhNode::setType(const NodeType &type)
+    inline void setType(const NodeType &type)
     {
         _type = type;
     }
     
     bool isRoot();
     
-    inline const BoundingBox &BvhNode::getBoundingBox() const
+    inline const BoundingBox& getBoundingBox() const
     {
         return *_boundingBox;
     }

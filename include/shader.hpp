@@ -10,6 +10,9 @@
 #endif
 
 #include <fstream>
+#ifdef NOT_MSVC
+#include <string.h>
+#endif
 #include <string>
 #include <iostream>
 

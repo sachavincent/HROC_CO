@@ -15,6 +15,10 @@ set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL_PDB OFF)
 set(BUILD_SHARED_LIBS OFF)
+           
+include(external/DisableAssimpImports.cmake)
+disableAssimpImports()
+
 add_subdirectory(external/assimp)
 
 set(GLFW_BUILD_DOCS OFF)

@@ -37,7 +37,7 @@ if(MSVC)
         /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable
-     -Wno-reorder -Wno-return-local-addr -Wno-format-security std=c++17 -DNOT_MSVC")
+        -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC")
 endif()
 
 include_directories(include/

@@ -58,14 +58,6 @@ void Scene::renderModels()
     }
 }
 
-void Scene::renderModelsWithShader(Shader &_shader)
-{
-    for (uint32_t i = 0; i < models.size(); i++)
-    {
-        models[i]->renderForDepth(_shader);
-    }
-}
-
 //! Add an object to scene
 Scene &Scene::addModel(std::shared_ptr<Model> _model)
 {

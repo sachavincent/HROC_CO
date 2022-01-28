@@ -42,7 +42,7 @@ public:
 	 * \param position Its position
 	 * \param fov The field of view (in degrees)
 	 **/
-	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 2.0f, -5.0f}, float fov = 50.0f);
+	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 2.0f, -10.0f}, float fov = 55.0f);
 
 	//! Get current camera position
 	inline const glm::vec3 &getPosition() const
@@ -96,6 +96,7 @@ public:
 
 	//! Get camera viewport width (in px)
 	int getResWidth() { return _width; };
+
 	//! Get camera viewport height (in px)
 	int getResHeight() { return _height; };
 

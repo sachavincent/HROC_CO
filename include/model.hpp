@@ -42,35 +42,21 @@ protected:
 
         std::string shaderVertPath = "";
         std::string shaderFragPath = "";
-        std::string shaderTescPath = "";
-        std::string shaderTesePath = "";
 
         Texture diffuseMap = Texture::DEFAULT_TEXTURE();
         Texture specularMap = Texture::DEFAULT_TEXTURE();
-        Texture metallicMap = Texture::DEFAULT_TEXTURE();
-        Texture heightMap = Texture::DEFAULT_TEXTURE();
-        Texture normalMap = Texture::DEFAULT_TEXTURE();
-        Texture AOMap = Texture::DEFAULT_TEXTURE();
 
         std::string diffuseMapPath = "";
         std::string specularMapPath = "";
-        std::string metallicMapPath = "";
-        std::string heightMapPath = "";
-        std::string normalMapPath = "";
-        std::string AOMapPath = "";
 
         glm::vec3 diffuseColor = glm::vec3{0.9};
         glm::vec3 specularColor = glm::vec3{1.0};
-        float metallic = 0.0f;
-        float roughness = 0.0f;
         float shininess = 64.0f;
 
         glm::vec2 texScaling = {1,1};
 
         std::vector<GLfloat> vertices, normals, textureCoord;
         std::vector<GLuint>  indices;
-
-        float displacementStrength = 0.01f;
 
         glm::mat4 scale, rotation, translate;
     };
@@ -87,12 +73,6 @@ public:
 
     //! Render the object on screen.
     virtual void render(Scene* _scene);
-    
-    //! render objects faster for shadow map
-    /**
-     * \param _shader the depth map shader.
-     **/
-    virtual void renderForDepth(Shader& _shader);
 
     virtual Model& setScale(glm::vec3 _scale);
     virtual Model& setRotation(float _angle, glm::vec3 _axis);
@@ -101,40 +81,24 @@ public:
     Model& setTexDiffuse(std::string _path);
     Model& setTexSpecular(std::string _path);
 
-    Model& setTexAlbedo(std::string _path);
-    Model& setTexRoughness(std::string _path);
-    Model& setTexMetallic(std::string _path);
-
-    Model& setTexHeight( std::string _path);
-    Model& setTexNormal( std::string _path);
-    Model& setTexAO( std::string _path);
-
     virtual Model& setTexScaling( glm::vec2 _scale);
 
     //! Set color of object (unused if textures are defined)
     virtual Model& setDiffuse(glm::vec3 _color);
     virtual Model& setSpecular(glm::vec3 _color);
-    virtual Model& setAlbedo(glm::vec3 _color);
-    virtual Model& setRoughness(float _roughness);
-    virtual Model& setMetallic(float _metallic);
     virtual Model& setShininess(float _shininess);
 
     virtual glm::vec3 getPosition(){return glm::vec3(m.translate[3]);}
     virtual glm::vec3 getScale(){return glm::vec3(m.scale[0][0],m.scale[1][1],m.scale[2][2]);}
+
     virtual glm::vec3 getDiffuse(){return m.diffuseColor;}
     virtual glm::vec3 getSpecular(){return m.specularColor;}
-    virtual float getRoughness(){return m.roughness;}
-    virtual float getMetallic(){return m.metallic;}
     virtual float getShininess() {return m.shininess;}
+
     virtual glm::vec2 getTexScaling(){return m.texScaling;}
+
     virtual std::string getName() = 0;
-    virtual bool hasTextures(){return m.diffuseMap != Texture::DEFAULT_TEXTURE();}
-
-
-    //! Set the displacement mutiplier factor to control displacement amount
-    Model& displacementStrength(float _strength);
-
-    
+    virtual bool hasTextures(){return m.diffuseMap != Texture::DEFAULT_TEXTURE();} 
 };
 
 
@@ -163,28 +127,25 @@ public:
     void load();
     void loadShaders();
     void render(Scene* _scene);
-    void renderForDepth(Shader& _shader); 
 
     FileModel& setScale(glm::vec3 _scale);
     FileModel& setRotation(float _angle, glm::vec3 _axis);
     FileModel& setPosition(glm::vec3 _pos);
+
     FileModel& setDiffuse(glm::vec3 _color);
     FileModel& setSpecular(glm::vec3 _color);
-    FileModel& setRoughness(float _roughness);
-    FileModel& setMetallic(float _metallic);
-    FileModel& setAlbedo(glm::vec3 _color);
     FileModel& setShininess(float _shininess);
 
-    std::string getName(){return name;}
     glm::vec3 getPosition(){return glm::vec3(subModels[0].translate[3]);}
     glm::vec3 getScale(){return glm::vec3(subModels[0].scale[0][0],
                                         subModels[0].scale[1][1]
                                         ,subModels[0].scale[2][2]);}
+
     glm::vec3 getDiffuse(){return subModels[0].diffuseColor;}
     glm::vec3 getSpecular(){return subModels[0].specularColor;}
-    float getRoughness(){return subModels[0].roughness;}
-    float getMetallic(){return subModels[0].metallic;}
     float getShininess() {return subModels[0].shininess;}
+
+    std::string getName(){return name;}
     bool hasTextures(){return false;}
 
 };

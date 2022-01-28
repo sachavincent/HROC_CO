@@ -8,7 +8,6 @@ int FileModel::instance = 0;
 
 FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 {
-
 	name = _path.substr(_path.find_last_of("/") + 1) + "_" + std::to_string(instance);
 	instance++;
 
@@ -44,7 +43,7 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 		processMesh(mesh, scene, i);
 	}
 
-	// center objects vertices
+	// center objects vertices (for scaling later)
 	double meanX = 0, meanY = 0, meanZ = 0;
 	size_t count = 0;
 	for (auto &subModel : subModels)
@@ -71,13 +70,7 @@ FileModel::FileModel(std::string _path, SMOOTH_NORMAL _smoothNormals)
 			subModel.vertices[i + 2] -= (GLfloat)meanZ;
 		}
 	}
-
-	// subtract min
 }
-
-// void FileModel::processMaterial(){
-//
-// }
 
 void FileModel::processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx)
 {
@@ -161,22 +154,6 @@ void FileModel::load()
 		{
 			subModel.specularMap = Texture::loadTexture(subModel.specularMapPath.c_str());
 		}
-		if (subModel.heightMapPath != "")
-		{
-			subModel.heightMap = Texture::loadTexture(subModel.heightMapPath.c_str());
-		}
-		if (subModel.normalMapPath != "")
-		{
-			subModel.normalMap = Texture::loadTexture(subModel.normalMapPath.c_str());
-		}
-		if (subModel.AOMapPath != "")
-		{
-			subModel.AOMap = Texture::loadTexture(subModel.AOMapPath.c_str());
-		}
-		if (subModel.metallicMapPath != "")
-		{
-			subModel.metallicMap = Texture::loadTexture(subModel.metallicMapPath.c_str());
-		}
 		loadShaders(subModel);
 	}
 }
@@ -212,7 +189,7 @@ void FileModel::render(Scene *_scene)
 
 		for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
 		{
-			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1); // TODO
+			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
 			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPosition());
 			sh.loadVec3("lights[" + std::to_string(i) + "].color", lights[i]->getColor());
 			sh.loadVec3("lights[" + std::to_string(i) + "].attenuation", lights[i]->getAttenuation());
@@ -232,23 +209,6 @@ void FileModel::render(Scene *_scene)
 		glBindVertexArray(0);
 		sh.stop();
 	}
-}
-
-void FileModel::renderForDepth(Shader &_shader)
-{
-	for (auto &subModel : subModels)
-	{
-		_shader.start();
-		glm::mat4 model = subModel.translate * subModel.rotation * subModel.scale;
-
-		_shader.loadMat4("model", model);
-
-		glBindVertexArray(subModel.vao);
-
-		glDrawElements(GL_TRIANGLES, subModel.indices.size(), GL_UNSIGNED_INT, nullptr);
-	}
-	glBindVertexArray(0);
-	_shader.stop();
 }
 
 void FileModel::loadShaders(modelDescription &model)
@@ -307,33 +267,6 @@ FileModel &FileModel::setSpecular(glm::vec3 _color)
 	for (auto &subModel : subModels)
 	{
 		subModel.specularColor = _color;
-	}
-	return *this;
-}
-
-FileModel &FileModel::setAlbedo(glm::vec3 _color)
-{
-	for (auto &subModel : subModels)
-	{
-		subModel.diffuseColor = _color;
-	}
-	return *this;
-}
-
-FileModel &FileModel::setRoughness(float _roughness)
-{
-	for (auto &subModel : subModels)
-	{
-		subModel.roughness = _roughness;
-	}
-	return *this;
-}
-
-FileModel &FileModel::setMetallic(float _metallic)
-{
-	for (auto &subModel : subModels)
-	{
-		subModel.metallic = _metallic;
 	}
 	return *this;
 }

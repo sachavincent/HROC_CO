@@ -54,23 +54,6 @@ void Model::load()
 	{
 		m.specularMap = Texture::loadTexture(m.specularMapPath.c_str());
 	}
-	if (m.heightMapPath != "")
-	{
-		m.heightMap = Texture::loadTexture(m.heightMapPath.c_str());
-	}
-	if (m.normalMapPath != "")
-	{
-		m.normalMap = Texture::loadTexture(m.normalMapPath.c_str());
-	}
-	if (m.AOMapPath != "")
-	{
-		m.AOMap = Texture::loadTexture(m.AOMapPath.c_str());
-	}
-	if (m.metallicMapPath != "")
-	{
-		m.metallicMap = Texture::loadTexture(m.metallicMapPath.c_str());
-	}
-
 	loadShaders();
 }
 
@@ -100,14 +83,12 @@ void Model::render(Scene *_scene)
 	if (m.diffuseMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.diffuseTex", 0);
-		m.shader.loadInt("material.albedoTex", 0);
 		m.shader.loadBool("material.hasTexture", true);
 		m.diffuseMap.load();
 	}
 	else
 	{
 		m.shader.loadVec3("material.diffuse", m.diffuseColor);
-		m.shader.loadVec3("material.albedo", m.diffuseColor);
 		m.shader.loadBool("material.hasTexture", false);
 		m.diffuseMap.unload();
 	}
@@ -116,58 +97,16 @@ void Model::render(Scene *_scene)
 	if (m.specularMap != Texture::DEFAULT_TEXTURE())
 	{
 		m.shader.loadInt("material.specularTex", 1);
-		m.shader.loadInt("material.roughnessTex", 1);
 		m.specularMap.load();
 	}
 	else
 	{
 		m.shader.loadVec3("material.specular", m.specularColor);
-		m.shader.loadFloat("material.roughness", m.roughness);
 		m.specularMap.unload();
 	}
 	//bind mellatlic texture (if PBR)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// bind displacement map texture
-	glActiveTexture(GL_TEXTURE3);
-	if (m.heightMap != Texture::DEFAULT_TEXTURE())
-	{
-		m.shader.loadInt("dispMap", 3);
-		m.shader.loadFloat("dispStrength", m.displacementStrength);
-		m.heightMap.load();
-	}
-	else
-	{
-		m.heightMap.unload();
-	}
-
-	glActiveTexture(GL_TEXTURE5);
-	if (m.normalMap != Texture::DEFAULT_TEXTURE())
-	{
-		m.shader.loadInt("material.normalMap", 5);
-		m.shader.loadBool("material.hasNormalMap", true);
-		m.normalMap.load();
-	}
-	else
-	{
-		m.shader.loadBool("material.hasNormalMap", false);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		m.normalMap.load();
-	}
-
-	glActiveTexture(GL_TEXTURE6);
-	if (m.AOMap != Texture::DEFAULT_TEXTURE())
-	{
-		m.shader.loadInt("material.AOmap", 6);
-		m.shader.loadBool("material.hasAOMap", true);
-		m.AOMap.load();
-	}
-	else
-	{
-		m.shader.loadBool("material.hasAOMap", false);
-		m.AOMap.load();
-	}
 
 	for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
 	{
@@ -192,22 +131,6 @@ void Model::render(Scene *_scene)
 
 	glBindVertexArray(0);
 	m.shader.stop();
-}
-
-void Model::renderForDepth(Shader &_shader)
-{
-
-	_shader.start();
-	glm::mat4 model = m.translate * m.rotation * m.scale;
-
-	_shader.loadMat4("model", model);
-
-	glBindVertexArray(m.vao);
-
-	glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
-
-	glBindVertexArray(0);
-	_shader.stop();
 }
 
 void Model::loadShaders()
@@ -254,49 +177,7 @@ Model &Model::setShininess(float _shininess)
 	return *this;
 }
 
-Model &Model::setTexAlbedo(std::string _path)
-{
-	m.diffuseMapPath = _path;
-	return *this;
-}
-
-Model &Model::setTexRoughness(std::string _path)
-{
-	m.specularMapPath = _path;
-	return *this;
-}
-
-Model &Model::setTexMetallic(std::string _path)
-{
-	m.metallicMapPath = _path;
-	return *this;
-}
-
-Model &Model::setTexHeight(std::string _heightPath)
-{
-	m.heightMapPath = _heightPath;
-	return *this;
-}
-
-Model &Model::setTexNormal(std::string _normalPath)
-{
-	m.normalMapPath = _normalPath;
-	return *this;
-}
-
-Model &Model::setTexAO(std::string _AOPath)
-{
-	m.AOMapPath = _AOPath;
-	return *this;
-}
-
 Model &Model::setDiffuse(glm::vec3 _color)
-{
-	m.diffuseColor = _color;
-	return *this;
-}
-
-Model &Model::setAlbedo(glm::vec3 _color)
 {
 	m.diffuseColor = _color;
 	return *this;
@@ -305,24 +186,6 @@ Model &Model::setAlbedo(glm::vec3 _color)
 Model &Model::setSpecular(glm::vec3 _color)
 {
 	m.specularColor = _color;
-	return *this;
-}
-
-Model &Model::setRoughness(float _roughness)
-{
-	m.roughness = _roughness;
-	return *this;
-}
-
-Model &Model::setMetallic(float _metallic)
-{
-	m.metallic = _metallic;
-	return *this;
-}
-
-Model &Model::displacementStrength(float _strength)
-{
-	m.displacementStrength = _strength;
 	return *this;
 }
 

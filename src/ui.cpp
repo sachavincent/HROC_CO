@@ -49,8 +49,8 @@ void Ui::lightsParams()
         const char *items[100];
         auto lights = scene->getLights();
         std::vector<std::string> lightsNames;
-        for (auto &li : lights)
-            lightsNames.push_back("Light");
+        for (size_t i = 0; lights.size(); i++)
+            lightsNames.push_back("Light_"+std::to_string(i));
 
         for (int i = 0; i < lightsNames.size(); i++)
         {

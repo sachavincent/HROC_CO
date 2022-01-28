@@ -4,7 +4,7 @@
 void IOUtils::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
     _resetFocus = true;
-    _camera->setResolution(width, height);
+    _engine->getCurrentCamera()->setResolution(width, height);
 }
 
 void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -16,13 +16,13 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
         _lastMouseX = xpos;
         _lastMouseY = ypos;
-        _camera->offsetYaw(xoffset, MOUSE_SENSITIVTY);
-        _camera->offsetPitch(yoffset, MOUSE_SENSITIVTY);
+        _engine->getCurrentCamera()->offsetYaw(xoffset, MOUSE_SENSITIVTY);
+        _engine->getCurrentCamera()->offsetPitch(yoffset, MOUSE_SENSITIVTY);
     }
     else
     {
-        _lastMouseX = _camera->getResWidth() / 2;
-        _lastMouseY = _camera->getResHeight() / 2;
+        _lastMouseX = _engine->getCurrentCamera()->getResWidth() / 2;
+        _lastMouseY = _engine->getCurrentCamera()->getResHeight() / 2;
         glfwSetCursorPos(window, _lastMouseX, _lastMouseY);
         _resetFocus = false;
     }
@@ -30,64 +30,19 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
 void IOUtils::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
-    _camera->offsetFov(yoffset);
+    _engine->getCurrentCamera()->offsetFov(yoffset);
 }
 
-// manage IOUtils
-void IOUtils::processInput(GLFWwindow *window, double deltaTime, Camera *camera)
+void IOUtils::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    _camera = camera;
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    switch (action)
     {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    // keys 1,2,3 to switch polygon display mode
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-
-    // _camera movement
-    const float _cameraSpeed = 2.0f * (float)deltaTime; // framerate independent
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        _camera->moveZ(_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        _camera->moveZ(-_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        _camera->moveX(-_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        _camera->moveX(_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        _camera->moveZ(_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        _camera->moveZ(-_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        _camera->moveX(-_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        _camera->moveX(_cameraSpeed);
-
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        _camera->moveY(_cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        _camera->moveY(-_cameraSpeed);
-
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPosCallback(window, nullptr);
-        glfwSetScrollCallback(window, nullptr);
-    }
-    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-    {
-        _resetFocus = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(window, IOUtils::mouseCallback);
-        glfwSetScrollCallback(window, IOUtils::scrollCallback);
+    case GLFW_PRESS:
+        IOUtils::onKeyPressed(window, key);
+        break;
+    default:
+        // No need for now
+        break;
     }
 }
 
@@ -101,12 +56,70 @@ void IOUtils::updateScreenRes(GLFWwindow *window, int width, int height)
 
     _engine->setResolution(width, height);
 
-    _camera->setResolution(width, height);
-
     glfwSetWindowSize(window, width, height);
     glViewport(0, 0, width, height);
 }
 
-void IOUtils::setEngine(Engine &engine){
-    _engine = &engine;
+void IOUtils::onKeyPressed(GLFWwindow *window, int key)
+{
+    const float cameraSpeed = 2.0f * (float)_engine->getDeltaTime(); // framerate independent
+    switch (key)
+    {
+    case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, true);
+        break;
+    case GLFW_KEY_E:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        break;
+    case GLFW_KEY_R:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        break;
+    case GLFW_KEY_T:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        break;
+
+    case GLFW_KEY_W:
+    case GLFW_KEY_UP:
+        _engine->getCurrentCamera()->moveZ(cameraSpeed);
+        break;
+    case GLFW_KEY_S:
+    case GLFW_KEY_DOWN:
+        _engine->getCurrentCamera()->moveZ(-cameraSpeed);
+        break;
+    case GLFW_KEY_A:
+    case GLFW_KEY_LEFT:
+        _engine->getCurrentCamera()->moveX(-cameraSpeed);
+        break;
+    case GLFW_KEY_D:
+    case GLFW_KEY_RIGHT:
+        _engine->getCurrentCamera()->moveX(cameraSpeed);
+        break;
+
+    case GLFW_KEY_SPACE:
+        _engine->getCurrentCamera()->moveY(cameraSpeed);
+        break;
+    case GLFW_KEY_LEFT_CONTROL:
+        _engine->getCurrentCamera()->moveY(-cameraSpeed);
+        break;
+
+    case GLFW_KEY_U:
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPosCallback(window, nullptr);
+        glfwSetScrollCallback(window, nullptr);
+        break;
+
+    case GLFW_KEY_I:
+        _resetFocus = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, IOUtils::mouseCallback);
+        glfwSetScrollCallback(window, IOUtils::scrollCallback);
+        break;
+
+    case GLFW_KEY_L:
+        _engine->switchCamera();
+        break;
+    default:
+        // Key not assigned
+        break;
+    }
 }

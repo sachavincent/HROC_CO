@@ -11,6 +11,11 @@
 
 class Scene;
 
+enum CameraType
+{
+    FREE,
+    STATIC
+};
 class Engine
 {
 public:
@@ -19,8 +24,6 @@ public:
     ~Engine();
 
     void clear();
-
-    inline void setCamera(Camera *camera) { _camera = camera; }
 
     Scene loadScene(const std::string &file);
 
@@ -36,11 +39,25 @@ public:
 
     inline Scene &getScene() const { return *_scene; }
 
+    inline double getDeltaTime() const { return _deltaTime; }
+
+    inline Camera *getFreeCam() const { return _freeCam; }
+
+    inline Camera *getStaticCamera() const { return _camera; }
+
+    inline Camera *getCurrentCamera() const { return _currentCamera == CameraType::STATIC ? _camera : _freeCam; }
+
+    // This method switches between the two available cameras
+    void switchCamera();
+
 private:
     Ui _ui;
     float _width;
     float _height;
     Camera *_camera;
+    Camera *_freeCam;
+
+    CameraType _currentCamera;
     Scene *_scene;
     GLFWwindow *_window;
     std::string _windowName = WINDOW_NAME;

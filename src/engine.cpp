@@ -7,15 +7,18 @@
 #include <mutex>
 #include <iomanip>
 
-Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr), _camera(new Camera(width, height))
+Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr), _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
 {
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE); // TODO: Enlever (performances)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
+    glfwSetErrorCallback(IOUtils::errorCallback);//TODO: Enlever (performances)
 
     _window = glfwCreateWindow(_width, _height, _windowName.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(_window);
@@ -23,6 +26,7 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     // Callbacks binding
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(_window, IOUtils::mouseCallback);
+    glfwSetKeyCallback(_window, IOUtils::keyCallback);
     glfwSetScrollCallback(_window, IOUtils::scrollCallback);
     glfwSetFramebufferSizeCallback(_window, IOUtils::framebufferSizeCallback);
     glfwSetWindowSizeCallback(_window, IOUtils::updateScreenRes);
@@ -42,8 +46,9 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
 
 Engine::~Engine()
 {
-    delete _scene;
+    clear();
     delete _camera;
+    delete _freeCam;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -87,8 +92,6 @@ void Engine::startLoop()
         double currentFrame = glfwGetTime();
         _deltaTime = currentFrame - _lastFrame;
         _lastFrame = currentFrame;
-        
-        IOUtils::processInput(_window, _deltaTime, _camera);
 
         glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -132,9 +135,17 @@ void Engine::updateFpsCounter(double _updateRateMs)
     }
     counter += _deltaTime;
 }
-// oui je mange mais la batterie décharge plus vite qu'elle charge donc ça va bientot crash
+
 void Engine::setResolution(int width, int height)
 {
     _width = width;
     _height = height;
+
+    _camera->setResolution(width, height);
+    _freeCam->setResolution(width, height);
+}
+
+void Engine::switchCamera()
+{
+    _currentCamera = _currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
 }

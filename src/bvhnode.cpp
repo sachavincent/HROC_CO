@@ -6,6 +6,7 @@ BvhNode::BvhNode(const BoundingBox *boundingBox) : _boundingBox(boundingBox), _l
     _val+=1;
 }
 
+
 const BvhNode &BvhNode::getChild(const NodeType &t) const
 {
     if (t == LEFT)

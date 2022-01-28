@@ -77,3 +77,33 @@ BvhTree::PairNode BvhTree::requestMap()
     auto it = map->begin();
     return it->second;
 }
+
+std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes){
+
+    std::vector<BvhNode> occludeeGroups;
+    occludeeGroups.reserve(allNodes.size());
+    if(allNodes.empty()){
+        occludeeGroups.push_back(*root);
+        return occludeeGroups;
+    }
+    for (auto it = allNodes.begin();it!= allNodes.end();it++){
+        it->setVisibility(Visibility::null);
+    }
+
+    for (auto it = allNodes.begin();it!= allNodes.end();it++){
+        BvhNode & n = *it;
+        while(n.getVisibility() != Visibility::VISIBLE && n.getId() != root->getId()){
+            n.setVisibility(Visibility::VISIBLE);
+            BvhNode n2 = n.sibling();
+            n2.setVisibility(Visibility::UNKNOWN);
+            n = n.getParent();
+        }
+    }
+    for (auto it = allNodes.begin();it!= allNodes.end();it++){
+        if(it->getVisibility() == Visibility::UNKNOWN){
+            occludeeGroups.push_back(*it);
+        }
+    }
+
+    return occludeeGroups;
+}

@@ -10,7 +10,7 @@ enum NodeType
     RIGHT
 };
 
-enum Visiblity
+enum Visibility
 {
     null,
     VISIBLE,
@@ -22,7 +22,7 @@ class BvhNode
 private:
     int id;
     NodeType _type;
-    Visiblity _tag;
+    Visibility _tag;
     BvhNode *_leftChild;
     BvhNode *_rightChild;
     BvhNode *_parent;
@@ -30,7 +30,8 @@ private:
 
 public:
     BvhNode(const BoundingBox *boundingBox);
-    inline const int getId() const {return id;};
+    inline const Visibility getVisibility() const {return _tag;}
+    inline const int getId() const {return id;}
     inline const BvhNode& getLeftChild() const
     {
         return *_leftChild;
@@ -53,6 +54,10 @@ public:
     inline void setType(const NodeType &type)
     {
         _type = type;
+    }   
+     inline void setVisibility(const Visibility &tag)
+    {
+        _tag = tag;
     }
     
     bool isRoot();

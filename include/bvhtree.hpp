@@ -20,7 +20,7 @@ private:
 public:
     BvhTree(std::vector<BoundingBox> &objs);
 
-    std::vector<BvhNode> extractOccludees(std::vector<long int> &indices);
+    std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes);
     void createMap(std::vector<BvhNode> &nodes);
     void mergeAll(std::vector<BvhNode> &nodes);
     

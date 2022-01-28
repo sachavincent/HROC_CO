@@ -1,4 +1,4 @@
-#include "model.hpp"
+#include "object.hpp"
 #include "scene.hpp"
 #include "glm/ext.hpp"
 #include "glm/gtx/string_cast.hpp"
@@ -7,7 +7,7 @@
 int Cube::instance = 0;
 
 Cube::Cube(float _edgeSize){
-	m.name = "Cube_"+std::to_string(instance);
+	name = "Cube_"+std::to_string(instance);
 	instance++;
 
 	m.vertices = {
@@ -163,7 +163,7 @@ Cube::Cube(float _edgeSize){
 	};
     
 
-	m.translate = glm::mat4{1.0};
-	m.scale     = glm::scale(glm::mat4{1.0},glm::vec3(_edgeSize));
-	m.rotation  = glm::mat4{1.0};
+	translate = glm::mat4{1.0};
+	scale     = glm::scale(glm::mat4{1.0},glm::vec3(_edgeSize));
+	rotation  = glm::mat4{1.0};
 }

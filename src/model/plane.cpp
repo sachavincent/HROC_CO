@@ -1,10 +1,10 @@
-#include "model.hpp"
+#include "object.hpp"
 
 
 int Plane::instance = 0;
 
 Plane::Plane(glm::vec2 _size, int _nX, int _nY){
-    m.name = "Plane_"+std::to_string(instance);
+    name = "Plane_"+std::to_string(instance);
     instance++;
 
     GLuint idx = 0;
@@ -52,7 +52,7 @@ Plane::Plane(glm::vec2 _size, int _nX, int _nY){
             
         }
     }
-    m.translate = glm::mat4{1.0};
-	m.scale     = glm::mat4{1.0};
-	m.rotation  = glm::mat4{1.0};
+    translate = glm::mat4{1.0};
+	scale     = glm::mat4{1.0};
+	rotation  = glm::mat4{1.0};
 }

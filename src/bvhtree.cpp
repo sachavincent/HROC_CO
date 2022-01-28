@@ -1,4 +1,5 @@
 #include "bvhtree.hpp"
+
 void eraseInVector(std::vector<BvhNode> & nodes, BvhNode node){
     for (auto it = nodes.begin();it!=nodes.end();it++){
         if(it->getId() == node.getId()){

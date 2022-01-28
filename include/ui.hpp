@@ -22,7 +22,7 @@ private:
     Scene *scene;
     int lightListIndex = 0;
     int lastlightListIndex = 0;
-    int modelListIndex = 0;
+    int objectsListIndex = 0;
     bool newLightWindowActive = false;
     float nlMult;
     bool staticmultSet = false;

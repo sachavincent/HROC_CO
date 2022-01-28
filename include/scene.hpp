@@ -6,7 +6,7 @@
 #include <iostream>
 #include <memory>
 
-#include "model.hpp"
+#include "object.hpp"
 #include "camera.hpp"
 #include "light.hpp"
 #include "boundingbox.hpp"
@@ -15,7 +15,7 @@ class Scene
 {
 
 private:
-    std::vector<std::shared_ptr<Model>> models;
+    std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
 
     Camera &cam;
@@ -27,19 +27,12 @@ public:
     Scene(Camera &_cam, const std::string &file);
 
     void load();
-    //! render models with standard shader (i.e. Phong)
-    void renderModels();
+    //! render objects with standard shader (i.e. Phong)
+    void renderObjects();
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
 
-    //! Render all models of scene using the same shader
-    /**
-     * \param _shader The shader to render the models with,
-     * only "model" matrix is defined per object.
-     **/
-    void renderModelsWithShader(Shader &_shader);
-
-    Scene &addModel(std::shared_ptr<Model> _model);
+    Scene &addObject(std::shared_ptr<Object> _object);
     Scene &addLight(std::shared_ptr<Light> _light);
     Scene &setCamera(Camera &_cam);
 
@@ -54,7 +47,7 @@ public:
 
     inline const std::vector<std::shared_ptr<Light>> &getLights() { return lights; }
 
-    inline const std::vector<std::shared_ptr<Model>> &getModels() { return models; }
+    inline const std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 };
 
 #endif

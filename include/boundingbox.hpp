@@ -12,6 +12,7 @@ class BoundingBox
 private:
     glm::vec3 _size;
     glm::vec3 _center;
+    Cube* _wireframe = nullptr;
 
 public:
     BoundingBox(){};
@@ -28,6 +29,10 @@ public:
         glm::vec3 centerB = B.getCenter();
         return  glm::distance(centerA,centerB);
     };
+
+    //! Get a model of the BoundingBox object for debug mode rendering
+    Object* getWireframe();
+
 };
 class OrientedBoundingBox : public BoundingBox
 {

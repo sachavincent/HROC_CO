@@ -117,46 +117,46 @@ void Ui::objectsParams()
     if (ImGui::TreeNode("Objects Parameters"))
     {
         const char *items[200];
-        auto &models = scene->getModels();
-        std::vector<std::string> modelsNames;
-        for (auto &mo : models)
-            modelsNames.push_back(mo->getName());
+        auto &objects = scene->getObjects();
+        std::vector<std::string> objectsNames;
+        for (auto &mo : objects)
+            objectsNames.push_back(mo->getName());
 
-        for (int i = 0; i < modelsNames.size(); i++)
+        for (int i = 0; i < objectsNames.size(); i++)
         {
-            items[i] = modelsNames[i].c_str();
+            items[i] = objectsNames[i].c_str();
         }
 
-        ImGui::ListBox("Select a Model", &modelListIndex, items, modelsNames.size(), 5);
-        auto model = models[modelListIndex];
+        ImGui::ListBox("Select a object", &objectsListIndex, items, objectsNames.size(), 5);
+        auto object = objects[objectsListIndex];
 
-        std::string modelText = "\n" + model->getName() + " parameters:\n";
-        ImGui::Text(modelText.c_str());
+        std::string objectText = "\n" + object->getName() + " parameters:\n";
+        ImGui::Text(objectText.c_str());
         // position
-        glm::vec3 pos = model->getPosition();
+        glm::vec3 pos = object->getPosition();
         ImGui::DragFloat3("Position", &pos[0], 0.01, -10.0, 10.0);
-        model->setPosition(pos);
+        object->setPosition(pos);
         // position
-        glm::vec3 scale = model->getScale();
+        glm::vec3 scale = object->getScale();
         ImGui::DragFloat3("Scale", &scale[0], 0.01, 0.01, 10.0);
-        model->setScale(scale);
+        object->setScale(scale);
 
-        glm::vec3 diffuse = model->getDiffuse();
+        glm::vec3 diffuse = object->getDiffuse();
         ImGui::ColorEdit3("Diffuse", &diffuse[0]);
-        model->setDiffuse(diffuse);
-        glm::vec3 specular = model->getSpecular();
+        object->setDiffuse(diffuse);
+        glm::vec3 specular = object->getSpecular();
         ImGui::ColorEdit3("Specular", &specular[0]);
-        model->setSpecular(specular);
-        float shininess = model->getShininess();
+        object->setSpecular(specular);
+        float shininess = object->getShininess();
         ImGui::DragFloat("Shininess", &shininess, 1.0, 5.0, 256.0);
-        model->setShininess(shininess);
+        object->setShininess(shininess);
 
         ImGui::Text("Texture Parameters:");
-        if (model->hasTextures())
+        if (object->hasTextures())
         {
-            glm::vec2 texScale = model->getTexScaling();
+            glm::vec2 texScale = object->getTexScaling();
             ImGui::DragFloat2("Texture Scaling", &texScale[0], 0.1, 0.1, 20.0);
-            model->setTexScaling(texScale);
+            object->setTexScaling(texScale);
         }
 
         ImGui::TreePop();

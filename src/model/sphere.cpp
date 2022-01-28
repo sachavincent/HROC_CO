@@ -1,8 +1,8 @@
-#include "model.hpp"
+#include "object.hpp"
 
 int UVSphere::instance = 0;
-UVSphere::UVSphere(float _radius, int _nCols, int _nRows){
-    m.name = "UVSphere_"+std::to_string(instance);
+UVSphere::UVSphere(float _radius, int _nCols, int _nRows) : Object() {
+    name = "UVSphere_"+std::to_string(instance);
     instance++;
 
     float x, y, z, xy, s, t;
@@ -55,9 +55,9 @@ UVSphere::UVSphere(float _radius, int _nCols, int _nRows){
         }
     }
 
-    m.translate = glm::mat4{1.0};
-	m.scale     = glm::mat4{1.0};
-	m.rotation  = glm::mat4{1.0};
+    translate = glm::mat4{1.0};
+	scale     = glm::mat4{1.0};
+	rotation  = glm::mat4{1.0};
 }
 
 void inline UVSphere::pushIndices(int ind_1, int ind_2, int ind_3)

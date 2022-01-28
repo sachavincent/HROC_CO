@@ -7,7 +7,8 @@
 #include <mutex>
 #include <iomanip>
 
-Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr), _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
+Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr),
+     _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
 {
     glfwInit();
 
@@ -99,7 +100,8 @@ void Engine::startLoop()
         updateFpsCounter(500);
 
         // final rendering of scene
-        _scene->renderModels();
+        
+        _scene->renderObjects();
 
         // imgui part
         _ui.render(_scene);

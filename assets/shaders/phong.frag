@@ -64,12 +64,10 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos_in);
     vec3 result = vec3(0,0,0);
 
-
     for(int i = 0; i < NR_LIGHTS; i++)
         if(lights[i].enabled)
             result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
 
-    
     FragColor = vec4(result, 1.0);
 }
 

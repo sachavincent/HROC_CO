@@ -21,3 +21,11 @@ const BoundingBox *OrientedBoundingBox::merge(const BoundingBox &A) const
     return &A;
 }
 
+Object* BoundingBox::getWireframe(){
+    if(_wireframe)
+        return _wireframe;
+    _wireframe = new Cube(1.0);
+    _wireframe->setPosition(_center);
+    _wireframe->setScale(_size);
+    return _wireframe;
+}

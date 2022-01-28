@@ -10,25 +10,25 @@ Scene::Scene(Camera &_cam) : cam(_cam)
 
     auto cube0 = std::make_shared<Cube>(1.0f);
     cube0->setPosition({1.1f, 0.6f, 0.0f}).setDiffuse({0.0f, 1.0f, 0.0f}).setSpecular(glm::vec3{0.9});
-    addModel(cube0);
+    addObject(cube0);
 
     auto cube1 = std::make_shared<Cube>(1.0f);
     cube1->setPosition({-2.5f, 0.6f, 0.5f}).setScale({2.0, 1.0, 2.0}).setTexDiffuse("textures/tiles/basecolor.jpg").setTexSpecular("textures/tiles/roughness.png");
-    addModel(cube1);
+    addObject(cube1);
 
     auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
     sphere1->setPosition({3.5, 0.7, 3.5}).setRotation(-90, {1, 0, 0}).setDiffuse({1.0, 0.0, 1.0});
 
-    addModel(sphere1);
+    addObject(sphere1);
 
     auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
     plane1->setRotation(-90, {1, 0, 0}).setTexDiffuse("textures/stoneWall/diffuse.png").setTexSpecular("textures/stoneWall/roughness.png").setTexScaling({4, 4});
-    addModel(plane1);
+    addObject(plane1);
 
     // gold-ish utah teapot
-    auto teapot = std::make_shared<FileModel>("models/teapot.obj", SMOOTH_NORMAL_ENABLE);
+    auto teapot = std::make_shared<FileObject>("models/teapot.obj", SMOOTH_NORMAL_ENABLE);
     teapot->setScale(glm::vec3{0.45f}).setPosition({0.0f, 1.2f, -1.8f}).setDiffuse({0.55f, 0.5f, 0.0f});
-    addModel(teapot);
+    addObject(teapot);
 
     load();
     // TODO: Default scene
@@ -43,31 +43,31 @@ Scene::Scene(Camera &_cam, const std::string &file) : cam(_cam)
 void Scene::load()
 {
     // load models
-    for (uint32_t i = 0; i < models.size(); i++)
+    for (size_t i = 0; i < objects.size(); i++)
     {
-        models[i]->load();
+        objects[i]->load();
     }
 }
 
 //! Render all objects of scene
-void Scene::renderModels()
+void Scene::renderObjects()
 {
-    for (uint32_t i = 0; i < models.size(); i++)
+    for (size_t i = 0; i < objects.size(); i++)
     {
-        models[i]->render(this);
+        objects[i]->draw(this);
     }
 }
 
 void Scene::renderBoundingBoxes(){
     //TODO: this is only a testing code for this method
-    BoundingBox bbox()
+    //BoundingBox bbox();
 
 }
 
 //! Add an object to scene
-Scene &Scene::addModel(std::shared_ptr<Model> _model)
+Scene &Scene::addObject(std::shared_ptr<Object> _object)
 {
-    models.push_back(_model);
+    objects.push_back(_object);
     return *this;
 }
 

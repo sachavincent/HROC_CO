@@ -160,7 +160,7 @@ void FileModel::load()
 
 void FileModel::render(Scene *_scene)
 {
-	Camera &cam = _scene->getCamera();
+	Camera *cam = _scene->getCamera();
 	auto &lights = _scene->getLights();
 	for (auto &subModel : subModels)
 	{
@@ -171,10 +171,10 @@ void FileModel::render(Scene *_scene)
 		glm::mat4 model = subModel.translate * subModel.rotation * subModel.scale;
 
 		sh.loadMat4("model", model);
-		sh.loadMat4("view", cam.getViewMatrix());
-		sh.loadMat4("projection", cam.getProjectionMatrix());
-		sh.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
-		sh.loadVec3("viewPos", cam.getPosition());
+		sh.loadMat4("view", cam->getViewMatrix());
+		sh.loadMat4("projection", cam->getProjectionMatrix());
+		sh.loadVec2("screenSize", glm::vec2(cam->getResWidth(), cam->getResHeight()));
+		sh.loadVec3("viewPos", cam->getPosition());
 		sh.loadFloat("exposure", _scene->getExposure());
 		sh.loadVec2("texScaling", subModel.texScaling);
 

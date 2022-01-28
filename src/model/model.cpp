@@ -59,7 +59,7 @@ void Model::load()
 
 void Model::render(Scene *_scene)
 {
-	Camera &cam = _scene->getCamera();
+	Camera *cam = _scene->getCamera();
 	auto &lights = _scene->getLights();
 
 	m.shader.start();
@@ -68,10 +68,10 @@ void Model::render(Scene *_scene)
 	glm::mat4 model = m.translate * m.rotation * m.scale;
 
 	m.shader.loadMat4("model", model);
-	m.shader.loadMat4("view", cam.getViewMatrix());
-	m.shader.loadMat4("projection", cam.getProjectionMatrix());
-	m.shader.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
-	m.shader.loadVec3("viewPos", cam.getPosition());
+	m.shader.loadMat4("view", cam->getViewMatrix());
+	m.shader.loadMat4("projection", cam->getProjectionMatrix());
+	m.shader.loadVec2("screenSize", glm::vec2(cam->getResWidth(), cam->getResHeight()));
+	m.shader.loadVec3("viewPos", cam->getPosition());
 	m.shader.loadFloat("exposure", _scene->getExposure());
 	m.shader.loadVec2("texScaling", m.texScaling);
 

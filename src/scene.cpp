@@ -1,6 +1,7 @@
 #include "scene.hpp"
+#include "engine.hpp"
 
-Scene::Scene(Camera &_cam) : cam(_cam)
+Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0)
 {
 
     auto light0 = std::make_shared<Light>(glm::vec3{-0.2, 0.25, -0.8}, glm::vec3{0.8f});
@@ -34,7 +35,7 @@ Scene::Scene(Camera &_cam) : cam(_cam)
     // TODO: Default scene
 }
 
-Scene::Scene(Camera &_cam, const std::string &file) : cam(_cam)
+Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0)
 {
     // TODO:
 }
@@ -58,10 +59,9 @@ void Scene::renderModels()
     }
 }
 
-void Scene::renderBoundingBoxes(){
-    //TODO: this is only a testing code for this method
-    BoundingBox bbox()
-
+void Scene::renderBoundingBoxes()
+{
+    // TODO: this is only a testing code for this method
 }
 
 //! Add an object to scene
@@ -78,8 +78,7 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
     return *this;
 }
 
-Scene &Scene::setCamera(Camera &_cam)
+Camera *Scene::getCamera()
 {
-    cam = _cam;
-    return *this;
+    return engine->getCurrentCamera();
 }

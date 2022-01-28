@@ -15,6 +15,7 @@ private:
 	int _width;
 	int _height;
 
+	glm::vec3 movingFactor;
 	glm::vec3 _position;
 	float _yaw;
 	float _pitch;
@@ -75,7 +76,7 @@ public:
 	// ! Get projection perspective frustum
 	inline glm::mat4 getProjectionMatrix() const
 	{
-		return glm::perspective(glm::radians(_fov), (float)_width/_height, 0.3f, 100.0f);
+		return glm::perspective(glm::radians(_fov), (float)_width / _height, 0.3f, 100.0f);
 	}
 
 	//! Get current field of view (in degrees)
@@ -107,7 +108,7 @@ public:
 	//! Change the field of view of camera (from 1 to 90 degrees) by an offset
 	float offsetFov(float _offset);
 
-	void move(const glm::vec3 delta);
+	void move(const float delta);
 
 	void rotate(const glm::vec3 delta);
 	//! Move camera in X axis my an offset

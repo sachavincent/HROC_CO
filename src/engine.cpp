@@ -18,7 +18,7 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-    glfwSetErrorCallback(IOUtils::errorCallback);//TODO: Enlever (performances)
+    glfwSetErrorCallback(IOUtils::errorCallback); // TODO: Enlever (performances)
 
     _window = glfwCreateWindow(_width, _height, _windowName.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(_window);
@@ -69,7 +69,7 @@ Scene Engine::loadScene(const std::string &file)
     {
         delete _scene;
     }
-    _scene = new Scene(*_camera, file);
+    _scene = new Scene(this, file);
 
     return *_scene;
 }
@@ -80,7 +80,7 @@ Scene Engine::loadScene()
     {
         clear();
     }
-    _scene = new Scene(*_camera);
+    _scene = new Scene(this);
 
     return *_scene;
 }
@@ -98,6 +98,7 @@ void Engine::startLoop()
 
         updateFpsCounter(500);
 
+        getCurrentCamera()->move(2.0f * _deltaTime);
         // final rendering of scene
         _scene->renderModels();
 

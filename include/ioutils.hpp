@@ -42,6 +42,8 @@ public:
 
 private:
     static void onKeyPressed(GLFWwindow *window, int key);
+    
+    static void onKeyReleased(GLFWwindow *window, int key);
 };
 
 #endif

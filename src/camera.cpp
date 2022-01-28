@@ -1,8 +1,7 @@
 #include "camera.hpp"
 #include "frustum.hpp"
 
-
-Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(width), _height(height), _position(position), _fov(fov)
+Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(width), _height(height), _position(position), _fov(fov), movingFactor({0, 0, 0})
 {
 	_frustum = new Frustum();
 	_yaw = 90.0;
@@ -10,9 +9,8 @@ Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(wi
 	_front = glm::vec3(0.0f, 0.0f, 1.0f);
 	_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	setResolution(width,height);
+	setResolution(width, height);
 }
-
 
 // direction
 void Camera::updateDirection()
@@ -27,7 +25,6 @@ void Camera::updateDirection()
 	_right = glm::normalize(glm::cross(_front, {0, 1, 0}));
 	_up = glm::normalize(glm::cross(_right, _front));
 }
-
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
 {
@@ -45,7 +42,6 @@ float Camera::offsetPitch(float _offset, float _sensitivity)
 	return _pitch;
 }
 
-
 float Camera::offsetYaw(float _offset, float _sensitivity)
 {
 	_yaw += _offset * _sensitivity;
@@ -56,7 +52,6 @@ float Camera::offsetYaw(float _offset, float _sensitivity)
 	updateDirection();
 	return _yaw;
 }
-
 
 //_fov
 float Camera::offsetFov(float _offset)
@@ -76,21 +71,18 @@ float Camera::offsetFov(float _offset)
 // position
 void Camera::moveX(float _offset)
 {
-	_position += glm::normalize(glm::cross(_front, _up)) * _offset;
+	movingFactor = movingFactor + glm::vec3(_offset, 0, 0);
 }
-
 
 void Camera::moveY(float _offset)
 {
-	_position += glm::normalize(_up) * _offset;
+	movingFactor = movingFactor + glm::vec3(0, _offset, 0);
 }
-
 
 void Camera::moveZ(float _offset)
 {
-	_position += _front * _offset;
+	movingFactor = movingFactor + glm::vec3(0, 0, _offset);
 }
-
 
 void Camera::setResolution(int w, int h)
 {
@@ -100,12 +92,12 @@ void Camera::setResolution(int w, int h)
 	_lastY = (float)h / 2.0;
 }
 
-
-void Camera::move(const glm::vec3 delta)
+void Camera::move(const float delta)
 {
-	// TODO
+	_position += movingFactor.x * delta * glm::normalize(glm::cross(_front, _up));
+	_position += movingFactor.y * delta * glm::normalize(_up);
+	_position += movingFactor.z * delta * _front;
 }
-
 
 void Camera::rotate(const glm::vec3 delta)
 {

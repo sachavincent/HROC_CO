@@ -4,7 +4,7 @@
 void IOUtils::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
     _resetFocus = true;
-    _engine->getCurrentCamera()->setResolution(width, height);
+    _engine->setResolution(width, height);
 }
 
 void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -40,6 +40,9 @@ void IOUtils::keyCallback(GLFWwindow *window, int key, int scancode, int action,
     case GLFW_PRESS:
         IOUtils::onKeyPressed(window, key);
         break;
+    case GLFW_RELEASE:
+        IOUtils::onKeyReleased(window, key);
+        break;
     default:
         // No need for now
         break;
@@ -62,12 +65,8 @@ void IOUtils::updateScreenRes(GLFWwindow *window, int width, int height)
 
 void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 {
-    const float cameraSpeed = 2.0f * (float)_engine->getDeltaTime(); // framerate independent
     switch (key)
     {
-    case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, true);
-        break;
     case GLFW_KEY_E:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         break;
@@ -80,26 +79,26 @@ void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 
     case GLFW_KEY_W:
     case GLFW_KEY_UP:
-        _engine->getCurrentCamera()->moveZ(cameraSpeed);
+        _engine->getCurrentCamera()->moveZ(1.0);
         break;
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
-        _engine->getCurrentCamera()->moveZ(-cameraSpeed);
+        _engine->getCurrentCamera()->moveZ(-1.0);
         break;
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
-        _engine->getCurrentCamera()->moveX(-cameraSpeed);
+        _engine->getCurrentCamera()->moveX(-1.0);
         break;
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
-        _engine->getCurrentCamera()->moveX(cameraSpeed);
+        _engine->getCurrentCamera()->moveX(1.0);
         break;
 
     case GLFW_KEY_SPACE:
-        _engine->getCurrentCamera()->moveY(cameraSpeed);
+        _engine->getCurrentCamera()->moveY(1.0);
         break;
     case GLFW_KEY_LEFT_CONTROL:
-        _engine->getCurrentCamera()->moveY(-cameraSpeed);
+        _engine->getCurrentCamera()->moveY(-1.0);
         break;
 
     case GLFW_KEY_U:
@@ -117,6 +116,43 @@ void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 
     case GLFW_KEY_L:
         _engine->switchCamera();
+        break;
+    default:
+        // Key not assigned
+        break;
+    }
+}
+
+void IOUtils::onKeyReleased(GLFWwindow *window, int key)
+{
+    //const float cameraSpeed = 200.0f * (float)_engine->getDeltaTime(); // framerate independent
+    switch (key)
+    {
+    case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, true);
+        break;
+    case GLFW_KEY_W:
+    case GLFW_KEY_UP:
+        _engine->getCurrentCamera()->moveZ(-1.0);
+        break;
+    case GLFW_KEY_S:
+    case GLFW_KEY_DOWN:
+        _engine->getCurrentCamera()->moveZ(1.0);
+        break;
+    case GLFW_KEY_A:
+    case GLFW_KEY_LEFT:
+        _engine->getCurrentCamera()->moveX(1.0);
+        break;
+    case GLFW_KEY_D:
+    case GLFW_KEY_RIGHT:
+        _engine->getCurrentCamera()->moveX(-1.0);
+        break;
+
+    case GLFW_KEY_SPACE:
+        _engine->getCurrentCamera()->moveY(-1.0);
+        break;
+    case GLFW_KEY_LEFT_CONTROL:
+        _engine->getCurrentCamera()->moveY(1.0);
         break;
     default:
         // Key not assigned

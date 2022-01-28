@@ -11,20 +11,23 @@
 #include "light.hpp"
 #include "boundingbox.hpp"
 
+class Engine;
+
 class Scene
 {
-
-private:
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
 
     Camera &cam;
 
-    float exposure = 1.0;
+    Engine *engine;
+
+    float exposure;
 
 public:
-    Scene(Camera &_cam);
-    Scene(Camera &_cam, const std::string &file);
+    Scene(Engine *_engine);
+
+    Scene(Engine *_engine, const std::string &_file);
 
     void load();
     //! render objects with standard shader (i.e. Phong)
@@ -34,16 +37,16 @@ public:
 
     Scene &addObject(std::shared_ptr<Object> _object);
     Scene &addLight(std::shared_ptr<Light> _light);
-    Scene &setCamera(Camera &_cam);
 
     Scene &setExposure(float _exposure)
     {
         exposure = _exposure;
         return *this;
     }
-    float getExposure() { return exposure; }
-    Camera &getCamera() { return cam; }
-    Camera &getFreeCam() { return cam; }
+
+    Camera *getCamera();
+
+    inline float getExposure() const { return exposure; }
 
     inline const std::vector<std::shared_ptr<Light>> &getLights() { return lights; }
 

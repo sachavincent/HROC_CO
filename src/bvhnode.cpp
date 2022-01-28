@@ -3,7 +3,7 @@ BvhNode::BvhNode(const BoundingBox *boundingBox) : _boundingBox(boundingBox), _l
 {
     static int _val = 0;
     id = _val;
-    _val+=1;
+    _val += 1;
 }
 
 const BvhNode &BvhNode::getChild(const NodeType &t) const
@@ -17,7 +17,6 @@ const BvhNode &BvhNode::getChild(const NodeType &t) const
         return getRightChild();
     }
 }
-
 
 const BvhNode &BvhNode::sibling() const
 {

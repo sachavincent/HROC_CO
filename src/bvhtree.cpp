@@ -1,8 +1,10 @@
 #include "bvhtree.hpp"
-
-void eraseInVector(std::vector<BvhNode> & nodes, BvhNode node){
-    for (auto it = nodes.begin();it!=nodes.end();it++){
-        if(it->getId() == node.getId()){
+void eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
+{
+    for (auto it = nodes.begin(); it != nodes.end(); it++)
+    {
+        if (it->getId() == node.getId())
+        {
             nodes.erase(it);
             return;
         }
@@ -20,10 +22,10 @@ BvhTree::BvhTree(std::vector<BoundingBox> &objs)
     mergeAll(nodes);
 }
 void BvhTree::createMap(std::vector<BvhNode> &nodes)
-{   
+{
     map = new std::multimap<float, PairNode>();
-    
-    map->insert(PairDistanceNode(BoundingBox::distance((nodes[0]).getBoundingBox(), (nodes[1]).getBoundingBox()),PairNode(nodes[0],nodes[1])));
+
+    map->insert(PairDistanceNode(BoundingBox::distance((nodes[0]).getBoundingBox(), (nodes[1]).getBoundingBox()), PairNode(nodes[0], nodes[1])));
 
     std::vector<BvhNode> nodeInMap;
     nodeInMap.reserve(nodes.size());
@@ -39,7 +41,7 @@ void BvhTree::addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
-        map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node.getBoundingBox(), (BoundingBox &)it->getBoundingBox()),PairNode(node, *it)));
+        map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node.getBoundingBox(), (BoundingBox &)it->getBoundingBox()), PairNode(node, *it)));
     }
 }
 void BvhTree::removeFromMap(BvhNode &node)
@@ -64,8 +66,8 @@ void BvhTree::mergeAll(std::vector<BvhNode> &nodes)
         root = &merged;
         return;
     }
-    eraseInVector(nodes,first);
-    eraseInVector(nodes,second);
+    eraseInVector(nodes, first);
+    eraseInVector(nodes, second);
     removeFromMap(first);
     removeFromMap(second);
     addToMap(merged, nodes);
@@ -77,4 +79,41 @@ BvhTree::PairNode BvhTree::requestMap()
 {
     auto it = map->begin();
     return it->second;
+}
+
+std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes)
+{
+
+    std::vector<BvhNode> occludeeGroups;
+    occludeeGroups.reserve(allNodes.size());
+    if (allNodes.empty())
+    {
+        occludeeGroups.push_back(*root);
+        return occludeeGroups;
+    }
+    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    {
+        it->setVisibility(Visibility::null);
+    }
+
+    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    {
+        BvhNode &n = *it;
+        while (n.getVisibility() != Visibility::VISIBLE && n.getId() != root->getId())
+        {
+            n.setVisibility(Visibility::VISIBLE);
+            BvhNode n2 = n.sibling();
+            n2.setVisibility(Visibility::UNKNOWN);
+            n = n.getParent();
+        }
+    }
+    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    {
+        if (it->getVisibility() == Visibility::UNKNOWN)
+        {
+            occludeeGroups.push_back(*it);
+        }
+    }
+
+    return occludeeGroups;
 }

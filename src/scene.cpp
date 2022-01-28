@@ -58,6 +58,12 @@ void Scene::renderModels()
     }
 }
 
+void Scene::renderBoundingBoxes(){
+    //TODO: this is only a testing code for this method
+    BoundingBox bbox()
+
+}
+
 //! Add an object to scene
 Scene &Scene::addModel(std::shared_ptr<Model> _model)
 {

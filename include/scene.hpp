@@ -9,6 +9,7 @@
 #include "model.hpp"
 #include "camera.hpp"
 #include "light.hpp"
+#include "boundingbox.hpp"
 
 class Scene
 {
@@ -26,7 +27,10 @@ public:
     Scene(Camera &_cam, const std::string &file);
 
     void load();
+    //! render models with standard shader (i.e. Phong)
     void renderModels();
+    //! render a wireframe view of all bounding boxes in the scene.
+    void renderBoundingBoxes();
 
     //! Render all models of scene using the same shader
     /**

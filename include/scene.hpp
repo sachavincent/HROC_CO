@@ -15,10 +15,9 @@ class Engine;
 
 class Scene
 {
+private:
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
-
-    Camera &cam;
 
     Engine *engine;
 

@@ -1,5 +1,6 @@
 #include "bvhtree.hpp"
-void eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
+
+void BvhTree::eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
 {
     for (auto it = nodes.begin(); it != nodes.end(); it++)
     {

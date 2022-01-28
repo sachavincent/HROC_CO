@@ -160,7 +160,7 @@ void FileObject::load()
 
 void FileObject::draw(Scene *_scene)
 {
-	Camera &cam = _scene->getCamera();
+	Camera *cam = _scene->getCamera();
 	auto &lights = _scene->getLights();
 	for (auto &subObject : subObjects)
 	{
@@ -171,10 +171,10 @@ void FileObject::draw(Scene *_scene)
 		glm::mat4 object = translate * rotation * scale;
 
 		sh.loadMat4("object", object);
-		sh.loadMat4("view", cam.getViewMatrix());
-		sh.loadMat4("projection", cam.getProjectionMatrix());
-		sh.loadVec2("screenSize", glm::vec2(cam.getResWidth(), cam.getResHeight()));
-		sh.loadVec3("viewPos", cam.getPosition());
+		sh.loadMat4("view", cam->getViewMatrix());
+		sh.loadMat4("projection", cam->getProjectionMatrix());
+		sh.loadVec2("screenSize", glm::vec2(cam->getResWidth(), cam->getResHeight()));
+		sh.loadVec3("viewPos", cam->getPosition());
 		sh.loadFloat("exposure", _scene->getExposure());
 		sh.loadVec2("texScaling", texScaling);
 

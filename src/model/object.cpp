@@ -62,18 +62,18 @@ void Object::load() {
 }
 
 void Object::draw(Scene* _scene) {
-    Camera& cam = _scene->getCamera();
+    Camera* cam = _scene->getCamera();
     // std::cout << m.indices.size() << std::endl;
     auto& lights = _scene->getLights();
 
     shader.start();
 
     shader.loadMat4("model", translate * rotation * scale);
-    shader.loadMat4("view", cam.getViewMatrix());
-    shader.loadMat4("projection", cam.getProjectionMatrix());
+    shader.loadMat4("view", cam->getViewMatrix());
+    shader.loadMat4("projection", cam->getProjectionMatrix());
     shader.loadVec2("screenSize",
-                    glm::vec2(cam.getResWidth(), cam.getResHeight()));
-    shader.loadVec3("viewPos", cam.getPosition());
+                    glm::vec2(cam->getResWidth(), cam->getResHeight()));
+    shader.loadVec3("viewPos", cam->getPosition());
     shader.loadFloat("exposure", _scene->getExposure());
     shader.loadVec2("texScaling", texScaling);
 

@@ -48,7 +48,8 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0) {
     // TODO: Default scene
 }
 
-Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0) {
+Scene::Scene(Engine *_engine, const std::string &_file)
+    : engine(_engine), exposure(1.0) {
     // TODO:
 }
 

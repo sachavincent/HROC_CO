@@ -9,7 +9,8 @@
 #include <vector>
 
 #include "bvhnode.hpp"
-class BvhTree {
+class BvhTree
+{
 private:
     typedef std::pair<float, std::pair<BvhNode, BvhNode>> PairDistanceNode;
     typedef std::pair<BvhNode, BvhNode> PairNode;
@@ -32,8 +33,35 @@ public:
 
     void addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare);
 
+    void printBT(const std::string &prefix, const BvhNode &node, bool isLeft)
+    {
+        if (&node != nullptr)
+        {
+            std::cout << prefix;
+
+            std::cout << (isLeft ? "├──" : "└──");
+
+            // print the value of the node
+            std::cout << node.getId() << std::endl;
+
+            // enter the next tree level - left and right branch
+            printBT(prefix + (isLeft ? "│   " : "    "), node.getLeftChild(), true);
+            printBT(prefix + (isLeft ? "│   " : "    "), node.getRightChild(), false);
+        }
+    }
+
+    void printBT(const BvhNode &node)
+    {
+        printBT("", node, false);
+    }
+
+    void print()
+    {
+        printBT(*root);
+    }
+
 private:
-    void eraseInVector(std::vector<BvhNode> &nodes, BvhNode node);
+    static void eraseInVector(std::vector<BvhNode> &nodes, BvhNode node);
 };
 
 #endif

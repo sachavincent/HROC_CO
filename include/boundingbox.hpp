@@ -17,6 +17,10 @@ private:
 public:
     BoundingBox(){};
     BoundingBox(Object &o);
+    inline BoundingBox(glm::vec3 center,glm::vec3 size){
+        _size = size;
+        _center = center;
+    }
     virtual ~BoundingBox() = 0;
 
     inline const glm::vec3 &getSize() const { return _size; }

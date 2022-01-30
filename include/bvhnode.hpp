@@ -40,7 +40,7 @@ public:
         return *_leftChild;
     }
 
-    inline const BvhNode getRightChild() const
+    inline const BvhNode &getRightChild() const
     {
         return *_rightChild;
     }
@@ -48,6 +48,9 @@ public:
     inline const BvhNode &getParent() const
     {
         return *_parent;
+    }
+    inline const NodeType &getType() const{
+        return _type;
     }
 
     const BvhNode &sibling() const;

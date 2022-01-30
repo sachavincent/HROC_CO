@@ -1,16 +1,5 @@
 #include "bvhtree.hpp"
 
-void BvhTree::eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
-{
-    for (auto it = nodes.begin(); it != nodes.end(); it++)
-    {
-        if (it->getId() == node.getId())
-        {
-            nodes.erase(it);
-            return;
-        }
-    }
-}
 BvhTree::BvhTree(std::vector<BoundingBox> &objs)
 {
     std::vector<BvhNode> nodes;
@@ -117,4 +106,16 @@ std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes)
     }
 
     return occludeeGroups;
+}
+
+void BvhTree::eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
+{
+    for (auto it = nodes.begin(); it != nodes.end(); it++)
+    {
+        if (it->getId() == node.getId())
+        {
+            nodes.erase(it);
+            return;
+        }
+    }
 }

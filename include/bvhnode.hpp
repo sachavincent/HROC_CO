@@ -34,28 +34,40 @@ public:
     inline const Visibility getVisibility() const { return _tag; }
 
     inline const int getId() const { return id; }
+
+    inline const bool hasLeftChild() const
+    {
+        return _leftChild != nullptr;
+    }
+
+    inline const bool hasRightChild() const
+    {
+        return _rightChild != nullptr;
+    }
+
+    inline BvhNode *getLeftChild() const
+    {
+        return _leftChild;
+    }
+
+    inline BvhNode *getRightChild() const
+    {
+        return _rightChild;
+    }
+
+    inline BvhNode *getParent() const
+    {
+        return _parent;
+    }
     
-    inline const BvhNode &getLeftChild() const
+    inline const NodeType &getType() const
     {
-        return *_leftChild;
-    }
-
-    inline const BvhNode &getRightChild() const
-    {
-        return *_rightChild;
-    }
-
-    inline const BvhNode &getParent() const
-    {
-        return *_parent;
-    }
-    inline const NodeType &getType() const{
         return _type;
     }
 
-    const BvhNode &sibling() const;
+    BvhNode *sibling() const;
 
-    const BvhNode &getChild(const NodeType &type) const;
+    BvhNode *getChild(const NodeType &type) const;
 
     inline void setType(const NodeType &type)
     {
@@ -73,6 +85,6 @@ public:
         return *_boundingBox;
     }
 
-    static BvhNode merge(BvhNode &left, BvhNode &right);
+    static BvhNode merge(BvhNode *left, BvhNode *right);
 };
 #endif

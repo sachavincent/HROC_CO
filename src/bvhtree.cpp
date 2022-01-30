@@ -1,19 +1,23 @@
 #include "bvhtree.hpp"
 
-BvhTree::BvhTree(std::vector<BoundingBox> &objs)
+BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
 {
     std::vector<BvhNode> nodes;
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(BvhNode(&bb));
+        nodes.emplace_back(BvhNode(bb));
     }
     createMap(nodes);
     mergeAll(nodes);
 }
+
 void BvhTree::createMap(std::vector<BvhNode> &nodes)
 {
     map = new std::multimap<float, PairNode>();
+
+    if (nodes.size() < 2)
+        return;
 
     map->insert(PairDistanceNode(BoundingBox::distance((nodes[0]).getBoundingBox(), (nodes[1]).getBoundingBox()), PairNode(nodes[0], nodes[1])));
 
@@ -27,6 +31,7 @@ void BvhTree::createMap(std::vector<BvhNode> &nodes)
         nodeInMap.push_back(*it);
     }
 }
+
 void BvhTree::addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
@@ -34,23 +39,35 @@ void BvhTree::addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare)
         map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node.getBoundingBox(), (BoundingBox &)it->getBoundingBox()), PairNode(node, *it)));
     }
 }
+
 void BvhTree::removeFromMap(BvhNode &node)
 {
-    for (auto it = map->begin(); it != map->end(); it++)
+    // std::cout << "B4 remove " << map->size() << std::endl;
+    for (auto it = map->begin(); it != map->end(); it)
     {
         if ((it->second.first.getId() == node.getId()) || (it->second.second.getId()) == node.getId())
         {
-            map->erase(it);
-            it--;
+            // std::cout << "before -- " << std::endl;
+            map->erase(it++);
+            // std::cout << "in --" << std::endl;
+
+            // std::cout << "after --" << std::endl;
+        }
+        else
+        {
+            ++it;
         }
     }
+
+    // std::cout << "After remove : " << map->size() << std::endl;
 }
+
 void BvhTree::mergeAll(std::vector<BvhNode> &nodes)
 {
     PairNode pair = requestMap();
     BvhNode first = pair.first;
     BvhNode second = pair.second;
-    BvhNode merged = BvhNode::merge(first, second);
+    BvhNode merged = BvhNode::merge(&first, &second);
     if (map->size() == 1)
     {
         root = &merged;
@@ -88,13 +105,13 @@ std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes)
 
     for (auto it = allNodes.begin(); it != allNodes.end(); it++)
     {
-        BvhNode &n = *it;
-        while (n.getVisibility() != Visibility::VISIBLE && n.getId() != root->getId())
+        BvhNode *n = &(*it);
+        while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
         {
-            n.setVisibility(Visibility::VISIBLE);
-            BvhNode n2 = n.sibling();
-            n2.setVisibility(Visibility::UNKNOWN);
-            n = n.getParent();
+            n->setVisibility(Visibility::VISIBLE);
+            BvhNode *n2 = n->sibling();
+            n2->setVisibility(Visibility::UNKNOWN);
+            n = n->getParent();
         }
     }
     for (auto it = allNodes.begin(); it != allNodes.end(); it++)

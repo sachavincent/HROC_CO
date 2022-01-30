@@ -6,7 +6,7 @@ BvhNode::BvhNode(const BoundingBox *boundingBox) : _boundingBox(boundingBox), _l
     _val += 1;
 }
 
-const BvhNode &BvhNode::getChild(const NodeType &t) const
+const BvhNode *BvhNode::getChild(const NodeType &t) const
 {
     if (t == LEFT)
     {
@@ -18,7 +18,7 @@ const BvhNode &BvhNode::getChild(const NodeType &t) const
     }
 }
 
-const BvhNode &BvhNode::sibling() const
+ BvhNode *BvhNode::sibling() const
 {
     BvhNode *p = _parent;
     if (_type == LEFT)
@@ -33,22 +33,22 @@ const BvhNode &BvhNode::sibling() const
 
 bool BvhNode::isRoot()
 {
-    return &getParent() != nullptr;
+    return getParent() != nullptr;
 }
 
-BvhNode BvhNode::merge(BvhNode &left, BvhNode &right)
+BvhNode BvhNode::merge(BvhNode *left, BvhNode *right)
 {
-    const BoundingBox &bbLeft = left.getBoundingBox();
-    const BoundingBox &bbRight = right.getBoundingBox();
+    const BoundingBox &bbLeft = left->getBoundingBox();
+    const BoundingBox &bbRight = right->getBoundingBox();
     const BoundingBox *bb = bbLeft.merge(bbRight);
     BvhNode p = BvhNode(bb);
-    p._leftChild = &left;
-    p._rightChild = &right;
+    p._leftChild = left;
+    p._rightChild = right;
 
-    left._type = LEFT;
-    left._parent = &p;
+    left->_type = LEFT;
+    left->_parent = &p;
 
-    right._type = RIGHT;
-    right._parent = &p;
+    right->_type = RIGHT;
+    right->_parent = &p;
     return p;
 }

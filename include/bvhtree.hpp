@@ -11,15 +11,22 @@
 #include "bvhnode.hpp"
 class BvhTree
 {
-private:
+
+public: // TODO: For test purposes
     typedef std::pair<float, std::pair<BvhNode, BvhNode>> PairDistanceNode;
     typedef std::pair<BvhNode, BvhNode> PairNode;
+    BvhTree() {}
+
+    std::multimap<float, PairNode> *getMap() const { return map; };
+private:
+    //typedef std::pair<float, std::pair<BvhNode, BvhNode>> PairDistanceNode;
+    //typedef std::pair<BvhNode, BvhNode> PairNode;
 
     BvhNode *root;
     std::multimap<float, PairNode> *map;
 
 public:
-    BvhTree(std::vector<BoundingBox> &objs);
+    BvhTree(std::vector<BoundingBox *> &objs);
 
     std::vector<BvhNode> extractOccludees(std::vector<BvhNode> &allNodes);
 
@@ -33,31 +40,33 @@ public:
 
     void addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare);
 
-    void printBT(const std::string &prefix, const BvhNode &node, bool isLeft)
+    void printBT(const std::string &prefix, const BvhNode  * node, bool isLeft)
     {
-        if (&node != nullptr)
-        {
-            std::cout << prefix;
+        if (node == nullptr)
+            return;
+        std::cout << prefix;
 
-            std::cout << (isLeft ? "├──" : "└──");
+        std::cout << (isLeft ? "|--" : "'--");
 
-            // print the value of the node
-            std::cout << node.getId() << std::endl;
+        // print the value of the node
+        std::cout << node->getId() << std::endl;
 
-            // enter the next tree level - left and right branch
-            printBT(prefix + (isLeft ? "│   " : "    "), node.getLeftChild(), true);
-            printBT(prefix + (isLeft ? "│   " : "    "), node.getRightChild(), false);
-        }
+        // enter the next tree level - left and right branch
+
+        if (node->hasLeftChild())
+            printBT(prefix + (isLeft ? "|   " : "    "), node->getLeftChild(), true);
+        if (node->hasRightChild())
+            printBT(prefix + (isLeft ? "|   " : "    "), node->getRightChild(), false);
     }
 
-    void printBT(const BvhNode &node)
+    void printBT(const BvhNode * node)
     {
         printBT("", node, false);
     }
 
     void print()
     {
-        printBT(*root);
+        printBT(root);
     }
 
 private:

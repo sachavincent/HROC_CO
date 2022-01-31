@@ -89,12 +89,13 @@ public:
         float minZOther = centerOther[2] - sizeOther[2] / 2;
         float maxZOther = centerOther[2] + sizeOther[2] / 2;
 
-        float newMinX = min(minX, minXOther);
-        float newMaxX = max(maxX, maxXOther);
-        float newMinY = min(minY, minYOther);
-        float newMaxY = max(maxY, maxYOther);
-        float newMinZ = min(minZ, minZOther);
-        float newMaxZ = max(maxZ, maxZOther);
+        float newMinX = minX < minXOther ? minX : minXOther;
+        float newMaxX = maxX < maxXOther ? maxX : maxXOther;
+        float newMinY = minY < minYOther ? minY : minYOther;
+        float newMaxY = maxY < maxYOther ? maxY : maxYOther;
+        float newMinZ = minZ < minZOther ? minZ : maxYOther;
+        float newMaxZ = maxZ < maxZOther ? maxZ : maxZOther;
+        
         glm::vec3 newSize(newMaxX - newMinX, newMaxY - newMinY, newMaxZ - newMinZ);
 
         BoundingBox *newBoundingBox = new OrientedBoundingBox(newCenter, newSize);

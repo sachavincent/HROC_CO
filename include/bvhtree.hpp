@@ -14,8 +14,8 @@ class BvhTree
 {
 
 public: // TODO: For test purposes
-    typedef std::pair<float, std::pair<BvhNode, BvhNode>> PairDistanceNode;
-    typedef std::pair<BvhNode, BvhNode> PairNode;
+    typedef std::pair<float, std::pair<BvhNode*, BvhNode*>> PairDistanceNode;
+    typedef std::pair<BvhNode*, BvhNode*> PairNode;
     BvhTree() {}
 
     std::multimap<float, PairNode> *getMap() const { return map; };
@@ -25,23 +25,23 @@ private:
 
     BvhNode *root;
     std::multimap<float, PairNode> *map;
-    std::vector<BvhNode> nodes;
+    std::vector<BvhNode*> nodes;
     IdGenerator* idGenerator = nullptr;
 public:
     BvhTree(std::vector<BoundingBox *> &objs,IdGenerator* _idGen);
     BvhTree(std::vector<BoundingBox *> &objs);
 
-    std::vector<BvhNode> extractOccludees(std::vector<BvhNode> &allNodes);
+    std::vector<BvhNode*>* extractOccludees(std::vector<BvhNode*> &allNodes);
 
-    void createMap(std::vector<BvhNode> &nodes);
+    void createMap(std::vector<BvhNode*> &nodes);
 
-    void mergeAll(std::vector<BvhNode> &nodes);
+    void mergeAll(std::vector<BvhNode*> &nodes);
 
     PairNode requestMap();
 
     void removeFromMap(BvhNode &node);
 
-    void addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare);
+    void addToMap(BvhNode* node, std::vector<BvhNode*> &nodesToCompare);
 
     void printBT(const std::string &prefix, const BvhNode  * node, bool isLeft)
     {
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    static void eraseInVector(std::vector<BvhNode> &nodes, BvhNode node);
+    static void eraseInVector(std::vector<BvhNode*> &nodes, BvhNode* node);
 };
 
 #endif

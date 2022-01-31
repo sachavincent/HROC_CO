@@ -85,6 +85,6 @@ public:
         return *_boundingBox;
     }
 
-    static BvhNode merge(BvhNode *left, BvhNode *right,int newid);
+    static BvhNode* merge(BvhNode *left, BvhNode *right,int newid);
 };
 #endif

@@ -7,7 +7,7 @@ BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(BvhNode(bb,idGenerator->GetUniqueId()));
+        nodes.emplace_back(new BvhNode(bb,idGenerator->GetUniqueId()));
     }
     createMap(nodes);
     mergeAll(nodes);
@@ -21,37 +21,37 @@ BvhTree::BvhTree(std::vector<BoundingBox *> &objs,IdGenerator* _idGenerator)
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(BvhNode(bb,idGenerator->GetUniqueId()));
+        nodes.emplace_back(new BvhNode(bb,idGenerator->GetUniqueId()));
     }
     createMap(nodes);
     mergeAll(nodes);
 }
 
-void BvhTree::createMap(std::vector<BvhNode> &nodes)
+void BvhTree::createMap(std::vector<BvhNode*> &_nodes)
 {
     map = new std::multimap<float, PairNode>();
 
-    if (nodes.size() < 2)
+    if (_nodes.size() < 2)
         return;
 
-    map->insert(PairDistanceNode(BoundingBox::distance((nodes[0]).getBoundingBox(), (nodes[1]).getBoundingBox()), PairNode(nodes[0], nodes[1])));
+    map->insert(PairDistanceNode(BoundingBox::distance((_nodes[0])->getBoundingBox(), (_nodes[1])->getBoundingBox()), PairNode(_nodes[0], _nodes[1])));
 
-    std::vector<BvhNode> nodeInMap;
-    nodeInMap.reserve(nodes.size());
-    nodeInMap.push_back(nodes[0]);
-    nodeInMap.push_back(nodes[1]);
-    for (auto it = nodes.begin() + 2; it != nodes.end(); ++it)
+    std::vector<BvhNode*> nodeInMap;
+    nodeInMap.reserve(_nodes.size());
+    nodeInMap.push_back(_nodes[0]);
+    nodeInMap.push_back(_nodes[1]);
+    for (auto it = _nodes.begin() + 2; it != _nodes.end(); ++it)
     {
         addToMap(*it, nodeInMap);
         nodeInMap.emplace_back(*it);
     }
 }
 
-void BvhTree::addToMap(BvhNode &node, std::vector<BvhNode> &nodesToCompare)
+void BvhTree::addToMap(BvhNode *node, std::vector<BvhNode*> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
-        map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node.getBoundingBox(), (BoundingBox &)it->getBoundingBox()), PairNode(node, *it)));
+        map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node->getBoundingBox(), (BoundingBox &)(*it)->getBoundingBox()), PairNode(node, *it)));
     }
 }
 
@@ -60,7 +60,7 @@ void BvhTree::removeFromMap(BvhNode &node)
     // std::cout << "B4 remove " << map->size() << std::endl;
     for (auto it = map->begin(); it != map->end(); it)
     {
-        if ((it->second.first.getId() == node.getId()) || (it->second.second.getId()) == node.getId())
+        if ((it->second.first->getId() == node.getId()) || (it->second.second->getId()) == node.getId())
         {
             // std::cout << "before -- " << std::endl;
             map->erase(it++);
@@ -77,24 +77,24 @@ void BvhTree::removeFromMap(BvhNode &node)
     // std::cout << "After remove : " << map->size() << std::endl;
 }
 
-void BvhTree::mergeAll(std::vector<BvhNode> &nodes)
+void BvhTree::mergeAll(std::vector<BvhNode*> &_nodes)
 {
     PairNode pair = requestMap();
-    BvhNode first = pair.first;
-    BvhNode second = pair.second;
-    BvhNode merged = BvhNode::merge(&first, &second,idGenerator->GetUniqueId());
+    BvhNode* first = pair.first;
+    BvhNode* second = pair.second;
+    BvhNode* merged = BvhNode::merge(first, second,idGenerator->GetUniqueId());
     if (map->size() == 1)
     {
-        root = &merged;
+        root = merged;
         return;
     }
-    eraseInVector(nodes, first);
-    eraseInVector(nodes, second);
-    removeFromMap(first);
-    removeFromMap(second);
-    addToMap(merged, nodes);
-    nodes.push_back(merged);
-    mergeAll(nodes);
+    eraseInVector(_nodes, first);
+    eraseInVector(_nodes, second);
+    removeFromMap(*first);
+    removeFromMap(*second);
+    addToMap(merged, _nodes);
+    _nodes.push_back(merged);
+    mergeAll(_nodes);
 }
 
 BvhTree::PairNode BvhTree::requestMap()
@@ -103,24 +103,24 @@ BvhTree::PairNode BvhTree::requestMap()
     return it->second;
 }
 
-std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes)
+std::vector<BvhNode*>* BvhTree::extractOccludees(std::vector<BvhNode*> &allNodes)
 {
 
-    std::vector<BvhNode> occludeeGroups;
-    occludeeGroups.reserve(allNodes.size());
+    std::vector<BvhNode*> *occludeeGroups = new std::vector<BvhNode*>();
+    occludeeGroups->reserve(allNodes.size());
     if (allNodes.empty())
     {
-        occludeeGroups.push_back(*root);
+        occludeeGroups->push_back(root);
         return occludeeGroups;
     }
     for (auto it = allNodes.begin(); it != allNodes.end(); it++)
     {
-        it->setVisibility(Visibility::null);
+        (*it)->setVisibility(Visibility::null);
     }
 
     for (auto it = allNodes.begin(); it != allNodes.end(); it++)
     {
-        BvhNode *n = &(*it);
+        BvhNode *n = (*it);
         while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
         {
             n->setVisibility(Visibility::VISIBLE);
@@ -131,20 +131,20 @@ std::vector<BvhNode> BvhTree::extractOccludees(std::vector<BvhNode> &allNodes)
     }
     for (auto it = allNodes.begin(); it != allNodes.end(); it++)
     {
-        if (it->getVisibility() == Visibility::UNKNOWN)
+        if ((*it)->getVisibility() == Visibility::UNKNOWN)
         {
-            occludeeGroups.push_back(*it);
+            occludeeGroups->push_back(*it);
         }
     }
 
     return occludeeGroups;
 }
 
-void BvhTree::eraseInVector(std::vector<BvhNode> &nodes, BvhNode node)
+void BvhTree::eraseInVector(std::vector<BvhNode*> &nodes, BvhNode* node)
 {
     for (auto it = nodes.begin(); it != nodes.end(); it++)
     {
-        if (it->getId() == node.getId())
+        if ((*it)->getId() == node->getId())
         {
             nodes.erase(it);
             return;

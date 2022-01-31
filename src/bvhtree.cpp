@@ -43,7 +43,7 @@ void BvhTree::createMap(std::vector<BvhNode> &nodes)
     for (auto it = nodes.begin() + 2; it != nodes.end(); ++it)
     {
         addToMap(*it, nodeInMap);
-        nodeInMap.push_back(*it);
+        nodeInMap.emplace_back(*it);
     }
 }
 

@@ -29,7 +29,7 @@ private:
     const BoundingBox *_boundingBox;
 
 public:
-    BvhNode(const BoundingBox *boundingBox);
+    BvhNode(const BoundingBox *boundingBox,int _id);
 
     inline const Visibility getVisibility() const { return _tag; }
 
@@ -85,6 +85,6 @@ public:
         return *_boundingBox;
     }
 
-    static BvhNode merge(BvhNode *left, BvhNode *right);
+    static BvhNode merge(BvhNode *left, BvhNode *right,int newid);
 };
 #endif

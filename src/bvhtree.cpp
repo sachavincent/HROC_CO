@@ -2,11 +2,26 @@
 
 BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
 {
+    idGenerator = new IdGenerator();
     nodes.clear();
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(BvhNode(bb));
+        nodes.emplace_back(BvhNode(bb,idGenerator->GetUniqueId()));
+    }
+    createMap(nodes);
+    mergeAll(nodes);
+}
+
+
+BvhTree::BvhTree(std::vector<BoundingBox *> &objs,IdGenerator* _idGenerator)
+{
+    idGenerator = _idGenerator;
+    nodes.clear();
+    nodes.reserve(objs.size());
+    for (auto &bb : objs)
+    {
+        nodes.emplace_back(BvhNode(bb,idGenerator->GetUniqueId()));
     }
     createMap(nodes);
     mergeAll(nodes);
@@ -67,7 +82,7 @@ void BvhTree::mergeAll(std::vector<BvhNode> &nodes)
     PairNode pair = requestMap();
     BvhNode first = pair.first;
     BvhNode second = pair.second;
-    BvhNode merged = BvhNode::merge(&first, &second);
+    BvhNode merged = BvhNode::merge(&first, &second,idGenerator->GetUniqueId());
     if (map->size() == 1)
     {
         root = &merged;

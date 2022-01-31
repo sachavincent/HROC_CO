@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "bvhnode.hpp"
+#include "idgenerator.hpp"
 class BvhTree
 {
 
@@ -25,8 +26,9 @@ private:
     BvhNode *root;
     std::multimap<float, PairNode> *map;
     std::vector<BvhNode> nodes;
-
+    IdGenerator* idGenerator = nullptr;
 public:
+    BvhTree(std::vector<BoundingBox *> &objs,IdGenerator* _idGen);
     BvhTree(std::vector<BoundingBox *> &objs);
 
     std::vector<BvhNode> extractOccludees(std::vector<BvhNode> &allNodes);

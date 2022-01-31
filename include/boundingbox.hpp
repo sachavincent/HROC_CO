@@ -93,7 +93,7 @@ public:
         float newMaxX = maxX > maxXOther ? maxX : maxXOther;
         float newMinY = minY < minYOther ? minY : minYOther;
         float newMaxY = maxY > maxYOther ? maxY : maxYOther;
-        float newMinZ = minZ < minZOther ? minZ : maxYOther;
+        float newMinZ = minZ < minZOther ? minZ : minZOther;
         float newMaxZ = maxZ > maxZOther ? maxZ : maxZOther;
 
         glm::vec3 newSize(newMaxX - newMinX, newMaxY - newMinY, newMaxZ - newMinZ);

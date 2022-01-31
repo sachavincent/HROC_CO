@@ -24,6 +24,7 @@ private:
 
     BvhNode *root;
     std::multimap<float, PairNode> *map;
+    std::vector<BvhNode> nodes;
 
 public:
     BvhTree(std::vector<BoundingBox *> &objs);

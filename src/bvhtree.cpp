@@ -2,7 +2,7 @@
 
 BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
 {
-    std::vector<BvhNode> nodes;
+    nodes.clear();
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {

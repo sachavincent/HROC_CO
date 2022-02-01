@@ -268,3 +268,54 @@ TEST_F(BvhTest, Constructor_Case_1)
     std::cout << "Print done" << std::endl;
     EXPECT_EQ(0, 0);
 }
+// Pour des BB même endroits mais taille différentes
+TEST_F(BvhTest, Constructor_Case_2)
+{
+    std::vector<BoundingBox*> bbsSameCenter;
+    glm::vec3 center = {1, 1, 1};
+    std::vector<glm::vec3> sizes = {
+        {6.5, 2.5, 3},
+        {3.5, 2.5, 4},
+        {3.5, 0.5, 2},
+        {1.5, 1.5, 1},
+        {3.5, 2.5, 7},
+        {4.5, 5.5, 2.5},
+        {1.5, 5.5, 3}};
+    bbsSameCenter.reserve(sizes.size());
+    for (auto const &value : sizes)
+    {
+        bbsSameCenter.push_back(new AxisBoundingBox(center, value));
+    }
+    std::cout << "BB done" << std::endl;
+    BvhTree tree(bbsSameCenter);
+
+    std::cout << "Hierarchisation terminee" << std::endl;
+    tree.print();
+
+    std::cout << "Print done" << std::endl;
+    EXPECT_EQ(0, 0);
+}
+
+// Pour des BB a distances égale
+TEST_F(BvhTest, Constructor_Case_3)
+{
+    std::vector<BoundingBox*> bbsSameDistance;
+    glm::vec3 size = {1, 1, 1};
+    std::vector<glm::vec3> centers;
+    for (int i = 0;i<15;i++){
+        centers.push_back(glm::vec3{i,i,i});
+    }
+    bbsSameDistance.reserve(centers.size());
+    for (auto const &value : centers)
+    {
+        bbsSameDistance.push_back(new AxisBoundingBox(value, size));
+    }
+    std::cout << "BB done" << std::endl;
+    BvhTree tree(bbsSameDistance);
+
+    std::cout << "Hierarchisation terminee" << std::endl;
+    tree.print();
+
+    std::cout << "Print done" << std::endl;
+    EXPECT_EQ(0, 0);
+}

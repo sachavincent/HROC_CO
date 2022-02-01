@@ -14,7 +14,7 @@ class BoundingBox
 private:
     glm::vec3 _size;
     glm::vec3 _center;
-    Cube *_wireframe = nullptr;
+    BoundingBoxObject *_wireframe = nullptr;
 
 public:
     BoundingBox(){};
@@ -35,7 +35,7 @@ public:
     inline const glm::vec3 &getSize() const { return _size; }
     inline const glm::vec3 &getCenter() const { return _center; }
 
-    virtual const BoundingBox *merge(const BoundingBox &A) const = 0;
+    virtual BoundingBox *merge(const BoundingBox &A) const = 0;
 
     inline static float distance(const BoundingBox &A, const BoundingBox &B)
     {
@@ -45,7 +45,8 @@ public:
     };
 
     //! Get a model of the BoundingBox object for debug mode rendering
-    Object *getWireframe();
+    BoundingBoxObject *getWireframe();
+
 };
 class OrientedBoundingBox : public BoundingBox
 {
@@ -66,7 +67,7 @@ public:
     inline const glm::mat3 &getTransform() const { return _transform; }
 
     // const BoundingBox *merge(const BoundingBox &A) const;
-    const BoundingBox *merge(const BoundingBox &other) const
+    BoundingBox *merge(const BoundingBox &other) const
     {
         glm::vec3 center = getCenter();
         glm::vec3 centerOther = other.getCenter();

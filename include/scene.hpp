@@ -10,6 +10,7 @@
 #include "camera.hpp"
 #include "light.hpp"
 #include "boundingbox.hpp"
+#include "bvhtree.hpp"
 
 class Engine;
 
@@ -23,6 +24,7 @@ private:
 
     float exposure;
 
+    BvhTree* hierarchy;
 public:
     Scene(Engine *_engine);
 

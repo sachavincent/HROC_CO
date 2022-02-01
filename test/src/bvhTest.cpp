@@ -95,11 +95,11 @@ BvhNode BvhNode::merge(BvhNode *left, BvhNode *right)
 TEST_F(BvhTest, Merge_Case_1)
 {
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(simpleBBList[0],idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(simpleBBList[1],idGenerator.GetUniqueId());
+    BvhNode *nodeLeft = new BvhNode(simpleBBList[0], idGenerator.GetUniqueId());
+    BvhNode *nodeRight = new BvhNode(simpleBBList[1], idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode* actual = BvhNode::merge(nodeLeft, nodeRight,idGenerator.GetUniqueId());
+    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{0, 0, 0};
@@ -114,13 +114,13 @@ TEST_F(BvhTest, Merge_Case_1)
  */
 TEST_F(BvhTest, Merge_Case_2)
 {
-    
+
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(simpleBBList[2],idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(nodeLeft->getBoundingBox().getCenter(), glm::vec3(2, 0.5, 4)),idGenerator.GetUniqueId());
+    BvhNode *nodeLeft = new BvhNode(simpleBBList[2], idGenerator.GetUniqueId());
+    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(nodeLeft->getBoundingBox().getCenter(), glm::vec3(2, 0.5, 4)), idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode* actual = BvhNode::merge(nodeLeft, nodeRight,idGenerator.GetUniqueId());
+    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{4, 0, 0};
@@ -136,11 +136,11 @@ TEST_F(BvhTest, Merge_Case_2)
 TEST_F(BvhTest, Merge_Case_3)
 {
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(new AxisBoundingBox(glm::vec3{-1, 3, -7}, glm::vec3(2, 3, 5)),idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(glm::vec3(-4, -5, 2), glm::vec3(3, 2, 1)),idGenerator.GetUniqueId());
+    BvhNode *nodeLeft = new BvhNode(new AxisBoundingBox(glm::vec3{-1, 3, -7}, glm::vec3(2, 3, 5)), idGenerator.GetUniqueId());
+    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(glm::vec3(-4, -5, 2), glm::vec3(3, 2, 1)), idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode* actual = BvhNode::merge(nodeLeft, nodeRight,idGenerator.GetUniqueId());
+    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{-2.5, -1, -2.5};
@@ -156,11 +156,11 @@ TEST_F(BvhTest, Merge_Case_3)
 TEST_F(BvhTest, CreateMap_Case_1)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode*> nodes;
+    std::vector<BvhNode *> nodes;
     nodes.reserve(simpleBBList.size());
     for (auto bb : simpleBBList)
     {
-        nodes.push_back(new BvhNode(bb,idGenerator.GetUniqueId()));
+        nodes.push_back(new BvhNode(bb, idGenerator.GetUniqueId()));
     }
 
     BvhTree tree;
@@ -192,7 +192,7 @@ TEST_F(BvhTest, CreateMap_Case_1)
 TEST_F(BvhTest, CreateMap_Case_2)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode*> nodes = {new BvhNode(simpleBBList[0],idGenerator.GetUniqueId())};
+    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId())};
 
     BvhTree tree;
 
@@ -212,7 +212,7 @@ TEST_F(BvhTest, CreateMap_Case_2)
  */
 TEST_F(BvhTest, CreateMap_Case_3)
 {
-    std::vector<BvhNode*> nodes;
+    std::vector<BvhNode *> nodes;
 
     BvhTree tree;
 
@@ -233,7 +233,7 @@ TEST_F(BvhTest, CreateMap_Case_3)
 TEST_F(BvhTest, CreateMap_Case_4)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode*> nodes = {new BvhNode(simpleBBList[0],idGenerator.GetUniqueId()),new BvhNode(simpleBBList[1],idGenerator.GetUniqueId())};
+    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId()), new BvhNode(simpleBBList[1], idGenerator.GetUniqueId())};
 
     BvhTree tree;
 
@@ -256,22 +256,46 @@ TEST_F(BvhTest, CreateMap_Case_4)
     }
 }
 
+/**
+ * @brief Parcours en profondeur
+ */
+void getTreeIds(BvhNode *root, std::vector<int> &idList)
+{
+    idList.push_back(root->getId());
+    if (root->hasLeftChild())
+        getTreeIds(root->getLeftChild(), idList);
+    if (root->hasRightChild())
+        getTreeIds(root->getRightChild(), idList);
+}
+
+/**
+ * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) cas général
+ */
 TEST_F(BvhTest, Constructor_Case_1)
 {
-
-    std::cout << "BB done" << std::endl;
     BvhTree tree(bbs1);
+    BvhNode *root = tree.getRoot();
 
-    std::cout << "Hierarchisation terminee" << std::endl;
-    tree.print();
+    std::vector<int> expectedIdList = {12, 11, 9, 4, 0, 6, 10, 8, 7, 2, 1, 3, 5};
+    std::vector<int> actualList;
 
-    std::cout << "Print done" << std::endl;
-    EXPECT_EQ(0, 0);
+    getTreeIds(root, actualList);
+
+    EXPECT_EQ(expectedIdList.size(), actualList.size());
+
+    int i = 0;
+    for (auto it = actualList.begin(); it != actualList.end(); it++, i++)
+    {
+        EXPECT_EQ(expectedIdList[i], *it);
+    }
 }
-// Pour des BB même endroits mais taille différentes
+
+/**
+ * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) pour des BB même endroits mais tailles différentes
+ */
 TEST_F(BvhTest, Constructor_Case_2)
 {
-    std::vector<BoundingBox*> bbsSameCenter;
+    std::vector<BoundingBox *> bbsSameCenter;
     glm::vec3 center = {1, 1, 1};
     std::vector<glm::vec3> sizes = {
         {6.5, 2.5, 3},
@@ -286,36 +310,32 @@ TEST_F(BvhTest, Constructor_Case_2)
     {
         bbsSameCenter.push_back(new AxisBoundingBox(center, value));
     }
-    std::cout << "BB done" << std::endl;
     BvhTree tree(bbsSameCenter);
 
-    std::cout << "Hierarchisation terminee" << std::endl;
     tree.print();
 
-    std::cout << "Print done" << std::endl;
     EXPECT_EQ(0, 0);
 }
 
-// Pour des BB a distances égale
+/**
+ * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) pour des BB à distances égales
+ */
 TEST_F(BvhTest, Constructor_Case_3)
 {
-    std::vector<BoundingBox*> bbsSameDistance;
+    std::vector<BoundingBox *> bbsSameDistance;
     glm::vec3 size = {1, 1, 1};
     std::vector<glm::vec3> centers;
-    for (int i = 0;i<15;i++){
-        centers.push_back(glm::vec3{i,i,i});
+    for (int i = 0; i < 15; i++)
+    {
+        centers.push_back(glm::vec3{i, i, i});
     }
     bbsSameDistance.reserve(centers.size());
     for (auto const &value : centers)
     {
         bbsSameDistance.push_back(new AxisBoundingBox(value, size));
     }
-    std::cout << "BB done" << std::endl;
     BvhTree tree(bbsSameDistance);
 
-    std::cout << "Hierarchisation terminee" << std::endl;
     tree.print();
-
-    std::cout << "Print done" << std::endl;
     EXPECT_EQ(0, 0);
 }

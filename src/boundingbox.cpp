@@ -14,11 +14,11 @@ BoundingBox::BoundingBox(Object &o)
 {
 }
 
-Object *BoundingBox::getWireframe()
+BoundingBoxObject *BoundingBox::getWireframe()
 {
     if (_wireframe)
         return _wireframe;
-    _wireframe = new Cube(1.0);
+    _wireframe = new BoundingBoxObject(1.0);
     _wireframe->setPosition(_center);
     _wireframe->setScale(_size);
     return _wireframe;

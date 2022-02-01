@@ -26,10 +26,10 @@ private:
     BvhNode *_leftChild;
     BvhNode *_rightChild;
     BvhNode *_parent;
-    const BoundingBox *_boundingBox;
+    BoundingBox *_boundingBox;
 
 public:
-    BvhNode(const BoundingBox *boundingBox,int _id);
+    BvhNode(BoundingBox *boundingBox,int _id);
 
     inline const Visibility getVisibility() const { return _tag; }
 
@@ -80,7 +80,7 @@ public:
 
     bool isRoot();
 
-    inline const BoundingBox &getBoundingBox() const
+    inline BoundingBox &getBoundingBox() const
     {
         return *_boundingBox;
     }

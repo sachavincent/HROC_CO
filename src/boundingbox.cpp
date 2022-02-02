@@ -32,11 +32,11 @@ BoundingBox::BoundingBox(Object &o)
     _size = glm::vec3(maxX - minX,maxY - minY,maxZ - minZ);
 }
 
-Object *BoundingBox::getWireframe()
+BoundingBoxObject *BoundingBox::getWireframe()
 {
     if (_wireframe)
         return _wireframe;
-    _wireframe = new Cube(1.0);
+    _wireframe = new BoundingBoxObject(1.0);
     _wireframe->setPosition(_center);
     _wireframe->setScale(_size);
     return _wireframe;

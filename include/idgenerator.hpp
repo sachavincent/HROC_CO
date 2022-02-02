@@ -4,7 +4,8 @@ class IdGenerator
 {
 private:
     int id = 0;
+
 public:
-    int GetUniqueId() { return id++;};
+    int GetUniqueId() { return id++; };
 };
 #endif

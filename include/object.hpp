@@ -18,7 +18,8 @@
 #include "texture.hpp"
 #include "observable.hpp"
 
-typedef enum {
+typedef enum 
+{
     SMOOTH_NORMAL_ENABLE = true,
     SMOOTH_NORMAL_DISABLE = false
 } SMOOTH_NORMAL;
@@ -26,7 +27,8 @@ typedef enum {
 class Scene;
 class BoundingBox;
 
-class Object : public Observable{
+class Object : public Observable
+{
 protected:
     std::string name;
 
@@ -56,7 +58,8 @@ protected:
     bool _visible;
 
     //! une structure qui encapsule la description d'un seul object
-    struct OBJECT_DATA{
+    struct OBJECT_DATA
+    {
         // vbo = vertices
         // nbo = normals
         // ebo = indices
@@ -70,7 +73,7 @@ protected:
     OBJECT_DATA m;
 
 public:
-    Object(){id=id_counter++;}
+    Object() : _boundingBox(nullptr) { id = id_counter++; }
 
     virtual std::string getName() = 0;
     size_t getId() const { return id; }
@@ -78,8 +81,12 @@ public:
     //! Load the object on the gpu. This action is performed after opengl/glfw initialization
     virtual void load();
     virtual void loadShaders();
+    /*    void loadShaders(const std::string &vert, const std::string &frag)
+        {
+            shader = {vert, frag};
+        }*/
     //! Render the object on screen.
-    virtual void draw(Scene* _scene);
+    virtual void draw(Scene *_scene);
 
 
     virtual Object& setPosition(glm::vec3 _pos);
@@ -97,7 +104,7 @@ public:
 
     inline void setVisible(bool visible) { _visible = visible; }
     inline void setBoundingBox(BoundingBox *boundingBox) { _boundingBox = boundingBox; }
-
+    inline BoundingBox *getBoundingBox() { return _boundingBox; }
 
     virtual glm::vec3 getPosition(){return glm::vec3(translate[3]);}
     virtual glm::vec3 getScale(){return glm::vec3(scale[0][0],scale[1][1],scale[2][2]);}
@@ -126,6 +133,28 @@ public:
     std::string getName(){return name;}
     //! Create a cube of size _edgeSize.
     Cube(float _edgeSize);
+};
+
+class BoundingBoxObject : public Cube
+{
+public:
+    BoundingBoxObject() : Cube()
+    {
+    }
+    BoundingBoxObject(float _edgeSize) : Cube(_edgeSize) {}
+
+    void loadShaders() override
+    {
+        shader = {"shaders/boundingBoxShader.vert", "shaders/boundingBoxShader.frag"};
+    }
+
+    void draw(Scene *_scene, int depth)
+    {
+        shader.start();
+
+        shader.loadInt("depth", depth);
+        Cube::draw(_scene);
+    }
 };
 
 

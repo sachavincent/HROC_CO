@@ -14,7 +14,7 @@ BoundingBox::BoundingBox(Object &o)
 {
     _center = o.getPosition();
 
-    float maxX = 0, maxY = 0 , maxZ = 0;
+    float maxX = -INFINITE, maxY = -INFINITE , maxZ = -INFINITE;
     float minX = INFINITE, minY = INFINITE, minZ = INFINITE;
 
 

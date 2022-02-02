@@ -12,6 +12,24 @@ OrientedBoundingBox::OrientedBoundingBox(Object &o, glm::mat3 &transform) : Boun
 
 BoundingBox::BoundingBox(Object &o)
 {
+    _center = o.getPosition();
+
+    float maxX = 0, maxY = 0 , maxZ = 0;
+    float minX = INFINITE, minY = INFINITE, minZ = INFINITE;
+
+
+    for(auto it = o.getVertices().begin();it != o.getVertices().end();it++)
+    {
+        minX = (*it) < minX ? (*it): minX;
+        maxX = (*it) > maxX ? (*it): maxX;
+        it++;
+        minY = (*it) < minY ? (*it): minY;
+        maxY = (*it) > maxY ? (*it): maxY;
+        it++;
+        minZ = (*it) < minZ ? (*it): minZ;
+        maxZ = (*it) > maxZ ? (*it): maxZ;
+    }
+    _size = glm::vec3(maxX - minX,maxY - minY,maxZ - minZ);
 }
 
 Object *BoundingBox::getWireframe()

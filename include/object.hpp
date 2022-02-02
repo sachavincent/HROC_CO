@@ -102,6 +102,7 @@ public:
     virtual glm::vec3 getPosition(){return glm::vec3(translate[3]);}
     virtual glm::vec3 getScale(){return glm::vec3(scale[0][0],scale[1][1],scale[2][2]);}
 
+    virtual std::vector<GLfloat>& getVertices() {return m.vertices;}
     virtual glm::vec3 getDiffuse(){return diffuseColor;}
     virtual glm::vec3 getSpecular(){return specularColor;}
     virtual float getShininess() {return shininess;}

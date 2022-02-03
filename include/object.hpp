@@ -37,8 +37,8 @@ protected:
     Shader shader;
     std::string shaderVertPath = "";
     std::string shaderFragPath = "";
-    glm::vec3 diffuseColor = glm::vec3{0.9};
-    glm::vec3 specularColor = glm::vec3{1.0};
+    glm::vec3 diffuseColor = glm::vec3{0.9f};
+    glm::vec3 specularColor = glm::vec3{1.0f};
     float shininess = 64.0f;
     
     Texture diffuseMap = Texture::DEFAULT_TEXTURE();
@@ -143,8 +143,6 @@ public:
 
     std::string getName(){return name;}
     bool hasTextures(){return false;}
-    inline const long &getId() const { return id; }
-
 };
 
 class UVSphere : public Object{

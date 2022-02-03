@@ -16,8 +16,8 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
         _lastMouseX = xpos;
         _lastMouseY = ypos;
-        _engine->getCurrentCamera()->offsetYaw(xoffset, MOUSE_SENSITIVTY);
-        _engine->getCurrentCamera()->offsetPitch(yoffset, MOUSE_SENSITIVTY);
+        _engine->getCurrentCamera()->offsetYaw((float)xoffset, MOUSE_SENSITIVTY);
+        _engine->getCurrentCamera()->offsetPitch((float)yoffset, MOUSE_SENSITIVTY);
     }
     else
     {

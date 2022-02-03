@@ -62,63 +62,32 @@ void Object::load() {
 }
 
 void Object::draw(Scene* _scene) {
-    Camera* cam = _scene->getCamera();
-    // std::cout << m.indices.size() << std::endl;
-    auto& lights = _scene->getLights();
+    Shader& sh = _scene->getShader();
 
-    shader.start();
+    sh.loadMat4("model", translate * rotation * scale);
+    sh.loadVec2("texScaling", texScaling);
+    sh.loadFloat("material.specularStrength", 0.5f);
+    sh.loadFloat("material.shininess", shininess);
 
-    shader.loadMat4("model", translate * rotation * scale);
-    shader.loadMat4("view", cam->getViewMatrix());
-    shader.loadMat4("projection", cam->getProjectionMatrix());
-    shader.loadVec2("screenSize",
-                    glm::vec2(cam->getResWidth(), cam->getResHeight()));
-    shader.loadVec3("viewPos", cam->getPosition());
-    shader.loadFloat("exposure", _scene->getExposure());
-    shader.loadVec2("texScaling", texScaling);
-
-    shader.loadFloat("material.specularStrength", 0.5f);
-    shader.loadFloat("material.shininess", shininess);
-
-    // bind diffuse/albedo texture
+    // bind diffuse texture
     glActiveTexture(GL_TEXTURE0);
     if (diffuseMap != Texture::DEFAULT_TEXTURE()) {
-        shader.loadInt("material.diffuseTex", 0);
-        shader.loadBool("material.hasTexture", true);
+        sh.loadInt("material.diffuseTex", 0);
+        sh.loadBool("material.hasTexture", true);
         diffuseMap.load();
     } else {
-        shader.loadVec3("material.diffuse", diffuseColor);
-        shader.loadBool("material.hasTexture", false);
+        sh.loadVec3("material.diffuse", diffuseColor);
+        sh.loadBool("material.hasTexture", false);
         diffuseMap.unload();
     }
-    // bind specular/roughness texture
+    // bind specular texture
     glActiveTexture(GL_TEXTURE1);
     if (specularMap != Texture::DEFAULT_TEXTURE()) {
-        shader.loadInt("material.specularTex", 1);
+        sh.loadInt("material.specularTex", 1);
         specularMap.load();
     } else {
-        shader.loadVec3("material.specular", specularColor);
+        sh.loadVec3("material.specular", specularColor);
         specularMap.unload();
-    }
-    // bind mellatlic texture (if PBR)
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++) {
-        shader.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-
-        shader.loadVec3("lights[" + std::to_string(i) + "].position",
-                        lights[i]->getPosition());
-
-        shader.loadVec3("lights[" + std::to_string(i) + "].color",
-                        lights[i]->getColor());
-        shader.loadVec3("lights[" + std::to_string(i) + "].attenuation",
-                        lights[i]->getAttenuation());
-    }
-    if (lights.size() < MAXLIGHTS) {
-        for (size_t i = lights.size(); i < MAXLIGHTS; i++) {
-            shader.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
-        }
     }
 
     glBindVertexArray(m.vao);
@@ -126,7 +95,6 @@ void Object::draw(Scene* _scene) {
     glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
-    shader.stop();
 }
 
 void Object::loadShaders() {

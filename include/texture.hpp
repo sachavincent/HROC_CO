@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 
+#include "utils.hpp"
+
 class Texture
 {
 private:

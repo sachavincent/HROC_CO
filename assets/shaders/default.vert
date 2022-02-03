@@ -23,4 +23,3 @@ void main(){
 
     gl_Position = projection * view * vec4(FragPos_in, 1.0);
 }
-

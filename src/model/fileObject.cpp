@@ -1,5 +1,7 @@
 #include "object.hpp"
 #include "scene.hpp"
+#include "utils.hpp"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -12,6 +14,8 @@ FileObject::FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals) : Object
 	instance++;
 
 	Assimp::Importer importer;
+
+	_path = Utils::workingDirectory() + _path;
 
 	std::cout << "loading object from file : "
 			  << _path << " ..." << std::endl;
@@ -160,54 +164,27 @@ void FileObject::load()
 
 void FileObject::draw(Scene *_scene)
 {
-	Camera *cam = _scene->getCamera();
-	auto &lights = _scene->getLights();
+	
+	Shader &sh = _scene->getShader();
+	sh.loadMat4("model", translate * rotation * scale);
+	sh.loadVec2("texScaling", texScaling);
+
+	sh.loadBool("material.hasTexture", false);
+	sh.loadBool("material.hasNormalMap", false);
+	sh.loadBool("material.hasMetallicTex", false);
+
+	sh.loadFloat("material.shininess", shininess);
+		
+	sh.loadVec3("material.diffuse", diffuseColor);
+	sh.loadVec3("material.specular", specularColor);
+
 	for (auto &subObject : subObjects)
 	{
-
-		auto &sh = shader;
-		sh.start();
-
-		glm::mat4 object = translate * rotation * scale;
-
-		sh.loadMat4("object", object);
-		sh.loadMat4("view", cam->getViewMatrix());
-		sh.loadMat4("projection", cam->getProjectionMatrix());
-		sh.loadVec2("screenSize", glm::vec2(cam->getResWidth(), cam->getResHeight()));
-		sh.loadVec3("viewPos", cam->getPosition());
-		sh.loadFloat("exposure", _scene->getExposure());
-		sh.loadVec2("texScaling", texScaling);
-
-		sh.loadBool("material.hasTexture", false);
-		sh.loadBool("material.hasNormalMap", false);
-		sh.loadBool("material.hasMetallicTex", false);
-
-		sh.loadFloat("material.specularStrength", 1.0f);
-		sh.loadFloat("material.shininess", shininess);
-		sh.loadVec3("material.diffuse", diffuseColor);
-		sh.loadVec3("material.specular", specularColor);
-
-		for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
-		{
-			sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-			sh.loadVec3("lights[" + std::to_string(i) + "].position", lights[i]->getPosition());
-			sh.loadVec3("lights[" + std::to_string(i) + "].color", lights[i]->getColor());
-			sh.loadVec3("lights[" + std::to_string(i) + "].attenuation", lights[i]->getAttenuation());
-		}
-		if (lights.size() < MAXLIGHTS)
-		{
-			for (size_t i = lights.size(); i < MAXLIGHTS; i++)
-			{
-				sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
-			}
-		}
-
 		glBindVertexArray(subObject.vao);
 
 		glDrawElements(GL_TRIANGLES, subObject.indices.size(), GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
-		sh.stop();
 	}
 }
 

@@ -2,7 +2,13 @@
 #define SHADER_H
 
 #include <glad/glad.h>
+
+#ifndef NOT_MSVC
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 #ifndef GLM_H
 #define GLM_H
@@ -13,18 +19,18 @@
 #ifdef NOT_MSVC
 #include <string.h>
 #endif
+
 #include <string>
 #include <iostream>
+#include <map>
+#include <utility>
 
-
-enum SHADER_TYPE{
-    PHONG,
-    PBR
-};
+#include "utils.hpp"
 
 class Shader {
 private:
 	static const char* loadShader(std::string path);
+	static std::map<std::pair<std::string,std::string>,int> buffer;
 
 public:
 	unsigned int ID;

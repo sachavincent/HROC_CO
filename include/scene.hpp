@@ -18,6 +18,7 @@ class Scene
 private:
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
+    Shader sh;
 
     Engine *engine;
 
@@ -50,6 +51,8 @@ public:
     inline const std::vector<std::shared_ptr<Light>> &getLights() { return lights; }
 
     inline const std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
+
+    Shader& Scene::getShader(){return sh;}
 };
 
 #endif

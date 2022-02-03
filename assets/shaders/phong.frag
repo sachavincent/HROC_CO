@@ -22,7 +22,6 @@ struct Material {
     sampler2D AOmap;
 
     float shininess;
-    float specularStrength;
 };
 
 struct Light {  
@@ -34,10 +33,6 @@ struct Light {
     vec3 specular;
     
     vec3 attenuation;
-
-    float constant;
-    float linear;
-    float quadratic; 
 }; 
 
 in vec3 FragPos_in;
@@ -45,7 +40,6 @@ in vec2 TexCoords_in;
 in vec3 Normal_in;
   
 uniform vec3 viewPos;
-uniform vec2 screenSize;
 uniform float exposure;
 uniform vec2 texScaling;
 
@@ -107,7 +101,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     ambient  = light.ambient  * diffuseColor;
     diffuse  = light.color  * diff * diffuseColor;
-    specular = light.specular * spec * specularColor *vec3(material.specularStrength);
+    specular = light.specular * spec * specularColor;
 
 
   

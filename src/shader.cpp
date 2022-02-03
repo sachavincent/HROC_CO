@@ -1,20 +1,25 @@
 #include "shader.hpp"
 
+std::map<std::pair<std::string,std::string>,int> Shader::buffer = {};
+
 const char *Shader::loadShader(std::string path)
 {
+	path = Utils::workingDirectory() + path;
+
+	
 	std::ifstream file(path);
 
 	std::string str((std::istreambuf_iterator<char>(file)),
 					std::istreambuf_iterator<char>());
 	int fSize = str.length();
 
-	char *cstr = new char[fSize + 1];
+	char *cstr = new char[fSize+1];
 
 	if (fSize == 0)
 	{
 		std::cout << "failed to load shader with path : " << path << std::endl;
 	}
-	strcpy(cstr, str.c_str());
+	strcpy_s(cstr, fSize+1,str.c_str());
 	file.close();
 	return cstr;
 }
@@ -26,6 +31,14 @@ Shader::Shader(std::string computePath)
 
 Shader::Shader(std::string vertexPath, std::string fragmentPath)
 {
+	std::pair<std::string,std::string> paths = {vertexPath,fragmentPath};
+	auto it = buffer.find(paths);
+	if( it != buffer.end()){
+		ID = it->second;
+		std::cout << it->second << std::endl;
+		return;
+	}
+	
 	const char *vertexShaderSource = Shader::loadShader(vertexPath);
 	const char *fragmentShaderSource = Shader::loadShader(fragmentPath);
 
@@ -53,6 +66,7 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)
 	glDeleteShader(fragmentShader);
 
 	ID = shaderProgram;
+	buffer[paths] = ID;
 }
 
 void Shader::start()

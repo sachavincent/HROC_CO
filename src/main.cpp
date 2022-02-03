@@ -16,9 +16,8 @@
 int main(int argc, char *argv[])
 {
 
-    // init the interface/camera/scene
-    Ui interface {
-    };
+    // init the ui/camera/scene
+    Ui ui {};
 
     Engine engine(WIDTH, HEIGHT);
 

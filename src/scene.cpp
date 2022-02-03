@@ -67,17 +67,30 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0) {
 
     load();
     // TODO: Default scene
+
+    std::vector<BoundingBox *> bbs;
+    for (auto obj : getObjects())
+    {
+        Object *bbo = obj.get();
+        if (bbo && bbo->getBoundingBox())
+            bbs.push_back(bbo->getBoundingBox());
+    }
+
+    hierarchy = new BvhTree(bbs);
 }
 
 Scene::Scene(Engine *_engine, const std::string &_file)
-    : engine(_engine), exposure(1.0) {
+    : engine(_engine), exposure(1.0)
+{
     // TODO:
 }
 
 //! Load the scene models on GPU before rendering
-void Scene::load() {
+void Scene::load()
+{
     // load models
-    for (size_t i = 0; i < objects.size(); i++) {
+    for (size_t i = 0; i < objects.size(); i++)
+    {
         objects[i]->load();
     }
     //load shader
@@ -120,19 +133,33 @@ void Scene::renderObjects() {
     sh.stop();
 }
 
-void Scene::renderBoundingBoxes() {
+void Scene::renderBoundingBoxes()
+{
     // TODO: this is only a testing code for this method
-    // BoundingBox bbox();
+    if (!hierarchy)
+        return;
+
+    auto debugData = hierarchy->getDebugData();
+    for (auto entry : debugData)
+    {
+        auto bbs = entry.second;
+        for (auto bb : bbs)
+        {
+            bb->draw(this, entry.first);
+        }
+    }
 }
 
 //! Add an object to scene
-Scene &Scene::addObject(std::shared_ptr<Object> _object) {
+Scene &Scene::addObject(std::shared_ptr<Object> _object)
+{
     objects.push_back(_object);
     return *this;
 }
 
 //! Add a light to the scene
-Scene &Scene::addLight(std::shared_ptr<Light> _light) {
+Scene &Scene::addLight(std::shared_ptr<Light> _light)
+{
     lights.push_back(_light);
     return *this;
 }

@@ -27,14 +27,15 @@
 
 #include "utils.hpp"
 
-class Shader {
+class Shader
+{
 private:
 	static const char* loadShader(std::string path);
 	static std::map<std::pair<std::string,std::string>,int> buffer;
 
 public:
 	unsigned int ID;
-	Shader(){};
+	Shader() {}
 	Shader(std::string computePath);
 	Shader(std::string vertexPath, std::string fragmentPath);
 
@@ -45,9 +46,8 @@ public:
 	void loadInt(const std::string &name, int value) const;
 	void loadFloat(const std::string &name, float value) const;
 	void loadMat4(const std::string &name, glm::mat4 value) const;
-	void loadVec3(const std::string& name, glm::vec3 value) const;
-	void loadVec2(const std::string& name, glm::vec2 value) const;
+	void loadVec3(const std::string &name, glm::vec3 value) const;
+	void loadVec2(const std::string &name, glm::vec2 value) const;
 };
-
 
 #endif

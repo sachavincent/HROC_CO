@@ -7,7 +7,6 @@
 #include <unistd.h> 
 #else
 #include <Windows.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
 #endif
 
 class Utils {
@@ -16,7 +15,7 @@ public:
     static std::string workingDirectory(){
         char workingDir[256];
 #ifdef NOT_MSVC
-        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        ssize_t count = readlink("/proc/self/exe", workingDir, PATH_MAX);
         if(count)
             return std::string(dirname(workingDir));
         return "";

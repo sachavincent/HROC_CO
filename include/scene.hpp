@@ -54,7 +54,7 @@ public:
 
     inline const std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
-    Shader& Scene::getShader(){return sh;}
+    Shader& getShader(){return sh;}
 };
 
 #endif

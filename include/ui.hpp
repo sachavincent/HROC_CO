@@ -2,12 +2,13 @@
 #define UI_H
 
 
-#ifndef NOT_MSVC
+#ifdef NOT_MSVC
+#include <GLFW/glfw3.h>
+#else
 #define GLFW_EXPOSE_NATIVE_WIN32
-#endif
-
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#endif
 
 
 #include <imgui.h>

@@ -76,7 +76,7 @@ public:
 	// ! Get projection perspective frustum
 	inline glm::mat4 getProjectionMatrix() const
 	{
-		return glm::perspective(glm::radians(_fov), (float)_width / _height, 0.3f, 100.0f);
+		return glm::perspective(glm::radians(_fov), (float)_width / _height, _nearDistance, _farDistance);
 	}
 
 	//! Get current field of view (in degrees)

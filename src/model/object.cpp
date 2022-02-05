@@ -8,13 +8,16 @@
 
 size_t Object::id_counter = 0;
 
-void Object::load() {
+void Object::load()
+{
+    std::cout << "Loading object " << name << std::endl;
     // gen geometry buffers
     glGenBuffers(1, &m.vbo);
     glGenBuffers(1, &m.nbo);
     glGenBuffers(1, &m.tbo);
     glGenBuffers(1, &m.ebo);
     glGenVertexArrays(1, &m.vao);
+    std::cout << "Loaded object " << name << " vbo=" << m.vbo << std::endl;
 
     // Bind the vao
     glBindVertexArray(m.vao);
@@ -24,7 +27,7 @@ void Object::load() {
     glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(GLfloat),
                  m.vertices.data(), GL_STATIC_DRAW);
     // set vertex attribute pointer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
     // copy normals to nbo
@@ -32,7 +35,7 @@ void Object::load() {
     glBufferData(GL_ARRAY_BUFFER, m.normals.size() * sizeof(GLfloat),
                  m.normals.data(), GL_STATIC_DRAW);
     // define array for normals
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(1);
 
     // Copy texture array in element buffer
@@ -40,7 +43,7 @@ void Object::load() {
     glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat),
                  m.textureCoord.data(), GL_STATIC_DRAW);
     // define array for texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(2);
 
     // copy indices to ebo
@@ -52,40 +55,48 @@ void Object::load() {
     glBindVertexArray(0);
 
     // load textures if defined
-    if (diffuseMapPath != "") {
+    if (diffuseMapPath != "")
+    {
         diffuseMap = Texture::loadTexture(diffuseMapPath.c_str());
     }
-    if (specularMapPath != "") {
+    if (specularMapPath != "")
+    {
         specularMap = Texture::loadTexture(specularMapPath.c_str());
     }
-    loadShaders();
 }
 
-void Object::draw(Scene* _scene) {
-    Shader& sh = _scene->getShader();
+void Object::draw(Scene *_scene)
+{
+    Shader &sh = _scene->getShader();
 
-    sh.loadMat4("model", translate * rotation * scale);
+    sh.loadMat4("model", translate * rotation * glm::mat4(1.0f));
     sh.loadVec2("texScaling", texScaling);
     sh.loadFloat("material.specularStrength", 0.5f);
     sh.loadFloat("material.shininess", shininess);
 
     // bind diffuse texture
     glActiveTexture(GL_TEXTURE0);
-    if (diffuseMap != Texture::DEFAULT_TEXTURE()) {
+    if (diffuseMap != Texture::DEFAULT_TEXTURE())
+    {
         sh.loadInt("material.diffuseTex", 0);
         sh.loadBool("material.hasTexture", true);
         diffuseMap.load();
-    } else {
+    }
+    else
+    {
         sh.loadVec3("material.diffuse", diffuseColor);
         sh.loadBool("material.hasTexture", false);
         diffuseMap.unload();
     }
     // bind specular texture
     glActiveTexture(GL_TEXTURE1);
-    if (specularMap != Texture::DEFAULT_TEXTURE()) {
+    if (specularMap != Texture::DEFAULT_TEXTURE())
+    {
         sh.loadInt("material.specularTex", 1);
         specularMap.load();
-    } else {
+    }
+    else
+    {
         sh.loadVec3("material.specular", specularColor);
         specularMap.unload();
     }
@@ -97,60 +108,65 @@ void Object::draw(Scene* _scene) {
     glBindVertexArray(0);
 }
 
-void Object::loadShaders() {
-    shader = {"shaders/default.vert", "shaders/phong.frag"};
-}
-
-Object& Object::setScale(glm::vec3 _scale) {
+Object &Object::setScale(glm::vec3 _scale)
+{
     scale = glm::mat4(1.0);
     scale = glm::scale(scale, _scale);
     return *this;
 }
 
-Object& Object::setRotation(float _angle, glm::vec3 _axis) {
+Object &Object::setRotation(float _angle, glm::vec3 _axis)
+{
     rotation = glm::mat4(1.0);
     rotation = glm::rotate(rotation, glm::radians(_angle), _axis);
     return *this;
 }
 
-Object& Object::setPosition(glm::vec3 _pos) {
+Object &Object::setPosition(glm::vec3 _pos)
+{
     translate = glm::mat4{1.0};
     translate = glm::translate(translate, _pos);
     return *this;
 }
 
-Object& Object::setTexDiffuse(std::string _path) {
+Object &Object::setTexDiffuse(std::string _path)
+{
     diffuseMapPath = _path;
     return *this;
 }
 
-Object& Object::setTexSpecular(std::string _path) {
+Object &Object::setTexSpecular(std::string _path)
+{
     specularMapPath = _path;
     return *this;
 }
 
-Object& Object::setShininess(float _shininess) {
+Object &Object::setShininess(float _shininess)
+{
     shininess = _shininess;
     return *this;
 }
 
-Object& Object::setDiffuse(glm::vec3 _color) {
+Object &Object::setDiffuse(glm::vec3 _color)
+{
     diffuseColor = _color;
     return *this;
 }
 
-Object& Object::setSpecular(glm::vec3 _color) {
+Object &Object::setSpecular(glm::vec3 _color)
+{
     specularColor = _color;
     return *this;
 }
 
-Object& Object::setTexScaling(glm::vec2 _scale) {
+Object &Object::setTexScaling(glm::vec2 _scale)
+{
     texScaling = _scale;
     return *this;
 }
 
-void Object::registerObserver(Observer& o) { _observer = &o; }
+void Object::registerObserver(Observer &o) { _observer = &o; }
 
-void Object::removeObserver(Observer& o) { _observer = nullptr; }
+void Object::removeObserver(Observer &o) { _observer = nullptr; }
 
 void Object::notifyObservers() { _observer->update(this, _visible); }

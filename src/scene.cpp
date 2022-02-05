@@ -3,30 +3,30 @@
 
 #include <random>
 
-
-Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0) {
+Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullptr)
+{
     auto light0 =
         std::make_shared<Light>(glm::vec3{-0.2, 0.25, -0.8}, glm::vec3{0.8f});
     addLight(light0);
 
-
     auto sunLight =
         std::make_shared<Light>(glm::vec3{0, 50, -20}, glm::vec3{0.8f});
-    sunLight->setAttenuation({1.0f,0.0f,0.0f});
+    sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
     addLight(sunLight);
 
     //####################### creating models ###########################
 
     std::random_device device;
     std::mt19937 generator(device());
-    std::uniform_int_distribution<int> distribution(0,100);
+    std::uniform_int_distribution<int> distribution(0, 100);
 
     // enough boxes to get down to 60fps in release
-    for(size_t i = 0; i<1000;i++){
+    for (size_t i = 0; i < 10; i++)
+    {
         auto cube = std::make_shared<Cube>(1.0f);
-        cube->setPosition({distribution(generator)-50, distribution(generator), distribution(generator)+10})
-        .setDiffuse({0.0f, 1.0f, 0.0f})
-        .setSpecular(glm::vec3{0.8});
+        cube->setPosition({distribution(generator) - 50, distribution(generator), distribution(generator) + 10})
+            .setDiffuse({0.0f, 1.0f, 0.0f})
+            .setSpecular(glm::vec3{0.8});
         addObject(cube);
     }
 
@@ -46,6 +46,7 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0) {
     auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
     sphere1->setPosition({3.5, 0.7, 3.5})
         .setRotation(-90, {1, 0, 0})
+        .setScale(glm::vec3{3.0})
         .setDiffuse({1.0, 0.0, 1.0});
 
     addObject(sphere1);
@@ -63,24 +64,36 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0) {
     teapot->setScale(glm::vec3{0.3f})
         .setPosition({0.0f, 1.2f, -1.8f})
         .setDiffuse({0.55f, 0.5f, 0.0f});
-    addObject(teapot);
+    // addObject(teapot);
 
     load();
     // TODO: Default scene
 
     std::vector<BoundingBox *> bbs;
-    for (auto obj : getObjects())
+    const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
+    for (auto obj : _objects)
     {
         Object *bbo = obj.get();
-        if (bbo && bbo->getBoundingBox())
+        AxisBoundingBox newBoundingBox(*bbo);
+        bbo->setBoundingBox(&newBoundingBox);
+        if (bbo)
             bbs.push_back(bbo->getBoundingBox());
     }
 
     hierarchy = new BvhTree(bbs);
+
+    // auto debugData = hierarchy->getDebugData();
+    // for (auto entry : debugData)
+    //{
+    //     auto bbs = entry.second;
+    //     for (auto bb : bbs)
+    //     {
+    //         bb->load();
+    //     }
+    // }
 }
 
-Scene::Scene(Engine *_engine, const std::string &_file)
-    : engine(_engine), exposure(1.0)
+Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
     // TODO:
 }
@@ -93,12 +106,13 @@ void Scene::load()
     {
         objects[i]->load();
     }
-    //load shader
+    // load shader
     sh = {"shaders/default.vert", "shaders/phong.frag"};
 }
 
 //! Render all objects of scene
-void Scene::renderObjects() {
+void Scene::renderObjects()
+{
     // set shaders params
     sh.start();
 
@@ -106,30 +120,36 @@ void Scene::renderObjects() {
     sh.loadMat4("projection", getCamera()->getProjectionMatrix());
     sh.loadFloat("exposure", exposure);
     sh.loadVec3("viewPos", getCamera()->getPosition());
+    // depth parameter only for bboxes
+    sh.loadInt("depthBB", -1);
 
-    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++) {
+    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
+    {
         sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
 
         sh.loadVec3("lights[" + std::to_string(i) + "].position",
-                        lights[i]->getPosition());
+                    lights[i]->getPosition());
 
         sh.loadVec3("lights[" + std::to_string(i) + "].color",
-                        lights[i]->getColor());
+                    lights[i]->getColor());
         sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
-                        lights[i]->getAttenuation());
+                    lights[i]->getAttenuation());
     }
-    if (lights.size() < MAXLIGHTS) {
-        for (size_t i = lights.size(); i < MAXLIGHTS; i++) {
+    if (lights.size() < MAXLIGHTS)
+    {
+        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
+        {
             sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
         }
     }
 
-    //draw objects
-    for (size_t i = 0; i < objects.size(); i++) {
+    // draw objects
+    for (size_t i = 0; i < objects.size(); i++)
+    {
         objects[i]->draw(this);
     }
 
-    //unload shader
+    // unload shader
     sh.stop();
 }
 
@@ -139,15 +159,17 @@ void Scene::renderBoundingBoxes()
     if (!hierarchy)
         return;
 
-    auto debugData = hierarchy->getDebugData();
+    sh.start();
+    static auto debugData = hierarchy->getDebugData();
     for (auto entry : debugData)
     {
         auto bbs = entry.second;
         for (auto bb : bbs)
         {
-            bb->draw(this, entry.first);
+            bb.draw(this, entry.first);
         }
     }
+    sh.stop();
 }
 
 //! Add an object to scene

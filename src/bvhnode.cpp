@@ -2,6 +2,7 @@
 BvhNode::BvhNode(BoundingBox *boundingBox, int _id) : _boundingBox(boundingBox), _leftChild(nullptr), _rightChild(nullptr), _parent(nullptr)
 {
     id = _id;
+    _tag = Visibility::null;
 }
 
 BvhNode *BvhNode::getChild(const NodeType &t) const
@@ -36,9 +37,10 @@ bool BvhNode::isRoot()
 
 BvhNode *BvhNode::merge(BvhNode *left, BvhNode *right, int newid)
 {
-    const BoundingBox &bbLeft = left->getBoundingBox();
-    const BoundingBox &bbRight = right->getBoundingBox();
-    BoundingBox *bb = bbLeft.merge(bbRight);
+    BoundingBox *bbLeft = left->getBoundingBox();
+    BoundingBox *bbRight = right->getBoundingBox();
+    BoundingBox *bb = bbLeft->merge(bbRight);
+    bb->getWireframe()->load();
     BvhNode *p = new BvhNode(bb, newid);
     p->_leftChild = left;
     p->_rightChild = right;

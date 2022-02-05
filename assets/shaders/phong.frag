@@ -6,6 +6,15 @@
 // PHONG SHADER
 
 
+#define MAX_DEPTH_BB 16
+
+const vec3 colorsBB[MAX_DEPTH_BB] = { vec3(244, 67, 54),vec3(233, 30, 99),vec3(156, 39, 176),vec3(103, 58, 183),
+                                vec3(63, 81, 181),vec3(33, 150, 243),vec3(3, 169, 244),vec3(0, 188, 212),
+                                vec3(0, 150, 136),vec3(76, 175, 80),vec3(139, 195, 74),vec3(205, 220, 57),
+                                vec3(255, 235, 59),vec3(255, 193, 7),vec3(255, 152, 0),vec3(255, 87, 34) };
+
+const float ALPHA_BB = 0.2;
+
 out vec4 FragColor;
 
 struct Material {
@@ -42,6 +51,7 @@ in vec3 Normal_in;
 uniform vec3 viewPos;
 uniform float exposure;
 uniform vec2 texScaling;
+uniform int depthBB;
 
 
 uniform Light lights[NR_LIGHTS];
@@ -55,14 +65,26 @@ mat3 CalcTBN(vec3 normal, vec3 viewDir);
     
 void main()
 {
-    vec3 viewDir = normalize(viewPos - FragPos_in);
-    vec3 result = vec3(0,0,0);
+    float alpha;
+    vec3 result;
+    if(depthBB == -1) // Not a bounding box
+    {
+        vec3 viewDir = normalize(viewPos - FragPos_in);
+        result = vec3(0,0,0);
+        
+        for(int i = 0; i < NR_LIGHTS; i++)
+            if(lights[i].enabled)
+                result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
+        alpha = 1.0;
+    }
+    else // This object is a bounding box
+    {
+        result = colorsBB[depthBB];
+        result = vec3(0,1,0);
+        alpha = 1;//ALPHA_BB;
+    }
 
-    for(int i = 0; i < NR_LIGHTS; i++)
-        if(lights[i].enabled)
-            result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
-
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, alpha);
 }
 
 // Calculate values for point lights

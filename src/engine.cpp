@@ -104,6 +104,8 @@ void Engine::startLoop()
         
         _scene->renderObjects();
 
+        _scene->renderBoundingBoxes();
+
         // imgui part
         _ui.render(_scene);
 

@@ -14,28 +14,32 @@ BoundingBox::BoundingBox(Object &o)
 {
     _center = o.getPosition();
 
-    float maxX = -(float)INFINITE, maxY = -(float)INFINITE , maxZ = -(float)INFINITE;
+    float maxX = -(float)INFINITE, maxY = -(float)INFINITE, maxZ = -(float)INFINITE;
     float minX = INFINITE, minY = INFINITE, minZ = INFINITE;
 
-
-    for(auto it = o.getVertices().begin();it != o.getVertices().end();it++)
+    for (auto it = o.getVertices().begin(); it != o.getVertices().end(); it++)
     {
-        minX = (*it) < minX ? (*it): minX;
-        maxX = (*it) > maxX ? (*it): maxX;
+        minX = (*it) < minX ? (*it) : minX;
+        maxX = (*it) > maxX ? (*it) : maxX;
         it++;
-        minY = (*it) < minY ? (*it): minY;
-        maxY = (*it) > maxY ? (*it): maxY;
+        minY = (*it) < minY ? (*it) : minY;
+        maxY = (*it) > maxY ? (*it) : maxY;
         it++;
-        minZ = (*it) < minZ ? (*it): minZ;
-        maxZ = (*it) > maxZ ? (*it): maxZ;
+        minZ = (*it) < minZ ? (*it) : minZ;
+        maxZ = (*it) > maxZ ? (*it) : maxZ;
     }
-    _size = glm::vec3(maxX - minX,maxY - minY,maxZ - minZ);
+    _size = glm::vec3(maxX - minX, maxY - minY, maxZ - minZ);
+    // TODO: Transformation matrix (scale+trans+rot)
+    
+    if (_size[0] < 0 || _size[1] < 0 || _size[2] < 0)
+        throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(_size));
 }
 
 BoundingBoxObject *BoundingBox::getWireframe()
 {
     if (_wireframe)
         return _wireframe;
+        
     _wireframe = new BoundingBoxObject(1.0);
     _wireframe->setPosition(_center);
     _wireframe->setScale(_size);

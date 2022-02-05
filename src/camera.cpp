@@ -3,13 +3,16 @@
 
 Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(width), _height(height), _position(position), _fov(fov), movingFactor({0, 0, 0})
 {
-	_frustum = new Frustum();
 	_yaw = 90.0;
 	_pitch = 0.0;
 	_front = glm::vec3(0.0f, 0.0f, 1.0f);
 	_up = glm::vec3(0.0f, 1.0f, 0.0f);
-
+	_nearDistance = 1.0f;
+	_farDistance = 200.0f;
+	
 	setResolution(width, height);
+
+	_frustum = new Frustum();
 }
 
 // direction

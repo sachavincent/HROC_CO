@@ -29,7 +29,7 @@ private:
     BoundingBox *_boundingBox;
 
 public:
-    BvhNode(BoundingBox *boundingBox,int _id);
+    BvhNode(BoundingBox *boundingBox, int _id);
 
     inline const Visibility getVisibility() const { return _tag; }
 
@@ -59,7 +59,7 @@ public:
     {
         return _parent;
     }
-    
+
     inline const NodeType &getType() const
     {
         return _type;
@@ -80,11 +80,11 @@ public:
 
     bool isRoot();
 
-    inline BoundingBox &getBoundingBox() const
+    inline BoundingBox *getBoundingBox()
     {
-        return *_boundingBox;
+        return _boundingBox;
     }
 
-    static BvhNode* merge(BvhNode *left, BvhNode *right,int newid);
+    static BvhNode *merge(BvhNode *left, BvhNode *right, int newid);
 };
 #endif

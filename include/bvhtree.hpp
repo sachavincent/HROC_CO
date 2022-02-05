@@ -75,12 +75,12 @@ public:
         printBT(root);
     }
 
-    void nodeDepthExploration(std::map<int, std::vector<BoundingBoxObject *>> &nodeDepths, const BvhNode *node, int depth)
+    void nodeDepthExploration(std::map<int, std::vector<BoundingBoxObject>> &nodeDepths, BvhNode *node, int depth)
     {
         if (nodeDepths.find(depth) == nodeDepths.end())
-            nodeDepths.insert(std::make_pair(depth, std::vector<BoundingBoxObject *>()));
-
-        nodeDepths[depth].push_back(node->getBoundingBox().getWireframe());
+            nodeDepths.insert(std::make_pair(depth, std::vector<BoundingBoxObject>()));
+        BoundingBoxObject *bbo = node->getBoundingBox()->getWireframe();
+        nodeDepths[depth].push_back(*bbo);
 
         if (node->hasLeftChild())
             nodeDepthExploration(nodeDepths, node->getLeftChild(), depth + 1);
@@ -88,10 +88,11 @@ public:
             nodeDepthExploration(nodeDepths, node->getRightChild(), depth + 1);
     }
 
-    std::map<int, std::vector<BoundingBoxObject *>> getDebugData()
+    std::map<int, std::vector<BoundingBoxObject>> getDebugData()
     {
-        std::map<int, std::vector<BoundingBoxObject *>> nodeDepths;
-        nodeDepthExploration(nodeDepths, root, 0);
+        std::map<int, std::vector<BoundingBoxObject>> nodeDepths;
+        if (root)
+            nodeDepthExploration(nodeDepths, root, 0);
 
         return nodeDepths;
     }

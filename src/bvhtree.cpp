@@ -1,6 +1,6 @@
 #include "bvhtree.hpp"
 
-BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
+BvhTree::BvhTree(std::vector<BoundingBox *> &objs) : root(nullptr)
 {
     idGenerator = new IdGenerator();
     nodes.clear();
@@ -13,7 +13,7 @@ BvhTree::BvhTree(std::vector<BoundingBox *> &objs)
     mergeAll(nodes);
 }
 
-BvhTree::BvhTree(std::vector<BoundingBox *> &objs, IdGenerator *_idGenerator)
+BvhTree::BvhTree(std::vector<BoundingBox *> &objs, IdGenerator *_idGenerator) : root(nullptr)
 {
     idGenerator = _idGenerator;
     nodes.clear();
@@ -50,7 +50,7 @@ void BvhTree::addToMap(BvhNode *node, std::vector<BvhNode *> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
-        map->insert(PairDistanceNode(BoundingBox::distance((BoundingBox &)node->getBoundingBox(), (BoundingBox &)(*it)->getBoundingBox()), PairNode(node, *it)));
+        map->insert(PairDistanceNode(BoundingBox::distance(node->getBoundingBox(), (*it)->getBoundingBox()), PairNode(node, *it)));
     }
 }
 
@@ -80,7 +80,7 @@ void BvhTree::mergeAll(std::vector<BvhNode *> &_nodes)
 {
     if (map->empty())
         return;
-        
+
     PairNode pair = requestMap();
     BvhNode *first = pair.first;
     BvhNode *second = pair.second;

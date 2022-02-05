@@ -159,7 +159,6 @@ void FileObject::load()
 			specularMap = Texture::loadTexture(specularMapPath.c_str());
 		}
 	}
-	loadShaders();
 }
 
 void FileObject::draw(Scene *_scene)

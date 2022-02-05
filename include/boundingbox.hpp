@@ -17,7 +17,10 @@ private:
     BoundingBoxObject *_wireframe = nullptr;
 
 public:
-    BoundingBox(){};
+    BoundingBox()
+    {
+        std::cout << "Wrong constructor..." << std::endl;
+    };
 
     BoundingBox(Object &o);
 
@@ -26,7 +29,7 @@ public:
         _center = center;
         _size = size;
 
-        if (size[0] <= 0 || size[1] <= 0 || size[2] <= 0)
+        if (size[0] < 0 || size[1] < 0 || size[2] < 0)
             throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
     }
 
@@ -35,18 +38,20 @@ public:
     inline const glm::vec3 &getSize() const { return _size; }
     inline const glm::vec3 &getCenter() const { return _center; }
 
-    virtual BoundingBox *merge(const BoundingBox &A) const = 0;
-
-    inline static float distance(const BoundingBox &A, const BoundingBox &B)
+    BoundingBox *merge(BoundingBox *A)
     {
-        glm::vec3 centerA = A.getCenter();
-        glm::vec3 centerB = B.getCenter();
+        return this;
+    }
+
+    inline static float distance(BoundingBox *A, BoundingBox *B)
+    {
+        glm::vec3 centerA = A->getCenter();
+        glm::vec3 centerB = B->getCenter();
         return glm::distance(centerA, centerB);
     };
 
     //! Get a model of the BoundingBox object for debug mode rendering
     BoundingBoxObject *getWireframe();
-
 };
 class OrientedBoundingBox : public BoundingBox
 {
@@ -66,15 +71,14 @@ public:
 
     inline const glm::mat3 &getTransform() const { return _transform; }
 
-    // const BoundingBox *merge(const BoundingBox &A) const;
-    BoundingBox *merge(const BoundingBox &other) const
+    BoundingBox *merge(BoundingBox *other)
     {
         glm::vec3 center = getCenter();
-        glm::vec3 centerOther = other.getCenter();
+        glm::vec3 centerOther = other->getCenter();
 
         glm::vec3 newCenter = (center + centerOther) * glm::vec3(0.5);
         glm::vec3 size = getSize();
-        glm::vec3 sizeOther = other.getSize();
+        glm::vec3 sizeOther = other->getSize();
 
         float minX = center[0] - size[0] / 2;
         float maxX = center[0] + size[0] / 2;
@@ -117,6 +121,42 @@ public:
     {
     }
 
+    BoundingBox *merge(BoundingBox *other)
+    {
+        glm::vec3 center = getCenter();
+        glm::vec3 centerOther = other->getCenter();
+
+        glm::vec3 newCenter = (center + centerOther) * glm::vec3(0.5);
+        glm::vec3 size = getSize();
+        glm::vec3 sizeOther = other->getSize();
+
+        float minX = center[0] - size[0] / 2;
+        float maxX = center[0] + size[0] / 2;
+        float minY = center[1] - size[1] / 2;
+        float maxY = center[1] + size[1] / 2;
+        float minZ = center[2] - size[2] / 2;
+        float maxZ = center[2] + size[2] / 2;
+
+        float minXOther = centerOther[0] - sizeOther[0] / 2;
+        float maxXOther = centerOther[0] + sizeOther[0] / 2;
+        float minYOther = centerOther[1] - sizeOther[1] / 2;
+        float maxYOther = centerOther[1] + sizeOther[1] / 2;
+        float minZOther = centerOther[2] - sizeOther[2] / 2;
+        float maxZOther = centerOther[2] + sizeOther[2] / 2;
+
+        float newMinX = minX < minXOther ? minX : minXOther;
+        float newMaxX = maxX > maxXOther ? maxX : maxXOther;
+        float newMinY = minY < minYOther ? minY : minYOther;
+        float newMaxY = maxY > maxYOther ? maxY : maxYOther;
+        float newMinZ = minZ < minZOther ? minZ : minZOther;
+        float newMaxZ = maxZ > maxZOther ? maxZ : maxZOther;
+
+        glm::vec3 newSize(newMaxX - newMinX, newMaxY - newMinY, newMaxZ - newMinZ);
+
+        BoundingBox *newBoundingBox = new AxisBoundingBox(newCenter, newSize);
+
+        return newBoundingBox;
+    }
     ~AxisBoundingBox()
     {
     }

@@ -53,7 +53,7 @@ public:
     };
 
     //! Get a model of the BoundingBox object for debug mode rendering
-    BoundingBoxObject *getWireframe();
+    inline BoundingBoxObject *getWireframe() { return _wireframe; }
 };
 class OrientedBoundingBox : public BoundingBox
 {

@@ -37,8 +37,3 @@ BoundingBox::BoundingBox(Object &o)
 
     _wireframe = new BoundingBoxObject(o.getName(), _center, _size);
 }
-
-BoundingBoxObject *BoundingBox::getWireframe()
-{
-    return _wireframe;
-}

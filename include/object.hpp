@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <memory>
 
 #include <glad/glad.h>
 #include <assimp/Importer.hpp>

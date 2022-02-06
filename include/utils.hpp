@@ -15,7 +15,7 @@ public:
 
     static std::string workingDirectory(){
         char workingDir[256];
-#ifdef NOT_MSVC
+#ifndef WIN32
         ssize_t count = readlink("/proc/self/exe", workingDir, PATH_MAX);
         if(count)
             return std::string(dirname(workingDir));

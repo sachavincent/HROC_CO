@@ -48,7 +48,7 @@ void BvhTree::addToMap(BvhNode *node, std::vector<BvhNode *> &nodesToCompare)
 void BvhTree::removeFromMap(BvhNode &node)
 {
     // std::cout << "B4 remove " << map->size() << std::endl;
-    for (auto it = map->begin(); it != map->end(); it)
+    for (auto it = map->begin(); it != map->end();)
     {
         if ((it->second.first->getId() == node.getId()) || (it->second.second->getId()) == node.getId())
         {

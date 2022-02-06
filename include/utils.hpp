@@ -2,7 +2,7 @@
 #define UTILS_H
 
 #include <string>
-#ifdef NOT_MSVC
+#ifndef WIN32
 #include <libgen.h>
 #include <unistd.h> 
 #include <linux/limits.h>

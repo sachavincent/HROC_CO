@@ -69,13 +69,14 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
     load();
     // TODO: Default scene
 
-    std::vector<BoundingBox *> bbs;
+    std::vector<std::shared_ptr<BoundingBox>> bbs;
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
     for (auto obj : _objects)
     {
         Object *bbo = obj.get();
-        AxisBoundingBox newBoundingBox(*bbo);
-        bbo->setBoundingBox(&newBoundingBox);
+        auto newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
+        bbo->setBoundingBox(newBoundingBox);
+        newBoundingBox.get()->getWireframe()->load();
         if (bbo)
             bbs.push_back(bbo->getBoundingBox());
     }

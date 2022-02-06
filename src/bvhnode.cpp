@@ -37,8 +37,8 @@ bool BvhNode::isRoot()
 
 BvhNode *BvhNode::merge(BvhNode *left, BvhNode *right, int newid)
 {
-    BoundingBox *bbLeft = left->getBoundingBox();
-    BoundingBox *bbRight = right->getBoundingBox();
+    AxisBoundingBox *bbLeft = dynamic_cast<AxisBoundingBox*>(left->getBoundingBox());
+    AxisBoundingBox *bbRight = dynamic_cast<AxisBoundingBox*>(right->getBoundingBox());
     BoundingBox *bb = bbLeft->merge(bbRight);
     bb->getWireframe()->load();
     BvhNode *p = new BvhNode(bb, newid);

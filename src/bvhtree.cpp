@@ -1,26 +1,17 @@
 #include "bvhtree.hpp"
 
-BvhTree::BvhTree(std::vector<BoundingBox *> &objs) : root(nullptr)
+BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs) : BvhTree(objs, new IdGenerator())
 {
-    idGenerator = new IdGenerator();
-    nodes.clear();
-    nodes.reserve(objs.size());
-    for (auto &bb : objs)
-    {
-        nodes.emplace_back(new BvhNode(bb, idGenerator->GetUniqueId()));
-    }
-    createMap(nodes);
-    mergeAll(nodes);
 }
 
-BvhTree::BvhTree(std::vector<BoundingBox *> &objs, IdGenerator *_idGenerator) : root(nullptr)
+BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGenerator) : root(nullptr)
 {
     idGenerator = _idGenerator;
     nodes.clear();
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(new BvhNode(bb, idGenerator->GetUniqueId()));
+        nodes.emplace_back(new BvhNode(bb.get(), idGenerator->GetUniqueId()));
     }
     createMap(nodes);
     mergeAll(nodes);

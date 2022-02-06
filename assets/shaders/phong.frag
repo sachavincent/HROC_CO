@@ -80,8 +80,9 @@ void main()
     else // This object is a bounding box
     {
         result = colorsBB[depthBB];
-        result = vec3(0,1,0);
-        alpha = 1;//ALPHA_BB;
+        alpha = ALPHA_BB;
+        //result = vec3(0,1,0);
+        //alpha = 1;
     }
 
     FragColor = vec4(result, alpha);

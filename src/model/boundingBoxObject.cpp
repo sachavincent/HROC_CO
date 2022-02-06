@@ -1,19 +1,18 @@
 #include "object.hpp"
 #include "scene.hpp"
 
-BoundingBoxObject::BoundingBoxObject() : Cube()
+BoundingBoxObject::BoundingBoxObject(std::string _parentName, glm::vec3 center, glm::vec3 size, float _edgeSize)
+	: Cube(_edgeSize, "BoundingBox_" + _parentName)
 {
-
+	setPosition(center);
+	setScale(size);
+	pos = center;
+	std::cout << "Created bounding box '" << name << "'" << std::endl;
 }
 
-BoundingBoxObject::BoundingBoxObject(float _edgeSize) : Cube(_edgeSize)
+void BoundingBoxObject::draw(Scene *_scene, int _depth)
 {
-}
-
-void BoundingBoxObject::draw(Scene *_scene, int depth)
-{
-	_scene->getShader().loadInt("depthBB", depth);
-	std::cout << depth << std::endl;
-	std::cout << translate[1][1] << std::endl;
+	std::cout << "Rendering bounding box object " << name << " at " << glm::to_string(pos) << " with depth = " << _depth << std::endl;
+	_scene->getShader().loadInt("depthBB", _depth);
 	Cube::draw(_scene);
 }

@@ -31,8 +31,8 @@ private:
     IdGenerator *idGenerator = nullptr;
 
 public:
-    BvhTree(std::vector<BoundingBox *> &objs, IdGenerator *_idGen);
-    BvhTree(std::vector<BoundingBox *> &objs);
+    BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGen);
+    BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs);
 
     std::vector<BvhNode *> *extractOccludees(std::vector<BvhNode *> &allNodes);
 

@@ -10,14 +10,13 @@ size_t Object::id_counter = 0;
 
 void Object::load()
 {
-    std::cout << "Loading object " << name << std::endl;
     // gen geometry buffers
     glGenBuffers(1, &m.vbo);
     glGenBuffers(1, &m.nbo);
     glGenBuffers(1, &m.tbo);
     glGenBuffers(1, &m.ebo);
     glGenVertexArrays(1, &m.vao);
-    std::cout << "Loaded object " << name << " vbo=" << m.vbo << std::endl;
+    std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
 
     // Bind the vao
     glBindVertexArray(m.vao);
@@ -165,8 +164,8 @@ Object &Object::setTexScaling(glm::vec2 _scale)
     return *this;
 }
 
-void Object::registerObserver(Observer &o) { _observer = &o; }
+void Object::registerObserver(Observer &o) { observer = &o; }
 
-void Object::removeObserver(Observer &o) { _observer = nullptr; }
+void Object::removeObserver(Observer &o) { observer = nullptr; }
 
-void Object::notifyObservers() { _observer->update(this, _visible); }
+void Object::notifyObservers() { observer->update(this, visible); }

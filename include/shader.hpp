@@ -1,15 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h>
-
-#ifdef NOT_MSVC
-#include <GLFW/glfw3.h>
-#else
-#define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-#endif
+#include <glad/glad.h>
 
 #ifndef GLM_H
 #define GLM_H
@@ -31,8 +25,8 @@
 class Shader
 {
 private:
-	static const char* loadShader(std::string path);
-	static std::map<std::pair<std::string,std::string>,int> buffer;
+	static const char *loadShader(std::string path);
+	static std::map<std::pair<std::string, std::string>, int> buffer;
 
 public:
 	unsigned int ID;

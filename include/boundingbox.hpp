@@ -31,6 +31,8 @@ public:
 
         if (size[0] < 0 || size[1] < 0 || size[2] < 0)
             throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
+
+        _wireframe = new BoundingBoxObject("NoObject", _center, _size);
     }
 
     virtual ~BoundingBox() {}

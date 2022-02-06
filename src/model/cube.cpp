@@ -6,9 +6,8 @@
 
 int Cube::instance = 0;
 
-Cube::Cube(float _edgeSize)
+Cube::Cube(float _edgeSize, std::string _name) : Object(_name)
 {
-	name = "Cube_" + std::to_string(instance);
 	instance++;
 
 	m.vertices = {

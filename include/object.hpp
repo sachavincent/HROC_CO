@@ -49,9 +49,9 @@ protected:
     glm::vec2 texScaling = {1, 1};
 
     // HROC
-    BoundingBox *_boundingBox;
-    Observer *_observer;
-    bool _visible;
+    std::shared_ptr<BoundingBox> boundingBox;
+    Observer *observer;
+    bool visible;
 
     //! une structure qui encapsule la description d'un seul object
     struct OBJECT_DATA
@@ -69,14 +69,13 @@ protected:
     OBJECT_DATA m;
 
 public:
-    Object() : _boundingBox(nullptr) { id = id_counter++; }
+    Object(std::string _name = "Object") : name(_name), boundingBox(nullptr) { id = id_counter++; }
 
-    virtual std::string getName() = 0;
-    size_t getId() const { return id; }
+    inline size_t getId() const { return id; }
 
     //! Load the object on the gpu. This action is performed after opengl/glfw initialization
     virtual void load();
-    
+
     //! Render the object on screen.
     virtual void draw(Scene *_scene);
 
@@ -93,9 +92,10 @@ public:
     virtual Object &setSpecular(glm::vec3 _color);
     virtual Object &setShininess(float _shininess);
 
-    inline void setVisible(bool visible) { _visible = visible; }
-    inline void setBoundingBox(BoundingBox *boundingBox) { _boundingBox = boundingBox; }
-    inline BoundingBox *getBoundingBox() { return _boundingBox; }
+    inline void setVisible(bool _visible) { visible = _visible; }
+    inline void setBoundingBox(std::shared_ptr<BoundingBox> _boundingBox) { boundingBox = _boundingBox; }
+    inline std::shared_ptr<BoundingBox> getBoundingBox() { return boundingBox; }
+    inline std::string getName() const { return name; }
 
     virtual glm::vec3 getPosition() { return glm::vec3(translate[3]); }
     virtual glm::vec3 getScale() { return glm::vec3(scale[0][0], scale[1][1], scale[2][2]); }
@@ -120,26 +120,24 @@ class Cube : public Object
     static int instance;
 
 public:
-    std::string getName() { return name; }
     //! Create a cube of size _edgeSize.
-    Cube(float _edgeSize);
-    Cube() : Cube(1.0f){};
+    Cube(float _edgeSize = 1.0f, std::string _name = "Cube_" + std::to_string(instance));
 };
 
 class BoundingBoxObject : public Cube
 {
+private:
+    glm::vec3 pos;
 public:
-    BoundingBoxObject();
-    BoundingBoxObject(float _edgeSize);
+    BoundingBoxObject(std::string _parentName, glm::vec3 center, glm::vec3 size, float _edgeSize = 1.0f);
 
-    void draw(Scene *_scene, int depth);
+    void draw(Scene *_scene, int _depth);
 };
 
 //! A object loaded from a file, it can contain multiple subobjects inside it.
 class FileObject : public Object
 {
 private:
-    std::string name;
     static int instance;
     std::vector<OBJECT_DATA> subObjects;
 
@@ -150,7 +148,6 @@ public:
     void load();
     void draw(Scene *_scene);
 
-    std::string getName() { return name; }
     bool hasTextures() { return false; }
 };
 
@@ -162,7 +159,6 @@ private:
 
 public:
     UVSphere(float _radius, int _nCols, int _nRows);
-    std::string getName() { return name; }
 };
 
 class Plane : public Object
@@ -172,7 +168,6 @@ private:
 
 public:
     Plane(glm::vec2 _size, int _ncol, int _nrows);
-    std::string getName() { return name; }
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "scene.hpp"
 #include "engine.hpp"
+#include "boundingBoxObject.hpp"
 
 #include <random>
 

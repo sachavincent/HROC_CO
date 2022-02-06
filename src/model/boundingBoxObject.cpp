@@ -1,4 +1,4 @@
-#include "object.hpp"
+#include "boundingBoxObject.hpp"
 #include "scene.hpp"
 
 BoundingBoxObject::BoundingBoxObject(std::string _parentName, glm::vec3 center, glm::vec3 size, float _edgeSize)
@@ -7,7 +7,8 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, glm::vec3 center, 
 	setPosition(center);
 	setScale(size);
 	pos = center;
-	std::cout << "Created bounding box '" << name << "'" << std::endl;
+	
+	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 }
 
 void BoundingBoxObject::draw(Scene *_scene, int _depth)

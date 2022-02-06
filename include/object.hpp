@@ -125,16 +125,6 @@ public:
     Cube(float _edgeSize = 1.0f, std::string _name = "Cube_" + std::to_string(instance));
 };
 
-class BoundingBoxObject : public Cube
-{
-private:
-    glm::vec3 pos;
-public:
-    BoundingBoxObject(std::string _parentName, glm::vec3 center, glm::vec3 size, float _edgeSize = 1.0f);
-
-    void draw(Scene *_scene, int _depth);
-};
-
 //! A object loaded from a file, it can contain multiple subobjects inside it.
 class FileObject : public Object
 {

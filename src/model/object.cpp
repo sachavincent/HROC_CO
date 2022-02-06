@@ -10,6 +10,7 @@ size_t Object::id_counter = 0;
 
 void Object::load()
 {
+#ifndef HROC_TESTS
     // gen geometry buffers
     glGenBuffers(1, &m.vbo);
     glGenBuffers(1, &m.nbo);
@@ -62,6 +63,7 @@ void Object::load()
     {
         specularMap = Texture::loadTexture(specularMapPath.c_str());
     }
+#endif
 }
 
 void Object::draw(Scene *_scene)

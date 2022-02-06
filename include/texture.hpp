@@ -1,5 +1,6 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
+
 #include <stb_image.h>
 #include <glad/glad.h>
 #include <map>
@@ -16,7 +17,7 @@ private:
     Texture(const std::string &file);
 
 public:
-    static Texture& DEFAULT_TEXTURE()
+    static Texture &DEFAULT_TEXTURE()
     {
         static Texture tex("default.png");
         return tex;

@@ -22,7 +22,8 @@ protected:
         bbs1.reserve(centers1.size());
         for (auto const &value : centers1)
         {
-            bbs1.push_back(std::make_shared<AxisBoundingBox>(value, size));
+            auto bb = std::make_shared<AxisBoundingBox>(value, size);
+            bbs1.push_back(bb);
         }
 
         std::vector<glm::vec3> centers2 = {
@@ -40,7 +41,8 @@ protected:
         simpleBBList.reserve(centers2.size());
         for (size_t i = 0; i < centers2.size(); i++)
         {
-            simpleBBList.push_back(std::make_shared<AxisBoundingBox>(centers2[i], sizes2[i]));
+            auto simpleBB = std::make_shared<AxisBoundingBox>(centers2[i], sizes2[i]);
+            simpleBBList.push_back(simpleBB);
         }
         // You can do set-up work for each test here.
     }

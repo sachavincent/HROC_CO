@@ -1,13 +1,13 @@
 #include "texture.hpp"
 
-
 std::map<std::string, int> Texture::cache = {};
 
 Texture::Texture(const std::string &file)
 {
-    std::string path = ""+file;
+#ifndef HROC_TESTS
+    std::string path = "" + file;
 
-    //load a texture only if it has not been loaded previously (avoids loading duplicates)
+    // load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (Texture::cache.find(path) == Texture::cache.end())
     {
         path = Utils::workingDirectory() + path;
@@ -79,6 +79,7 @@ Texture::Texture(const std::string &file)
         std::cout << "Texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
+#endif
 }
 
 Texture Texture::loadTexture(const std::string &file)

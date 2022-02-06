@@ -1,9 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-#include <glad/glad.h>
 
 #ifndef GLM_H
 #define GLM_H

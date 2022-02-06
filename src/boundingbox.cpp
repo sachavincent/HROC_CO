@@ -17,12 +17,10 @@ float BoundingBox::distance(BoundingBox *_A, BoundingBox *_B)
 
 OrientedBoundingBox::OrientedBoundingBox(Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
 {
-    std::cout << std::endl;
 }
 
 OrientedBoundingBox::OrientedBoundingBox(glm::vec3 _center, glm::vec3 _size) : BoundingBox(_center, _size)
 {
-    std::cout << std::endl;
 }
 
 AxisBoundingBox::AxisBoundingBox(glm::vec3 _center, glm::vec3 _size) : OrientedBoundingBox(_center, _size)

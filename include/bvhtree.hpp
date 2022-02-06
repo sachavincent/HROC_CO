@@ -6,10 +6,13 @@
 #include <iostream>
 #include <map>
 #include <utility>
+#include <memory>
 #include <vector>
 
 #include "bvhnode.hpp"
 #include "idgenerator.hpp"
+#include "boundingbox.hpp"
+
 class BvhTree
 {
 

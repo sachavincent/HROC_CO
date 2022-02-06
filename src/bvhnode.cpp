@@ -1,4 +1,6 @@
 #include "bvhnode.hpp"
+#include "boundingbox.hpp"
+
 BvhNode::BvhNode(BoundingBox *boundingBox, int _id) : _boundingBox(boundingBox), _leftChild(nullptr), _rightChild(nullptr), _parent(nullptr)
 {
     id = _id;

@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <iostream>
 #include <map>
-#include "boundingbox.hpp"
+
+class BoundingBox;
+
 enum NodeType
 {
     LEFT,

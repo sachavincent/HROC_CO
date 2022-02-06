@@ -5,6 +5,7 @@
 #ifdef NOT_MSVC
 #include <libgen.h>
 #include <unistd.h> 
+#include <linux/limits.h>
 #else
 #include <Windows.h>
 #endif

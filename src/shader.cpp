@@ -1,67 +1,68 @@
 #include "shader.hpp"
 
-std::map<std::pair<std::string,std::string>,int> Shader::buffer = {};
+std::map<std::pair<std::string, std::string>, int> Shader::buffer = {};
 
 const char *Shader::loadShader(std::string path)
 {
 	path = Utils::workingDirectory() + path;
 
-	
 	std::ifstream file(path);
 
 	std::string str((std::istreambuf_iterator<char>(file)),
 					std::istreambuf_iterator<char>());
 	int fSize = str.length();
 
-	char *cstr = new char[fSize+1];
+	char *cstr = new char[fSize + 1];
 
 	if (fSize == 0)
 	{
 		std::cout << "failed to load shader with path : " << path << std::endl;
 	}
-	strcpy_s(cstr, fSize+1,str.c_str());
+	strcpy(cstr, str.c_str());
 	file.close();
+	
 	return cstr;
 }
 
 Shader::Shader(std::string computePath)
 {
-	//TODO
+	// TODO
 }
 
 Shader::Shader(std::string vertexPath, std::string fragmentPath)
 {
-	std::pair<std::string,std::string> paths = {vertexPath,fragmentPath};
+	std::pair<std::string, std::string> paths = {vertexPath, fragmentPath};
 	auto it = buffer.find(paths);
-	if( it != buffer.end()){
+	if (it != buffer.end())
+	{
 		ID = it->second;
 		std::cout << it->second << std::endl;
 		return;
 	}
-	
+
 	const char *vertexShaderSource = Shader::loadShader(vertexPath);
 	const char *fragmentShaderSource = Shader::loadShader(fragmentPath);
 
-	//vertex shader creation and compilation
+	// vertex shader creation and compilation
 	unsigned int vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
-	//fragment shader creation and compilation
+	// fragment shader creation and compilation
 	unsigned int fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 
-	//shader program creation
+	// shader program creation
 	unsigned int shaderProgram;
 	shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
-	//shader program creation
+	// shader program creation
 	glUseProgram(shaderProgram);
-	//temp shader deletion
+	// temp shader deletion
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 

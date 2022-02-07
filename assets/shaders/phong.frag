@@ -8,12 +8,16 @@
 
 #define MAX_DEPTH_BB 16
 
-const vec3 colorsBB[MAX_DEPTH_BB] = { vec3(244, 67, 54),vec3(233, 30, 99),vec3(156, 39, 176),vec3(103, 58, 183),
-                                vec3(63, 81, 181),vec3(33, 150, 243),vec3(3, 169, 244),vec3(0, 188, 212),
-                                vec3(0, 150, 136),vec3(76, 175, 80),vec3(139, 195, 74),vec3(205, 220, 57),
-                                vec3(255, 235, 59),vec3(255, 193, 7),vec3(255, 152, 0),vec3(255, 87, 34) };
+const vec3 colorsBB[MAX_DEPTH_BB] = { vec3(244.0 / 255, 67.0 / 255, 54.0 / 255), vec3(233.0 / 255, 30.0 / 255, 99.0 / 255),
+                                    vec3(156.0 / 255, 39.0 / 255, 176.0 / 255), vec3(103.0 / 255, 58.0 / 255, 183.0 / 255),
+                                    vec3(63.0 / 255, 81.0 / 255, 181.0 / 255), vec3(33.0 / 255, 150.0 / 255, 243.0 / 255),
+                                    vec3(3.0 / 255, 169.0 / 255, 244.0 / 255), vec3(0.0 / 255, 188.0 / 255, 212.0 / 255),
+                                    vec3(0.0 / 255, 150.0 / 255, 136.0 / 255), vec3(76.0 / 255, 175.0 / 255, 80.0 / 255),
+                                    vec3(139.0 / 255, 195.0 / 255, 74.0 / 255), vec3(205.0 / 255, 220.0 / 255, 57.0 / 255),
+                                    vec3(255.0 / 255, 235.0 / 255, 59.0 / 255), vec3(255.0 / 255, 193.0 / 255, 7.0 / 255),
+                                    vec3(255.0 / 255, 152.0 / 255, 0.0 / 255), vec3(255.0 / 255, 87.0 / 255, 34.0 / 255) };
 
-const float ALPHA_BB = 0.2;
+const float ALPHA_BB = 1;
 
 out vec4 FragColor;
 
@@ -75,14 +79,12 @@ void main()
         for(int i = 0; i < NR_LIGHTS; i++)
             if(lights[i].enabled)
                 result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
-        alpha = 1.0;
+        alpha = 1;
     }
     else // This object is a bounding box
     {
         result = colorsBB[depthBB];
         alpha = ALPHA_BB;
-        //result = vec3(0,1,0);
-        //alpha = 1;
     }
 
     FragColor = vec4(result, alpha);

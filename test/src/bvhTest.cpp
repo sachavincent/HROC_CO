@@ -58,12 +58,15 @@ protected:
 
     virtual void TearDown()
     {
+        boundingBoxes.clear();
         // Code here will be called immediately after each test (right
         // before the destructor).
     }
 
     std::vector<std::shared_ptr<BoundingBox>> bbs1;
     std::vector<std::shared_ptr<BoundingBox>> simpleBBList;
+
+    std::vector<std::shared_ptr<BoundingBox>> boundingBoxes;
 };
 
 void EXPECT_VEC3(glm::vec3 actual, glm::vec3 expected)
@@ -272,7 +275,7 @@ void getTreeIds(BvhNode *root, std::vector<int> &idList)
 }
 
 /**
- * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) cas général
+ * Tests BvhTree::BvhTree(std::shared_ptr<BoundingBox>) general case
  */
 TEST_F(BvhTest, Constructor_Case_1)
 {
@@ -294,11 +297,10 @@ TEST_F(BvhTest, Constructor_Case_1)
 }
 
 /**
- * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) pour des BB même endroits mais tailles différentes
+ * Tests BvhTree::BvhTree(std::shared_ptr<BoundingBox>) for over overlapped BB but different sizes
  */
 TEST_F(BvhTest, Constructor_Case_2)
 {
-    std::vector<std::shared_ptr<BoundingBox>> bbsSameCenter;
     glm::vec3 center = {1, 1, 1};
     std::vector<glm::vec3> sizes = {
         {6.5, 2.5, 3},
@@ -308,37 +310,53 @@ TEST_F(BvhTest, Constructor_Case_2)
         {3.5, 2.5, 7},
         {4.5, 5.5, 2.5},
         {1.5, 5.5, 3}};
-    bbsSameCenter.reserve(sizes.size());
+    boundingBoxes.reserve(sizes.size());
     for (auto const &value : sizes)
     {
-        bbsSameCenter.push_back(std::make_shared<AxisBoundingBox>(center, value));
+        boundingBoxes.push_back(std::make_shared<AxisBoundingBox>(center, value));
     }
-    BvhTree tree(bbsSameCenter);
+    BvhTree tree(boundingBoxes);
 
     tree.print();
 
-    EXPECT_EQ(0, 0);
+    EXPECT_EQ(0, 0); // TODO
 }
 
 /**
- * Tests BvhTree::BvhTree(std::vector<BoundingBox*>) pour des BB à distances égales
+ * Tests BvhTree::BvhTree(std::shared_ptr<BoundingBox>) for BB at equal distance
  */
 TEST_F(BvhTest, Constructor_Case_3)
 {
-    std::vector<std::shared_ptr<BoundingBox>> bbsSameDistance;
     glm::vec3 size = {1, 1, 1};
     std::vector<glm::vec3> centers;
     for (int i = 0; i < 15; i++)
     {
         centers.push_back(glm::vec3{i, i, i});
     }
-    bbsSameDistance.reserve(centers.size());
+    boundingBoxes.reserve(centers.size());
     for (auto const &value : centers)
     {
-        bbsSameDistance.push_back(std::make_shared<AxisBoundingBox>(value, size));
+        boundingBoxes.push_back(std::make_shared<AxisBoundingBox>(value, size));
     }
-    BvhTree tree(bbsSameDistance);
+    BvhTree tree(boundingBoxes);
 
     tree.print();
-    EXPECT_EQ(0, 0);
+    EXPECT_EQ(0, 0); // TODO
+}
+
+/**
+ * Tests BvhTree::BvhTree(std::shared_ptr<BoundingBox>) with 1 boundingBox
+ */
+TEST_F(BvhTest, Constructor_Case_4)
+{
+    boundingBoxes.push_back(bbs1[1]);
+    BvhTree tree(boundingBoxes);
+    BvhNode *root = tree.getRoot();
+
+    std::vector<int> actualList;
+
+    getTreeIds(root, actualList);
+
+    EXPECT_EQ(actualList.size(), 1);
+    EXPECT_EQ(actualList[0], 0);
 }

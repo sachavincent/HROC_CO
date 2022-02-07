@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
+#include <memory>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -20,7 +21,7 @@ private:
 public:
     BoundingBox();
 
-    BoundingBox(Object &_o);
+    BoundingBox(const Object &_o);
 
     BoundingBox(glm::vec3 _center, glm::vec3 _size);
 
@@ -31,7 +32,7 @@ public:
 
     virtual BoundingBox *merge(BoundingBox *_A) = 0;
 
-    static float distance(BoundingBox *_A, BoundingBox *_B);
+    static float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
     //! Get a model of the BoundingBox object for debug mode rendering
     inline BoundingBoxObject *getWireframe() { return wireframe; }
@@ -43,7 +44,7 @@ private:
     glm::mat3 transform;
 
 public:
-    OrientedBoundingBox(Object &_o, glm::mat3 &_transform);
+    OrientedBoundingBox(const Object &_o, glm::mat3 &_transform);
 
     OrientedBoundingBox(glm::vec3 _center, glm::vec3 _size);
 
@@ -62,7 +63,7 @@ private:
     static glm::mat3 DEFAULT_TRANSFORM;
 
 public:
-    AxisBoundingBox(Object &_o);
+    AxisBoundingBox(const Object &_o);
 
     AxisBoundingBox(glm::vec3 _center, glm::vec3 _size);
 

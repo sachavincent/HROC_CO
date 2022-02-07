@@ -8,14 +8,14 @@ BoundingBox::BoundingBox() : wireframe(nullptr)
     // TODO: For test purposes
 }
 
-float BoundingBox::distance(BoundingBox *_A, BoundingBox *_B)
+float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B)
 {
-    glm::vec3 centerA = _A->getCenter();
-    glm::vec3 centerB = _B->getCenter();
+    glm::vec3 centerA = _A.get()->getCenter();
+    glm::vec3 centerB = _B.get()->getCenter();
     return glm::distance(centerA, centerB);
 }
 
-OrientedBoundingBox::OrientedBoundingBox(Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
+OrientedBoundingBox::OrientedBoundingBox(const Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
 {
 }
 
@@ -27,38 +27,51 @@ AxisBoundingBox::AxisBoundingBox(glm::vec3 _center, glm::vec3 _size) : OrientedB
 {
 }
 
-AxisBoundingBox::AxisBoundingBox(Object &_o) : OrientedBoundingBox(_o, AxisBoundingBox::DEFAULT_TRANSFORM)
+AxisBoundingBox::AxisBoundingBox(const Object &_o) : OrientedBoundingBox(_o, AxisBoundingBox::DEFAULT_TRANSFORM)
 {
 }
 
-BoundingBox::BoundingBox(Object &_o) : wireframe(nullptr)
+BoundingBox::BoundingBox(const Object &_o)
 {
-    center = _o.getPosition();
-
+    glm::mat4 transformationMatrix = _o.getTransformationMatrix();
+    center = glm::vec3(transformationMatrix * glm::vec4(0.0, 0.0, 0.0, 1.0)); // Apply object rotations & scale
+    // center = _o.getPosition();
     float maxX = -std::numeric_limits<float>::infinity(), maxY = -std::numeric_limits<float>::infinity(), maxZ = -std::numeric_limits<float>::infinity();
     float minX = std::numeric_limits<float>::infinity(), minY = std::numeric_limits<float>::infinity(), minZ = std::numeric_limits<float>::infinity();
 
-    for (auto it = _o.getVertices().begin(); it != _o.getVertices().end(); it++)
+    for (auto it = _o.getVertices().begin(); it != _o.getVertices().end();)
     {
-        minX = (*it) < minX ? (*it) : minX;
-        maxX = (*it) > maxX ? (*it) : maxX;
+        GLfloat x = *it;
         it++;
-        minY = (*it) < minY ? (*it) : minY;
-        maxY = (*it) > maxY ? (*it) : maxY;
+        GLfloat y = *it;
         it++;
-        minZ = (*it) < minZ ? (*it) : minZ;
-        maxZ = (*it) > maxZ ? (*it) : maxZ;
-    }
-    size = glm::vec3(maxX - minX, maxY - minY, maxZ - minZ);
-    // TODO: Transformation matrix (scale+trans+rot)
+        GLfloat z = *it;
+        it++;
 
+        glm::vec3 pos(x, y, z);
+        pos = glm::vec3(transformationMatrix * glm::vec4(pos, 1.0)); // Apply object rotations & scale
+
+        minX = pos[0] < minX ? pos[0] : minX;
+        maxX = pos[0] > maxX ? pos[0] : maxX;
+
+        minY = pos[1] < minY ? pos[1] : minY;
+        maxY = pos[1] > maxY ? pos[1] : maxY;
+
+        minZ = pos[2] < minZ ? pos[2] : minZ;
+        maxZ = pos[2] > maxZ ? pos[2] : maxZ;
+    }
+
+    glm::vec3 minPos(minX, minY, minZ);
+    glm::vec3 maxPos(maxX, maxY, maxZ);
+
+    size = maxPos - minPos;
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
 
-    wireframe = new BoundingBoxObject(_o.getName(), center, size);
+    wireframe = new BoundingBoxObject(_o.getName(), center, _o.getRotationMatrix(), size);
 }
 
-BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size) : wireframe(nullptr)
+BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size)
 {
     center = _center;
     size = _size;
@@ -66,7 +79,7 @@ BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size) : wireframe(nullptr
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
 
-    wireframe = new BoundingBoxObject("NoObject", center, size);
+    wireframe = new BoundingBoxObject("NoObject", center, glm::mat4(1.0), size);
 }
 
 BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
@@ -74,7 +87,6 @@ BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
     glm::vec3 _center = getCenter();
     glm::vec3 _centerOther = _other->getCenter();
 
-    glm::vec3 _newCenter = (_center + _centerOther) * glm::vec3(0.5);
     glm::vec3 _size = getSize();
     glm::vec3 _sizeOther = _other->getSize();
 
@@ -100,6 +112,7 @@ BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
     float _newMaxZ = _maxZ > _maxZOther ? _maxZ : _maxZOther;
 
     glm::vec3 _newSize(_newMaxX - _newMinX, _newMaxY - _newMinY, _newMaxZ - _newMinZ);
+    glm::vec3 _newCenter((_newMaxX + _newMinX) / 2, (_newMaxY + _newMinY) / 2, (_newMaxZ + _newMinZ) / 2);
 
     BoundingBox *_newBoundingBox = new OrientedBoundingBox(_newCenter, _newSize);
 
@@ -111,7 +124,6 @@ BoundingBox *AxisBoundingBox::merge(BoundingBox *_other)
     glm::vec3 _center = getCenter();
     glm::vec3 _centerOther = _other->getCenter();
 
-    glm::vec3 _newCenter = (_center + _centerOther) * glm::vec3(0.5);
     glm::vec3 _size = getSize();
     glm::vec3 _sizeOther = _other->getSize();
 
@@ -137,6 +149,7 @@ BoundingBox *AxisBoundingBox::merge(BoundingBox *_other)
     float _newMaxZ = _maxZ > _maxZOther ? _maxZ : _maxZOther;
 
     glm::vec3 _newSize(_newMaxX - _newMinX, _newMaxY - _newMinY, _newMaxZ - _newMinZ);
+    glm::vec3 _newCenter((_newMaxX + _newMinX) / 2, (_newMaxY + _newMinY) / 2, (_newMaxZ + _newMinZ) / 2);
 
     BoundingBox *_newBoundingBox = new AxisBoundingBox(_newCenter, _newSize);
 

@@ -158,7 +158,7 @@ Cube::Cube(float _edgeSize, std::string _name) : Object(_name)
 		30, 32, 31,
 		33, 35, 34};
 
-	translate = glm::mat4{1.0};
-	scale = glm::scale(glm::mat4{1.0}, glm::vec3(_edgeSize));
-	rotation = glm::mat4{1.0};
+	setPosition(glm::vec3{0.0});
+	setScale(glm::vec3(_edgeSize));
+	setRotationMatrix(glm::mat4{1.0});
 }

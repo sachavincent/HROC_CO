@@ -11,10 +11,18 @@ BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(new BvhNode(bb.get(), idGenerator->GetUniqueId()));
+        nodes.emplace_back(new BvhNode(bb, idGenerator->GetUniqueId()));
     }
-    createMap(nodes);
-    mergeAll(nodes);
+
+    if (nodes.size() == 1) // Only one node (=root)
+    {
+        root = nodes[0];
+    }
+    else
+    {
+        createMap(nodes);
+        mergeAll(nodes);
+    }
 }
 
 void BvhTree::createMap(std::vector<BvhNode *> &_nodes)

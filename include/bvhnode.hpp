@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <map>
+#include <memory>
 
 class BoundingBox;
 
@@ -23,70 +24,70 @@ class BvhNode
 {
 private:
     int id;
-    NodeType _type;
-    Visibility _tag;
-    BvhNode *_leftChild;
-    BvhNode *_rightChild;
-    BvhNode *_parent;
-    BoundingBox *_boundingBox;
+    NodeType type;
+    Visibility tag;
+    BvhNode *leftChild;
+    BvhNode *rightChild;
+    BvhNode *parent;
+    std::shared_ptr<BoundingBox> boundingBox;
 
 public:
-    BvhNode(BoundingBox *boundingBox, int _id);
+    BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id);
 
-    inline const Visibility getVisibility() const { return _tag; }
+    inline const Visibility getVisibility() const { return tag; }
 
     inline const int getId() const { return id; }
 
     inline const bool hasLeftChild() const
     {
-        return _leftChild != nullptr;
+        return leftChild != nullptr;
     }
 
     inline const bool hasRightChild() const
     {
-        return _rightChild != nullptr;
+        return rightChild != nullptr;
     }
 
     inline BvhNode *getLeftChild() const
     {
-        return _leftChild;
+        return leftChild;
     }
 
     inline BvhNode *getRightChild() const
     {
-        return _rightChild;
+        return rightChild;
     }
 
     inline BvhNode *getParent() const
     {
-        return _parent;
+        return parent;
     }
 
     inline const NodeType &getType() const
     {
-        return _type;
+        return type;
     }
 
     BvhNode *sibling() const;
 
-    BvhNode *getChild(const NodeType &type) const;
+    BvhNode *getChild(const NodeType &_type) const;
 
-    inline void setType(const NodeType &type)
+    inline void setType(const NodeType &_type)
     {
-        _type = type;
+        type = _type;
     }
-    inline void setVisibility(const Visibility &tag)
+    inline void setVisibility(const Visibility &_tag)
     {
-        _tag = tag;
+        tag = _tag;
     }
 
     bool isRoot();
 
-    inline BoundingBox *getBoundingBox()
+    inline std::shared_ptr<BoundingBox> getBoundingBox()
     {
-        return _boundingBox;
+        return boundingBox;
     }
 
-    static BvhNode *merge(BvhNode *left, BvhNode *right, int newid);
+    static BvhNode *merge(BvhNode *_left, BvhNode *_right, int _newId);
 };
 #endif

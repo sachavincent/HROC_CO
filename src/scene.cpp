@@ -19,13 +19,13 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
 
     std::random_device device;
     std::mt19937 generator(device());
-    std::uniform_int_distribution<int> distribution(0, 100);
+    std::uniform_int_distribution<int> distribution(0, 10);
 
     // enough boxes to get down to 60fps in release
     for (size_t i = 0; i < 10; i++)
     {
         auto cube = std::make_shared<Cube>(1.0f);
-        cube->setPosition({distribution(generator) - 50, distribution(generator), distribution(generator) + 10})
+        cube->setPosition({distribution(generator), distribution(generator), distribution(generator)})
             .setDiffuse({0.0f, 1.0f, 0.0f})
             .setSpecular(glm::vec3{0.8});
         addObject(cube);
@@ -35,29 +35,29 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
     cube0->setPosition({1.1f, 0.6f, 0.0f})
         .setDiffuse({0.0f, 1.0f, 0.0f})
         .setSpecular(glm::vec3{0.9});
-    addObject(cube0);
+     //addObject(cube0);
 
     auto cube1 = std::make_shared<Cube>(1.0f);
     cube1->setPosition({-2.5f, 0.6f, 0.5f})
         .setScale({2.0, 1.0, 2.0})
         .setTexDiffuse("textures/tiles/basecolor.jpg")
         .setTexSpecular("textures/tiles/roughness.png");
-    addObject(cube1);
+     //addObject(cube1);
 
     auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
     sphere1->setPosition({3.5, 0.7, 3.5})
         .setRotation(-90, {1, 0, 0})
-        .setScale(glm::vec3{3.0})
+        .setScale(glm::vec3{1.2f})
         .setDiffuse({1.0, 0.0, 1.0});
 
-    addObject(sphere1);
+     //addObject(sphere1);
 
     auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
     plane1->setRotation(-90, {1, 0, 0})
         .setTexDiffuse("textures/stoneWall/diffuse.png")
         .setTexSpecular("textures/stoneWall/roughness.png")
         .setTexScaling({4, 4});
-    addObject(plane1);
+    // addObject(plane1);
 
     // gold-ish utah teapot
     auto teapot =
@@ -83,16 +83,6 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
     }
 
     hierarchy = new BvhTree(bbs);
-
-    // auto debugData = hierarchy->getDebugData();
-    // for (auto entry : debugData)
-    //{
-    //     auto bbs = entry.second;
-    //     for (auto bb : bbs)
-    //     {
-    //         bb->load();
-    //     }
-    // }
 }
 
 Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr)
@@ -157,7 +147,6 @@ void Scene::renderObjects()
 
 void Scene::renderBoundingBoxes()
 {
-    // TODO: this is only a testing code for this method
     if (!hierarchy)
         return;
 

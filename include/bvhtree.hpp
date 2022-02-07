@@ -31,7 +31,7 @@ private:
     BvhNode *root;
     std::multimap<float, PairNode> *map;
     std::vector<BvhNode *> nodes;
-    IdGenerator *idGenerator = nullptr;
+    IdGenerator *idGenerator;
 
 public:
     BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGen);
@@ -78,7 +78,7 @@ public:
         printBT(root);
     }
 
-    void nodeDepthExploration(std::map<int, std::vector<BoundingBoxObject>> &nodeDepths, BvhNode *node, int depth)
+    void nodeDepthExploration(std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> &nodeDepths, BvhNode *node, int depth)
     {
         if (nodeDepths.find(depth) == nodeDepths.end())
             nodeDepths.insert(std::make_pair(depth, std::vector<BoundingBoxObject>()));
@@ -91,9 +91,9 @@ public:
             nodeDepthExploration(nodeDepths, node->getRightChild(), depth + 1);
     }
 
-    std::map<int, std::vector<BoundingBoxObject>> getDebugData()
+    std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> getDebugData()
     {
-        std::map<int, std::vector<BoundingBoxObject>> nodeDepths;
+        std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> nodeDepths;
         if (root)
             nodeDepthExploration(nodeDepths, root, 0);
 

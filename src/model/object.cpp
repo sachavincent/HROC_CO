@@ -24,32 +24,28 @@ void Object::load()
 
     // create and fill vertex data
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo);
-    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(GLfloat),
-                 m.vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(GLfloat), m.vertices.data(), GL_STATIC_DRAW);
     // set vertex attribute pointer
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
     // copy normals to nbo
     glBindBuffer(GL_ARRAY_BUFFER, m.nbo);
-    glBufferData(GL_ARRAY_BUFFER, m.normals.size() * sizeof(GLfloat),
-                 m.normals.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m.normals.size() * sizeof(GLfloat), m.normals.data(), GL_STATIC_DRAW);
     // define array for normals
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(1);
 
     // Copy texture array in element buffer
     glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
-    glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat),
-                 m.textureCoord.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
     // define array for texture
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     glEnableVertexAttribArray(2);
 
     // copy indices to ebo
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(GLfloat),
-                 m.indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(GLfloat), m.indices.data(), GL_STATIC_DRAW);
 
     // Unbind the VAO
     glBindVertexArray(0);
@@ -63,14 +59,17 @@ void Object::load()
     {
         specularMap = Texture::loadTexture(specularMapPath.c_str());
     }
+    loaded = true;
 #endif
 }
 
 void Object::draw(Scene *_scene)
 {
+    if (!loaded)
+        return;
     Shader &sh = _scene->getShader();
 
-    sh.loadMat4("model", translate * rotation * glm::mat4(1.0f));
+    sh.loadMat4("model", transformationMatrix);
     sh.loadVec2("texScaling", texScaling);
     sh.loadFloat("material.specularStrength", 0.5f);
     sh.loadFloat("material.shininess", shininess);
@@ -109,24 +108,32 @@ void Object::draw(Scene *_scene)
     glBindVertexArray(0);
 }
 
-Object &Object::setScale(glm::vec3 _scale)
+Object &Object::setScale(const glm::vec3 &_scale)
 {
-    scale = glm::mat4(1.0);
-    scale = glm::scale(scale, _scale);
+    scale = _scale;
+    updateTransformationMatrix();
     return *this;
 }
 
 Object &Object::setRotation(float _angle, glm::vec3 _axis)
 {
-    rotation = glm::mat4(1.0);
-    rotation = glm::rotate(rotation, glm::radians(_angle), _axis);
+    rotationMatrix = glm::mat4(1.0);
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(_angle), _axis);
+    updateTransformationMatrix();
     return *this;
 }
 
-Object &Object::setPosition(glm::vec3 _pos)
+Object &Object::setRotationMatrix(const glm::mat4 &_rotationMatrix)
 {
-    translate = glm::mat4{1.0};
-    translate = glm::translate(translate, _pos);
+    rotationMatrix = _rotationMatrix;
+    updateTransformationMatrix();
+    return *this;
+}
+
+Object &Object::setPosition(const glm::vec3 &_pos)
+{
+    position = _pos;
+    updateTransformationMatrix();
     return *this;
 }
 

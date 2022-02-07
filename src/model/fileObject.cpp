@@ -20,9 +20,8 @@ FileObject::FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals) : Object
 	std::cout << "loading object from file : "
 			  << _path << " ..." << std::endl;
 
-	const aiScene *scene = _smoothNormals ? 
-	importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
-	  : importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+	const aiScene *scene = _smoothNormals ? importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
+										  : importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -41,9 +40,9 @@ FileObject::FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals) : Object
 	for (size_t i = 0; i < scene->mNumMeshes; i++)
 	{
 		aiMesh *mesh = scene->mMeshes[i];
-		translate = glm::mat4{1.0};
-		scale = glm::mat4{1.0};
-		rotation = glm::mat4{1.0};
+		position = glm::vec3{0.0};
+		scale = glm::vec3{1.0};
+		rotationMatrix = glm::mat4{1.0};
 		processMesh(mesh, scene, i);
 	}
 
@@ -163,9 +162,8 @@ void FileObject::load()
 
 void FileObject::draw(Scene *_scene)
 {
-	
 	Shader &sh = _scene->getShader();
-	sh.loadMat4("model", translate * rotation * scale);
+	sh.loadMat4("model", transformationMatrix);
 	sh.loadVec2("texScaling", texScaling);
 
 	sh.loadBool("material.hasTexture", false);
@@ -173,7 +171,7 @@ void FileObject::draw(Scene *_scene)
 	sh.loadBool("material.hasMetallicTex", false);
 
 	sh.loadFloat("material.shininess", shininess);
-		
+
 	sh.loadVec3("material.diffuse", diffuseColor);
 	sh.loadVec3("material.specular", specularColor);
 
@@ -186,4 +184,3 @@ void FileObject::draw(Scene *_scene)
 		glBindVertexArray(0);
 	}
 }
-

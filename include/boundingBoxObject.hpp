@@ -6,10 +6,9 @@
 class BoundingBoxObject : public Cube
 {
 private:
-    glm::vec3 pos;
 
 public:
-    BoundingBoxObject(std::string _parentName, glm::vec3 center, glm::vec3 size, float _edgeSize = 1.0f);
+    BoundingBoxObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale);
 
     void draw(Scene *_scene, int _depth);
 };

@@ -8,7 +8,7 @@
 #include <iomanip>
 
 Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr),
-     _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
+                                            _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
 {
     glfwInit();
 
@@ -18,7 +18,11 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE); // TODO: Enlever (performances)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-
+#ifdef HROC_TESTS
+    glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+//#elif WIN32 && _DEBUG
+//  glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+#endif
     glfwSetErrorCallback(IOUtils::errorCallback); // TODO: Enlever (performances)
 
     _window = glfwCreateWindow(_width, _height, _windowName.c_str(), nullptr, nullptr);
@@ -35,8 +39,11 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     // GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glViewport(0, 0, _width, _height);
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_FRAMEBUFFER_SRGB);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // ImGui Setup
     _ui.load(_window);
@@ -101,10 +108,13 @@ void Engine::startLoop()
 
         getCurrentCamera()->move(2.0f * _deltaTime);
         // final rendering of scene
-        
+
         _scene->renderObjects();
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glLineWidth(4.0);
         _scene->renderBoundingBoxes();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // imgui part
         _ui.render(_scene);

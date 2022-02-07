@@ -12,6 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <glm/gtx/string_cast.hpp>
 
 #include "shader.hpp"
 #include "light.hpp"
@@ -46,14 +47,19 @@ protected:
     std::string diffuseMapPath = "";
     std::string specularMapPath = "";
 
-    glm::mat4 scale, rotation, translate;
     glm::vec2 texScaling = {1, 1};
+
+    glm::vec3 scale;
+    glm::vec3 position;
+    glm::mat4 rotationMatrix;
+
+    glm::mat4 transformationMatrix = glm::mat4(1.0);
+    bool loaded = false;
 
     // HROC
     std::shared_ptr<BoundingBox> boundingBox;
     Observer *observer;
     bool visible;
-
     //! une structure qui encapsule la description d'un seul object
     struct OBJECT_DATA
     {
@@ -69,44 +75,66 @@ protected:
 
     OBJECT_DATA m;
 
+    void updateTransformationMatrix()
+    {
+        if (loaded)
+            return;
+
+        glm::mat4 _scale(1.0);
+        _scale = glm::scale(_scale, scale);
+
+        glm::mat4 _translate = glm::mat4{1.0};
+        _translate = glm::translate(_translate, position);
+        transformationMatrix = _translate * rotationMatrix * _scale;
+    }
+
 public:
-    Object(std::string _name = "Object") : name(_name), boundingBox(nullptr) { id = id_counter++; }
+    Object(std::string _name = "Object")
+        : name(_name), boundingBox(nullptr), scale(1.0), position(0.0), rotationMatrix(1.0)
+    {
+        id = id_counter++;
+    }
 
     inline size_t getId() const { return id; }
 
     //! Load the object on the gpu. This action is performed after opengl/glfw initialization
-    virtual void load();
+    void load();
 
     //! Render the object on screen.
-    virtual void draw(Scene *_scene);
+    void draw(Scene *_scene);
 
-    virtual Object &setPosition(glm::vec3 _pos);
-    virtual Object &setScale(glm::vec3 _scale);
-    virtual Object &setRotation(float _angle, glm::vec3 _axis);
+    Object &setPosition(const glm::vec3 &_pos);
+    Object &setScale(const glm::vec3 &_scale);
+    Object &setRotation(float _angle, glm::vec3 _axis);
+    Object &setRotationMatrix(const glm::mat4 &_rotationMatrix);
 
     Object &setTexDiffuse(std::string _path);
     Object &setTexSpecular(std::string _path);
     Object &setTexScaling(glm::vec2 _scale);
 
     //! Set color of object (not used if textures are defined)
-    virtual Object &setDiffuse(glm::vec3 _color);
-    virtual Object &setSpecular(glm::vec3 _color);
-    virtual Object &setShininess(float _shininess);
+    Object &setDiffuse(glm::vec3 _color);
+    Object &setSpecular(glm::vec3 _color);
+    Object &setShininess(float _shininess);
 
     inline void setVisible(bool _visible) { visible = _visible; }
     inline void setBoundingBox(std::shared_ptr<BoundingBox> _boundingBox) { boundingBox = _boundingBox; }
     inline std::shared_ptr<BoundingBox> getBoundingBox() { return boundingBox; }
     inline std::string getName() const { return name; }
 
-    virtual glm::vec3 getPosition() { return glm::vec3(translate[3]); }
-    virtual glm::vec3 getScale() { return glm::vec3(scale[0][0], scale[1][1], scale[2][2]); }
+    inline const glm::vec3 &getPosition() const { return position; }
+    inline const glm::vec3 &getScale() const { return scale; }
 
-    virtual std::vector<GLfloat> &getVertices() { return m.vertices; }
-    virtual glm::vec3 getDiffuse() { return diffuseColor; }
-    virtual glm::vec3 getSpecular() { return specularColor; }
-    virtual float getShininess() { return shininess; }
+    inline const glm::mat4 &getRotationMatrix() const { return rotationMatrix; }
 
-    virtual glm::vec2 getTexScaling() { return texScaling; }
+    inline const glm::mat4 &getTransformationMatrix() const { return transformationMatrix; }
+
+    const std::vector<GLfloat> &getVertices() const { return m.vertices; }
+    const glm::vec3 &getDiffuse() const { return diffuseColor; }
+    const glm::vec3 &getSpecular() const { return specularColor; }
+    float getShininess() const { return shininess; }
+
+    const glm::vec2 &getTexScaling() const { return texScaling; }
 
     void registerObserver(Observer &o) override;
     void removeObserver(Observer &o) override;

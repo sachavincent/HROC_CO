@@ -32,7 +32,7 @@ public:
 
     virtual BoundingBox *merge(BoundingBox *_A) = 0;
 
-    static float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
+    static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
     //! Get a model of the BoundingBox object for debug mode rendering
     inline BoundingBoxObject *getWireframe() { return wireframe; }

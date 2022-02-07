@@ -114,6 +114,7 @@ void Engine::startLoop()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glLineWidth(4.0);
         _scene->renderBoundingBoxes();
+        glLineWidth(1.0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // imgui part

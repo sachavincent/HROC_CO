@@ -101,8 +101,8 @@ BvhNode BvhNode::merge(BvhNode *left, BvhNode *right)
 TEST_F(BvhTest, Merge_Case_1)
 {
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(simpleBBList[0].get(), idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(simpleBBList[1].get(), idGenerator.GetUniqueId());
+    BvhNode *nodeLeft = new BvhNode(simpleBBList[0], idGenerator.GetUniqueId());
+    BvhNode *nodeRight = new BvhNode(simpleBBList[1], idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
     BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
@@ -122,8 +122,9 @@ TEST_F(BvhTest, Merge_Case_2)
 {
 
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(simpleBBList[2].get(), idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(nodeLeft->getBoundingBox()->getCenter(), glm::vec3(2, 0.5, 4)), idGenerator.GetUniqueId());
+    BvhNode *nodeLeft = new BvhNode(simpleBBList[2], idGenerator.GetUniqueId());
+    auto bb = std::make_shared<AxisBoundingBox>(nodeLeft->getBoundingBox().get()->getCenter(), glm::vec3(2, 0.5, 4));
+    BvhNode *nodeRight = new BvhNode(bb, idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
     BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
@@ -142,8 +143,10 @@ TEST_F(BvhTest, Merge_Case_2)
 TEST_F(BvhTest, Merge_Case_3)
 {
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(new AxisBoundingBox(glm::vec3{-1, 3, -7}, glm::vec3(2, 3, 5)), idGenerator.GetUniqueId());
-    BvhNode *nodeRight = new BvhNode(new AxisBoundingBox(glm::vec3(-4, -5, 2), glm::vec3(3, 2, 1)), idGenerator.GetUniqueId());
+    auto bb1 = std::make_shared<AxisBoundingBox>(glm::vec3{-1, 3, -7}, glm::vec3(2, 3, 5));
+    auto bb2 = std::make_shared<AxisBoundingBox>(glm::vec3(-4, -5, 2), glm::vec3(3, 2, 1));
+    BvhNode *nodeLeft = new BvhNode(bb1, idGenerator.GetUniqueId());
+    BvhNode *nodeRight = new BvhNode(bb2, idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
     BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
@@ -166,7 +169,7 @@ TEST_F(BvhTest, CreateMap_Case_1)
     nodes.reserve(simpleBBList.size());
     for (auto bb : simpleBBList)
     {
-        nodes.push_back(new BvhNode(bb.get(), idGenerator.GetUniqueId()));
+        nodes.push_back(new BvhNode(bb, idGenerator.GetUniqueId()));
     }
 
     BvhTree tree;
@@ -198,7 +201,7 @@ TEST_F(BvhTest, CreateMap_Case_1)
 TEST_F(BvhTest, CreateMap_Case_2)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0].get(), idGenerator.GetUniqueId())};
+    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId())};
 
     BvhTree tree;
 
@@ -239,7 +242,7 @@ TEST_F(BvhTest, CreateMap_Case_3)
 TEST_F(BvhTest, CreateMap_Case_4)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0].get(), idGenerator.GetUniqueId()), new BvhNode(simpleBBList[1].get(), idGenerator.GetUniqueId())};
+    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId()), new BvhNode(simpleBBList[1], idGenerator.GetUniqueId())};
 
     BvhTree tree;
 

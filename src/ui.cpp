@@ -4,6 +4,8 @@
 
 #include <memory>
 #include <type_traits>
+#include <mutex>
+#include <utility>
 
 Ui::Ui() {}
 
@@ -25,10 +27,35 @@ void Ui::render(Scene *_scene)
     ImGui::NewFrame();
 
     ImGui::Begin("Scene parameters");
-
+    
     float exposure = scene->getExposure();
     ImGui::DragFloat("exposure", &exposure, 0.01, 0.01, 10.0);
     scene->setExposure(exposure);
+    ImGui::Separator();
+ 
+    static bool dispBbox = false;
+    static bool dispSpecificBbox = false;
+    static int dispBboxLevel = 1;
+
+    ImGui::Checkbox("Display Objects",&objectMode);
+    ImGui::Separator();
+    ImGui::Checkbox("Display Bounding Boxes",&dispBbox);
+
+    if (dispBbox){
+        ImGui::Checkbox("Display only for specific BVH level",&dispSpecificBbox);
+
+        if(dispSpecificBbox){
+            ImGui::SliderInt("Level to Display",&dispBboxLevel,1,bboxMaxLevel);
+            bboxMode = dispBboxLevel;
+        } else {
+            //display all
+            bboxMode=0;
+        }
+    } else {
+        bboxMode=-1;
+    }
+    ImGui::Separator();
+    
     lightsParams();
     objectsParams();
     if (newLightWindowActive)
@@ -47,9 +74,9 @@ void Ui::lightsParams()
 
         // display the light of light to choose from
         const char *items[100];
-        auto lights = scene->getLights();
+        std::vector<std::shared_ptr<Light>>& lights = scene->getLights();
         std::vector<std::string> lightsNames;
-        for (size_t i = 0; lights.size(); i++)
+        for (size_t i = 0; i<lights.size(); i++)
             lightsNames.push_back("Light_"+std::to_string(i));
 
         for (int i = 0; i < lightsNames.size(); i++)
@@ -63,33 +90,37 @@ void Ui::lightsParams()
             nlMult = 1.0;
         }
         ImGui::PopStyleColor();
-
         ImGui::ListBox("Select a Light to modify", &lightListIndex, items, lightsNames.size(), 5);
         auto light = lights[lightListIndex];
 
+        
+
+        // Change parameters for selected light
         std::string lightText = "\nLight parameters:\n";
         ImGui::Text(lightText.c_str());
-        // Change parameters for selected light
 
         // diffuse color
-        static float staticmult;
-        if (lightListIndex != lastlightListIndex)
-            staticmultSet = false;
-        if (!staticmultSet)
-        {
-            staticmult = 1.0;
-            staticmultSet = true;
-        }
-        ImGui::DragFloat("Color Multiplier", &staticmult, 0.1, 0.01, 20.0);
-        glm::vec3 diffuse = light->getColor() / staticmult;
-        ImGui::ColorEdit3("Color", &diffuse[0]);
-        light->setColor(diffuse * staticmult);
+        static std::vector<float> staticmult(100,1.0f);
+        static std::vector<glm::vec3> difColor(100,glm::vec3{1.0f});
+        static std::once_flag flag1;
+        std::call_once(flag1, [&](){
+            for(size_t i = 0; i<lights.size(); i++){
+                difColor[i] = lights[i]->getColor();
+            }
+        });
+        
+        ImGui::DragFloat("Color Multiplier", &staticmult[lightListIndex], 0.5, 0.1, 100.0);
+        ImGui::ColorEdit3("Color", &difColor[lightListIndex][0]);
+
+        light->setColor(difColor[lightListIndex] * staticmult[lightListIndex]);
+
 
         // change pos
         glm::vec3 pos = light->getPosition();
         ImGui::DragFloat3("Position", &pos[0], 0.1f, -10.0f, 10.0f);
 
         light->setPosition({pos[0], pos[1], pos[2]});
+
 
         // delete the light
         ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 30, 30, 255));

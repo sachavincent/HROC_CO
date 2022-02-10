@@ -135,11 +135,14 @@ void Scene::renderObjects()
         }
     }
 
-    // draw objects
-    for (size_t i = 0; i < objects.size(); i++)
-    {
-        objects[i]->draw(this);
+    // draw objects if gui enables it
+    if(engine->getUi().getObjectsVisMode()){
+        for (size_t i = 0; i < objects.size(); i++)
+        {
+            objects[i]->draw(this);
+        }
     }
+    
 
     // unload shader
     sh.stop();
@@ -150,16 +153,27 @@ void Scene::renderBoundingBoxes()
     if (!hierarchy)
         return;
 
+    int visMode = engine->getUi().getBboxVisMode();
+    // no bbox vis mode
+    if(visMode == -1) 
+        return;
+
     sh.start();
     static auto debugData = hierarchy->getDebugData();
+
+    int bboxLevel;
+    int maxBboxLevel = 0;
     for (auto entry : debugData)
     {
-        auto bbs = entry.second;
-        for (auto bb : bbs)
-        {
-            bb.draw(this, entry.first);
+        bboxLevel = entry.first;
+        maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
+        auto bboxs = entry.second;
+        if(visMode==0 ||  bboxLevel == visMode){
+            for (auto bbox : bboxs)
+                bbox.draw(this, bboxLevel);
         }
     }
+    engine->getUi().setBboxMaxLevel(maxBboxLevel);
     sh.stop();
 }
 

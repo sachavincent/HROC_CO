@@ -29,11 +29,24 @@ private:
     float nlMult;
     bool staticmultSet = false;
     bool smEnabled;
+    int bboxMaxLevel;
+    /** Mode of bbox visualisation
+    // -1 = none visvible
+    // 0 = all visvible
+    // 1 = first level visvible
+    // 1 = second level visvible
+    // etc..
+    **/
+    int bboxMode = 0;
+    bool objectMode = true;
     
 public:
     Ui();
     void load(GLFWwindow *_window);
     void render(Scene *_scene);
+    void setBboxMaxLevel(int _level){bboxMaxLevel = _level;}
+    int getBboxVisMode(){return bboxMode;}
+    int getObjectsVisMode(){return objectMode;}
 };
 
 #endif

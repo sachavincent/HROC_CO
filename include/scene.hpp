@@ -24,6 +24,7 @@ private:
     Engine *engine;
 
     float exposure;
+    //! maximum level of current bvh
 
     BvhTree* hierarchy;
 public:
@@ -50,9 +51,9 @@ public:
 
     inline float getExposure() const { return exposure; }
 
-    inline const std::vector<std::shared_ptr<Light>> &getLights() { return lights; }
+    inline std::vector<std::shared_ptr<Light>> &getLights() { return lights; }
 
-    inline const std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
+    inline std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
     Shader& getShader(){return sh;}
 };

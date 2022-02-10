@@ -49,6 +49,7 @@ public:
 
     inline Camera *getCurrentCamera() const { return _currentCamera == CameraType::STATIC ? _camera : _freeCam; }
 
+    inline Ui& getUi(){return _ui;}
     // This method switches between the two available cameras
     void switchCamera();
 

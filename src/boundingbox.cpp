@@ -3,11 +3,6 @@
 
 glm::mat3 AxisBoundingBox::DEFAULT_TRANSFORM = glm::mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};
 
-BoundingBox::BoundingBox() : wireframe(nullptr)
-{
-    // TODO: For test purposes
-}
-
 float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B)
 {
     glm::vec3 centerA = _A.get()->getCenter();
@@ -68,7 +63,7 @@ BoundingBox::BoundingBox(const Object &_o)
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
 
-    wireframe = new BoundingBoxObject(_o.getName(), center, _o.getRotationMatrix(), size);
+    wireframe = new BoundingBoxObject(_o.getName(), center, glm::mat4(1.0), size);
 }
 
 BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size)

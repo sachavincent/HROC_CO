@@ -16,18 +16,23 @@
 class BvhTree
 {
 
-public: // TODO: For test purposes
+#ifdef HROC_TESTS
+public:
+#else
+private:
+#endif
     typedef std::pair<float, std::pair<BvhNode *, BvhNode *>> PairDistanceNode;
     typedef std::pair<BvhNode *, BvhNode *> PairNode;
-    BvhTree() {}
+    
+#ifdef HROC_TESTS
+    BvhTree()
+    {
+    }
 
     std::multimap<float, PairNode> *getMap() const { return map; };
     BvhNode *getRoot() { return root; }
-
+#endif
 private:
-    // typedef std::pair<float, std::pair<BvhNode, BvhNode>> PairDistanceNode;
-    // typedef std::pair<BvhNode, BvhNode> PairNode;
-
     BvhNode *root;
     std::multimap<float, PairNode> *map;
     std::vector<BvhNode *> nodes;

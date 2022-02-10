@@ -39,7 +39,7 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     // GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glViewport(0, 0, _width, _height);
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_BLEND);

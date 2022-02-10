@@ -40,10 +40,10 @@ file(GLOB APP_SOURCES   ${PROJECT_SOURCE_DIR}/src/bvhtree.cpp
 )
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DHROC_TESTS /DGLFW_INCLUDE_NONE /std:c++17 /MP8 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 
         /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DHROC_TESTS -DNOT_MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include
@@ -59,3 +59,9 @@ add_executable(${BINARY} ${APP_SOURCES} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY} "src/main.cpp")
 
 target_link_libraries(${BINARY} PUBLIC gtest glfw assimp ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+
+if(MSVC)
+target_compile_options( ${BINARY}    PUBLIC "/DHROC_TESTS" )
+else()
+target_compile_options( ${BINARY}    PUBLIC "-DHROC_TESTS" )
+endif()

@@ -19,8 +19,9 @@ private:
     BoundingBoxObject *wireframe;
 
 public:
-    BoundingBox();
-
+#ifdef HROC_TESTS
+    BoundingBox() : wireframe(nullptr) {}
+#endif
     BoundingBox(const Object &_o);
 
     BoundingBox(glm::vec3 _center, glm::vec3 _size);

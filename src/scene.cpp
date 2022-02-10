@@ -28,7 +28,7 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
         cube->setPosition({distribution(generator), distribution(generator), distribution(generator)})
             .setDiffuse({0.0f, 1.0f, 0.0f})
             .setSpecular(glm::vec3{0.8});
-        addObject(cube);
+        //addObject(cube);
     }
 
     auto cube0 = std::make_shared<Cube>(1.0f);
@@ -42,7 +42,7 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
         .setScale({2.0, 1.0, 2.0})
         .setTexDiffuse("textures/tiles/basecolor.jpg")
         .setTexSpecular("textures/tiles/roughness.png");
-     //addObject(cube1);
+     addObject(cube1);
 
     auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
     sphere1->setPosition({3.5, 0.7, 3.5})
@@ -50,14 +50,14 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
         .setScale(glm::vec3{1.2f})
         .setDiffuse({1.0, 0.0, 1.0});
 
-     //addObject(sphere1);
+    addObject(sphere1);
 
     auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
     plane1->setRotation(-90, {1, 0, 0})
         .setTexDiffuse("textures/stoneWall/diffuse.png")
         .setTexSpecular("textures/stoneWall/roughness.png")
         .setTexScaling({4, 4});
-    // addObject(plane1);
+    addObject(plane1);
 
     // gold-ish utah teapot
     auto teapot =

@@ -3,11 +3,9 @@
 
 #include <iostream>
 
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-
 
 #include "engine.hpp"
 #include "camera.hpp"
@@ -38,14 +36,14 @@ public:
 
     static void updateScreenRes(GLFWwindow *window, int width, int height);
 
-    static void errorCallback(int error, const char *description) // TODO: Enlever quand le projet est fini
+    static void errorCallback(int error, const char *description)
     {
         fputs(description, stderr);
     }
 
 private:
     static void onKeyPressed(GLFWwindow *window, int key);
-    
+
     static void onKeyReleased(GLFWwindow *window, int key);
 };
 

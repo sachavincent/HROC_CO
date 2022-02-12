@@ -21,13 +21,13 @@ enum CameraType
 class Engine
 {
 public:
-    Engine(float width, float height);
+    Engine(float _width, float _height);
 
     ~Engine();
 
     void clear();
 
-    Scene loadScene(const std::string &file);
+    Scene loadScene(const std::string &_file);
 
     Scene loadScene();
 
@@ -39,33 +39,35 @@ public:
 
     void setResolution(int width, int height);
 
-    inline Scene &getScene() const { return *_scene; }
+    inline Scene &getScene() const { return *scene; }
 
-    inline double getDeltaTime() const { return _deltaTime; }
+    inline double getDeltaTime() const { return deltaTime; }
 
-    inline Camera *getFreeCam() const { return _freeCam; }
+    inline Camera *getFreeCam() const { return freeCam; }
 
-    inline Camera *getStaticCamera() const { return _camera; }
+    inline Camera *getStaticCamera() const { return camera; }
 
-    inline Camera *getCurrentCamera() const { return _currentCamera == CameraType::STATIC ? _camera : _freeCam; }
+    inline Camera *getCurrentCamera() const { return currentCamera == CameraType::STATIC ? camera : freeCam; }
+    inline const CameraType &getCurrentCameraType() const { return currentCamera; }
 
-    inline Ui& getUi(){return _ui;}
+    inline Ui &getUi() { return ui; }
+
     // This method switches between the two available cameras
     void switchCamera();
 
 private:
-    Ui _ui;
-    float _width;
-    float _height;
-    Camera *_camera;
-    Camera *_freeCam;
+    Ui ui;
+    float width;
+    float height;
+    Camera *camera;
+    Camera *freeCam;
 
-    CameraType _currentCamera;
-    Scene *_scene;
-    GLFWwindow *_window;
-    std::string _windowName = WINDOW_NAME;
+    CameraType currentCamera;
+    Scene *scene;
+    GLFWwindow *window;
+    std::string windowName = WINDOW_NAME;
 
-    double _deltaTime;
-    double _lastFrame;
+    double deltaTime;
+    double lastFrame;
 };
 #endif

@@ -1,8 +1,11 @@
 #include "scene.hpp"
 #include "engine.hpp"
 #include "boundingBoxObject.hpp"
+#include "jsonparser.hpp"
 
 #include <random>
+#include <string>
+#include <map>
 
 Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
@@ -35,14 +38,14 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
     cube0->setPosition({1.1f, 0.6f, 0.0f})
         .setDiffuse({0.0f, 1.0f, 0.0f})
         .setSpecular(glm::vec3{0.9});
-     //addObject(cube0);
+    // addObject(cube0);
 
     auto cube1 = std::make_shared<Cube>(1.0f);
     cube1->setPosition({-2.5f, 0.6f, 0.5f})
         .setScale({2.0, 1.0, 2.0})
         .setTexDiffuse("textures/tiles/basecolor.jpg")
         .setTexSpecular("textures/tiles/roughness.png");
-     addObject(cube1);
+    addObject(cube1);
 
     auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
     sphere1->setPosition({3.5, 0.7, 3.5})
@@ -61,33 +64,46 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
 
     // gold-ish utah teapot
     auto teapot =
-        std::make_shared<FileObject>("models/teapot.obj", SMOOTH_NORMAL_ENABLE);
+        std::make_shared<FileObject>("models/teapot.obj", true);
     teapot->setScale(glm::vec3{0.3f})
         .setPosition({0.0f, 1.2f, -1.8f})
         .setDiffuse({0.55f, 0.5f, 0.0f});
     // addObject(teapot);
 
-    load();
     // TODO: Default scene
+    load();
 
-    std::vector<std::shared_ptr<BoundingBox>> bbs;
-    const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
-    for (auto obj : _objects)
-    {
-        Object *bbo = obj.get();
-        auto newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
-        bbo->setBoundingBox(newBoundingBox);
-        newBoundingBox.get()->getWireframe()->load();
-        if (bbo)
-            bbs.push_back(bbo->getBoundingBox());
-    }
-
-    hierarchy = new BvhTree(bbs);
+    createBoundingBoxes();
 }
 
 Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
     // TODO:
+    const std::string path = Utils::workingDirectory() + "scenes/" + _file;
+    std::ifstream file(path);
+    if (!file.good())
+        std::cerr << "Scene file '" << path << "' could not be found!" << std::endl;
+
+    try
+    {
+        SceneData sceneData = JsonParser::parseFile(file);
+        sceneData.updateFreeCam(_engine);
+        sceneData.updateStaticCam(_engine);
+        lights = sceneData.lights;
+        objects = sceneData.objects;
+
+        load();
+
+        createBoundingBoxes();
+    }
+    catch (const json::exception &e)
+    {
+        std::cerr << "Scene file '" << path << "' contains json error:\n\t" << e.what() << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Scene file '" << path << "' contains error:\n\t" << e.what() << std::endl;
+    }
 }
 
 //! Load the scene models on GPU before rendering
@@ -102,6 +118,22 @@ void Scene::load()
     sh = {"shaders/default.vert", "shaders/phong.frag"};
 }
 
+void Scene::createBoundingBoxes()
+{
+    std::vector<std::shared_ptr<BoundingBox>> bbs;
+    const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
+    for (auto obj : _objects)
+    {
+        Object *bbo = obj.get();
+        auto newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
+        bbo->setBoundingBox(newBoundingBox);
+        newBoundingBox.get()->getWireframe()->load();
+        if (bbo)
+            bbs.push_back(bbo->getBoundingBox());
+    }
+
+    hierarchy = new BvhTree(bbs);
+}
 //! Render all objects of scene
 void Scene::renderObjects()
 {
@@ -113,7 +145,7 @@ void Scene::renderObjects()
     sh.loadFloat("exposure", exposure);
     sh.loadVec3("viewPos", getCamera()->getPosition());
     // depth parameter only for bboxes
-    sh.loadInt("depthBB", -1);
+    sh.loadInt("numBB", -1);
 
     for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
     {
@@ -136,13 +168,13 @@ void Scene::renderObjects()
     }
 
     // draw objects if gui enables it
-    if(engine->getUi().getObjectsVisMode()){
+    if (engine->getUi().getObjectsVisMode())
+    {
         for (size_t i = 0; i < objects.size(); i++)
         {
             objects[i]->draw(this);
         }
     }
-    
 
     // unload shader
     sh.stop();
@@ -155,7 +187,7 @@ void Scene::renderBoundingBoxes()
 
     int visMode = engine->getUi().getBboxVisMode();
     // no bbox vis mode
-    if(visMode == -1) 
+    if (visMode == -1)
         return;
 
     sh.start();
@@ -165,12 +197,14 @@ void Scene::renderBoundingBoxes()
     int maxBboxLevel = 0;
     for (auto entry : debugData)
     {
-        bboxLevel = entry.first;
+        int numBB = 0;
+        bboxLevel = entry.first + 1;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
         auto bboxs = entry.second;
-        if(visMode==0 ||  bboxLevel == visMode){
+        if (visMode == 0 || bboxLevel == visMode)
+        {
             for (auto bbox : bboxs)
-                bbox.draw(this, bboxLevel);
+                bbox.draw(this, numBB++);
         }
     }
     engine->getUi().setBboxMaxLevel(maxBboxLevel);

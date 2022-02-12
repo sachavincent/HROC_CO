@@ -28,9 +28,6 @@ AxisBoundingBox::AxisBoundingBox(const Object &_o) : OrientedBoundingBox(_o, Axi
 
 BoundingBox::BoundingBox(const Object &_o)
 {
-    glm::mat4 transformationMatrix = _o.getTransformationMatrix();
-    center = glm::vec3(transformationMatrix * glm::vec4(0.0, 0.0, 0.0, 1.0)); // Apply object rotations & scale
-    // center = _o.getPosition();
     float maxX = -std::numeric_limits<float>::infinity(), maxY = -std::numeric_limits<float>::infinity(), maxZ = -std::numeric_limits<float>::infinity();
     float minX = std::numeric_limits<float>::infinity(), minY = std::numeric_limits<float>::infinity(), minZ = std::numeric_limits<float>::infinity();
 
@@ -44,7 +41,7 @@ BoundingBox::BoundingBox(const Object &_o)
         it++;
 
         glm::vec3 pos(x, y, z);
-        pos = glm::vec3(transformationMatrix * glm::vec4(pos, 1.0)); // Apply object rotations & scale
+        pos = glm::vec3(_o.getTransformationMatrix() * glm::vec4(pos, 1.0)); // Apply object rotations & scale
 
         minX = pos[0] < minX ? pos[0] : minX;
         maxX = pos[0] > maxX ? pos[0] : maxX;
@@ -59,6 +56,7 @@ BoundingBox::BoundingBox(const Object &_o)
     glm::vec3 minPos(minX, minY, minZ);
     glm::vec3 maxPos(maxX, maxY, maxZ);
 
+    center = (maxPos + minPos) * glm::vec3(0.5f);
     size = maxPos - minPos;
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
@@ -85,33 +83,35 @@ BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
     glm::vec3 _size = getSize();
     glm::vec3 _sizeOther = _other->getSize();
 
-    float _minX = _center[0] - _size[0] / 2;
-    float _maxX = _center[0] + _size[0] / 2;
-    float _minY = _center[1] - _size[1] / 2;
-    float _maxY = _center[1] + _size[1] / 2;
-    float _minZ = _center[2] - _size[2] / 2;
-    float _maxZ = _center[2] + _size[2] / 2;
+    float minX = _center[0] - _size[0] / 2;
+    float maxX = _center[0] + _size[0] / 2;
+    float minY = _center[1] - _size[1] / 2;
+    float maxY = _center[1] + _size[1] / 2;
+    float minZ = _center[2] - _size[2] / 2;
+    float maxZ = _center[2] + _size[2] / 2;
 
-    float _minXOther = _centerOther[0] - _sizeOther[0] / 2;
-    float _maxXOther = _centerOther[0] + _sizeOther[0] / 2;
-    float _minYOther = _centerOther[1] - _sizeOther[1] / 2;
-    float _maxYOther = _centerOther[1] + _sizeOther[1] / 2;
-    float _minZOther = _centerOther[2] - _sizeOther[2] / 2;
-    float _maxZOther = _centerOther[2] + _sizeOther[2] / 2;
+    float minXOther = _centerOther[0] - _sizeOther[0] / 2;
+    float maxXOther = _centerOther[0] + _sizeOther[0] / 2;
+    float minYOther = _centerOther[1] - _sizeOther[1] / 2;
+    float maxYOther = _centerOther[1] + _sizeOther[1] / 2;
+    float minZOther = _centerOther[2] - _sizeOther[2] / 2;
+    float maxZOther = _centerOther[2] + _sizeOther[2] / 2;
 
-    float _newMinX = _minX < _minXOther ? _minX : _minXOther;
-    float _newMaxX = _maxX > _maxXOther ? _maxX : _maxXOther;
-    float _newMinY = _minY < _minYOther ? _minY : _minYOther;
-    float _newMaxY = _maxY > _maxYOther ? _maxY : _maxYOther;
-    float _newMinZ = _minZ < _minZOther ? _minZ : _minZOther;
-    float _newMaxZ = _maxZ > _maxZOther ? _maxZ : _maxZOther;
+    float newMinX = minX < minXOther ? minX : minXOther;
+    float newMaxX = maxX > maxXOther ? maxX : maxXOther;
+    float newMinY = minY < minYOther ? minY : minYOther;
+    float newMaxY = maxY > maxYOther ? maxY : maxYOther;
+    float newMinZ = minZ < minZOther ? minZ : minZOther;
+    float newMaxZ = maxZ > maxZOther ? maxZ : maxZOther;
 
-    glm::vec3 _newSize(_newMaxX - _newMinX, _newMaxY - _newMinY, _newMaxZ - _newMinZ);
-    glm::vec3 _newCenter((_newMaxX + _newMinX) / 2, (_newMaxY + _newMinY) / 2, (_newMaxZ + _newMinZ) / 2);
+    glm::vec3 minPos(newMinX, newMinY, newMinZ);
+    glm::vec3 maxPos(newMaxX, newMaxY, newMaxZ);
+    glm::vec3 newSize(newMaxX - newMinX, newMaxY - newMinY, newMaxZ - newMinZ);
+    glm::vec3 newCenter((newMaxX + newMinX) / 2, (newMaxY + newMinY) / 2, (newMaxZ + newMinZ) / 2);
 
-    BoundingBox *_newBoundingBox = new OrientedBoundingBox(_newCenter, _newSize);
+    BoundingBox *newBoundingBox = new OrientedBoundingBox((maxPos + minPos) * glm::vec3(0.5f), maxPos - minPos);
 
-    return _newBoundingBox;
+    return newBoundingBox;
 }
 
 BoundingBox *AxisBoundingBox::merge(BoundingBox *_other)
@@ -122,31 +122,31 @@ BoundingBox *AxisBoundingBox::merge(BoundingBox *_other)
     glm::vec3 _size = getSize();
     glm::vec3 _sizeOther = _other->getSize();
 
-    float _minX = _center[0] - _size[0] / 2;
-    float _maxX = _center[0] + _size[0] / 2;
-    float _minY = _center[1] - _size[1] / 2;
-    float _maxY = _center[1] + _size[1] / 2;
-    float _minZ = _center[2] - _size[2] / 2;
-    float _maxZ = _center[2] + _size[2] / 2;
+    float minX = _center[0] - _size[0] / 2;
+    float maxX = _center[0] + _size[0] / 2;
+    float minY = _center[1] - _size[1] / 2;
+    float maxY = _center[1] + _size[1] / 2;
+    float minZ = _center[2] - _size[2] / 2;
+    float maxZ = _center[2] + _size[2] / 2;
 
-    float _minXOther = _centerOther[0] - _sizeOther[0] / 2;
-    float _maxXOther = _centerOther[0] + _sizeOther[0] / 2;
-    float _minYOther = _centerOther[1] - _sizeOther[1] / 2;
-    float _maxYOther = _centerOther[1] + _sizeOther[1] / 2;
-    float _minZOther = _centerOther[2] - _sizeOther[2] / 2;
-    float _maxZOther = _centerOther[2] + _sizeOther[2] / 2;
+    float minXOther = _centerOther[0] - _sizeOther[0] / 2;
+    float maxXOther = _centerOther[0] + _sizeOther[0] / 2;
+    float minYOther = _centerOther[1] - _sizeOther[1] / 2;
+    float maxYOther = _centerOther[1] + _sizeOther[1] / 2;
+    float minZOther = _centerOther[2] - _sizeOther[2] / 2;
+    float maxZOther = _centerOther[2] + _sizeOther[2] / 2;
 
-    float _newMinX = _minX < _minXOther ? _minX : _minXOther;
-    float _newMaxX = _maxX > _maxXOther ? _maxX : _maxXOther;
-    float _newMinY = _minY < _minYOther ? _minY : _minYOther;
-    float _newMaxY = _maxY > _maxYOther ? _maxY : _maxYOther;
-    float _newMinZ = _minZ < _minZOther ? _minZ : _minZOther;
-    float _newMaxZ = _maxZ > _maxZOther ? _maxZ : _maxZOther;
+    float newMinX = minX < minXOther ? minX : minXOther;
+    float newMaxX = maxX > maxXOther ? maxX : maxXOther;
+    float newMinY = minY < minYOther ? minY : minYOther;
+    float newMaxY = maxY > maxYOther ? maxY : maxYOther;
+    float newMinZ = minZ < minZOther ? minZ : minZOther;
+    float newMaxZ = maxZ > maxZOther ? maxZ : maxZOther;
 
-    glm::vec3 _newSize(_newMaxX - _newMinX, _newMaxY - _newMinY, _newMaxZ - _newMinZ);
-    glm::vec3 _newCenter((_newMaxX + _newMinX) / 2, (_newMaxY + _newMinY) / 2, (_newMaxZ + _newMinZ) / 2);
+    glm::vec3 minPos(newMinX, newMinY, newMinZ);
+    glm::vec3 maxPos(newMaxX, newMaxY, newMaxZ);
 
-    BoundingBox *_newBoundingBox = new AxisBoundingBox(_newCenter, _newSize);
+    BoundingBox *newBoundingBox = new AxisBoundingBox((maxPos + minPos) * glm::vec3(0.5f), maxPos - minPos);
 
-    return _newBoundingBox;
+    return newBoundingBox;
 }

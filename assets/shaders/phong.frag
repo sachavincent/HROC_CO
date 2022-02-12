@@ -6,9 +6,9 @@
 // PHONG SHADER
 
 
-#define MAX_DEPTH_BB 16
+#define MAX_PER_DEPTH_BB 16
 
-const vec3 colorsBB[MAX_DEPTH_BB] = { vec3(244.0 / 255, 67.0 / 255, 54.0 / 255), vec3(233.0 / 255, 30.0 / 255, 99.0 / 255),
+const vec3 colorsBB[MAX_PER_DEPTH_BB] = { vec3(244.0 / 255, 67.0 / 255, 54.0 / 255), vec3(233.0 / 255, 30.0 / 255, 99.0 / 255),
                                     vec3(156.0 / 255, 39.0 / 255, 176.0 / 255), vec3(103.0 / 255, 58.0 / 255, 183.0 / 255),
                                     vec3(63.0 / 255, 81.0 / 255, 181.0 / 255), vec3(33.0 / 255, 150.0 / 255, 243.0 / 255),
                                     vec3(3.0 / 255, 169.0 / 255, 244.0 / 255), vec3(0.0 / 255, 188.0 / 255, 212.0 / 255),
@@ -55,7 +55,7 @@ in vec3 Normal_in;
 uniform vec3 viewPos;
 uniform float exposure;
 uniform vec2 texScaling;
-uniform int depthBB;
+uniform int numBB;
 
 
 uniform Light lights[NR_LIGHTS];
@@ -71,7 +71,7 @@ void main()
 {
     float alpha;
     vec3 result;
-    if(depthBB == -1) // Not a bounding box
+    if(numBB == -1) // Not a bounding box
     {
         vec3 viewDir = normalize(viewPos - FragPos_in);
         result = vec3(0,0,0);
@@ -83,7 +83,7 @@ void main()
     }
     else // This object is a bounding box
     {
-        result = colorsBB[depthBB];
+        result = colorsBB[numBB % MAX_PER_DEPTH_BB];
         alpha = ALPHA_BB;
     }
 

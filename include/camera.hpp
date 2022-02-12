@@ -2,36 +2,45 @@
 #define CAMERA_H
 
 #include <iostream>
+#include <optional>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+struct CameraInfo
+{
+	std::optional<glm::vec3> position;
+	std::optional<float> fov;
+	std::optional<float> yaw;
+	std::optional<float> pitch;
+};
 
 struct Frustum;
 //!  A perspective camera with parameters that can be updated, outputs a view matrix
 class Camera
 {
 private:
-	int _width;
-	int _height;
+	int width;
+	int height;
 
 	glm::vec3 movingFactor;
-	glm::vec3 _position;
-	float _yaw;
-	float _pitch;
-	glm::vec3 _front;
-	glm::vec3 _up;
-	glm::vec3 _right;
-	float _fov;
+	glm::vec3 position;
+	float yaw;
+	float pitch;
+	glm::vec3 front;
+	glm::vec3 up;
+	glm::vec3 right;
+	float fov;
 
-	float _nearDistance;
-	float _farDistance;
+	float nearDistance;
+	float farDistance;
 
-	glm::mat4 _projectionMatrix;
-	float _lastX;
-	float _lastY;
+	glm::mat4 projectionMatrix;
+	float lastX;
+	float lastY;
 
-	Frustum *_frustum;
+	Frustum *frustum;
 
 	void updateDirection();
 
@@ -43,63 +52,63 @@ public:
 	 * \param position Its position
 	 * \param fov The field of view (in degrees)
 	 **/
-	Camera(int width, int height, glm::vec3 position = glm::vec3{0.0f, 2.0f, -10.0f}, float fov = 55.0f);
+	Camera(int _width, int _height, glm::vec3 _position = glm::vec3{0.0f, 2.0f, -10.0f}, float _fov = 55.0f);
 
 	//! Get current camera position
 	inline const glm::vec3 &getPosition() const
 	{
-		return _position;
+		return position;
 	}
 
 	//! Get current camera direction vector
 	inline const glm::vec3 &getDirection() const
 	{
-		return _front;
+		return front;
 	}
 
 	inline const glm::vec3 &getUpVector() const
 	{
-		return _up;
+		return up;
 	}
 
 	inline const glm::vec3 &getRightVector() const
 	{
-		return _right;
+		return right;
 	}
 
 	//! Get the homogenous 4x4 view matrix of the camera
 	inline glm::mat4 getViewMatrix() const
 	{
-		return glm::lookAt(_position, _position + _front, _up);
+		return glm::lookAt(position, position + front, up);
 	}
 
 	// ! Get projection perspective frustum
 	inline glm::mat4 getProjectionMatrix() const
 	{
-		return glm::perspective(glm::radians(_fov), (float)_width / _height, _nearDistance, _farDistance);
+		return glm::perspective(glm::radians(fov), (float)width / height, nearDistance, farDistance);
 	}
 
 	//! Get current field of view (in degrees)
 	inline const float &getFov() const
 	{
-		return this->_fov;
+		return this->fov;
 	}
 
 	inline const float &getFarDistance() const
 	{
-		return this->_farDistance;
+		return this->farDistance;
 	}
 
 	inline const float &getNearDistance() const
 	{
-		return this->_nearDistance;
+		return this->nearDistance;
 	}
 
 	//! Get camera viewport width (in px)
-	int getResWidth() { return _width; };
+	int getResWidth() { return width; };
 
 	//! Get camera viewport height (in px)
-	int getResHeight() { return _height; };
+	int getResHeight() { return height; };
 
 	//! Offset the pitch of camera with a sensitivity factor
 	float offsetPitch(float _offset, float _sensitivity);
@@ -110,7 +119,6 @@ public:
 
 	void move(const float delta);
 
-	void rotate(const glm::vec3 delta);
 	//! Move camera in X axis my an offset
 	void moveX(float _offset);
 	//! Move camera in Y axis my an offset
@@ -118,9 +126,11 @@ public:
 	//! Move camera in Z axis my an offset
 	void moveZ(float _offset);
 	//! change
-	void setResolution(int w, int h);
+	void setResolution(int _w, int _h);
 
-	inline const Frustum *getFrustum() const { return _frustum; }
+	inline const Frustum *getFrustum() const { return frustum; }
+
+	void setCameraInfo(CameraInfo _cameraInfo);
 };
 
 #endif

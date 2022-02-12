@@ -15,7 +15,8 @@ void Object::load()
         // gen geometry buffers
         glGenBuffers(1, &m.vbo);
         glGenBuffers(1, &m.nbo);
-        glGenBuffers(1, &m.tbo);
+        if (!m.textureCoord.empty())
+            glGenBuffers(1, &m.tbo);
         glGenBuffers(1, &m.ebo);
         glGenVertexArrays(1, &m.vao);
         std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
@@ -37,12 +38,16 @@ void Object::load()
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
         glEnableVertexAttribArray(1);
 
+    if (!m.textureCoord.empty())
+    {
         // Copy texture array in element buffer
         glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
         glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
-        // define array for texture
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-        glEnableVertexAttribArray(2);
+    }
+
+    // define array for texture
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    glEnableVertexAttribArray(2);
 
         // copy indices to ebo
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.ebo);

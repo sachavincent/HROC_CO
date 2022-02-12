@@ -20,12 +20,6 @@
 #include "texture.hpp"
 #include "observable.hpp"
 
-typedef enum
-{
-    SMOOTH_NORMAL_ENABLE = true,
-    SMOOTH_NORMAL_DISABLE = false
-} SMOOTH_NORMAL;
-
 class Scene;
 class BoundingBox;
 
@@ -161,12 +155,12 @@ class FileObject : public Object
 {
 private:
     static int instance;
-    std::vector<OBJECT_DATA> subObjects;
 
     void processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx);
 
 public:
-    FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals);
+    FileObject(std::string _path, bool _smoothNormals);
+    FileObject(std::string _path, bool _smoothNormals, std::string _name);
     void load();
     void draw(Scene *_scene);
 
@@ -180,7 +174,7 @@ private:
     void inline pushIndices(int ind_1, int ind_2, int ind_3);
 
 public:
-    UVSphere(float _radius, int _nCols, int _nRows);
+    UVSphere(float _radius, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance));
 };
 
 class Plane : public Object
@@ -189,7 +183,7 @@ private:
     static int instance;
 
 public:
-    Plane(glm::vec2 _size, int _ncol, int _nrows);
+    Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "UVSphere_" + std::to_string(instance));
 };
 
 #endif

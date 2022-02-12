@@ -4,11 +4,18 @@
 #include "glm/gtx/string_cast.hpp"
 #include <algorithm>
 
-int Cube::instance = 0;
+int Cube::instance_counter = 0;
+unsigned int Cube::shared_vao = 0;
 
-Cube::Cube(float _edgeSize, std::string _name) : Object(_name)
+Cube::Cube(float _edgeSize, std::string _name)
 {
-	instance++;
+	instance = instance_counter;
+	instance_counter++;
+
+	Object();
+	Object::name = (_name.size()>0)?_name:"Cube_" + std::to_string(instance);
+	
+	
 
 	m.vertices = {
 		-0.5f, -0.5f, -0.5f,
@@ -162,3 +169,14 @@ Cube::Cube(float _edgeSize, std::string _name) : Object(_name)
 	setScale(glm::vec3(_edgeSize));
 	setRotationMatrix(glm::mat4{1.0});
 }
+
+void Cube::load(){
+        if(instance == 0){
+            Object::load();
+            shared_vao = m.vao;
+        } else {
+            m.vao = shared_vao;
+			loaded = true;
+			Object::load();
+        }
+    }

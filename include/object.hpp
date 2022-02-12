@@ -98,7 +98,7 @@ public:
     inline size_t getId() const { return id; }
 
     //! Load the object on the gpu. This action is performed after opengl/glfw initialization
-    void load();
+    virtual void load();
 
     //! Render the object on screen.
     void draw(Scene *_scene);
@@ -146,11 +146,14 @@ public:
 //! a simple cube to test shader on
 class Cube : public Object
 {
-    static int instance;
+    static int instance_counter;
+    int instance;
+    static unsigned int shared_vao;
 
 public:
     //! Create a cube of size _edgeSize.
-    Cube(float _edgeSize = 1.0f, std::string _name = "Cube_" + std::to_string(instance));
+    Cube(float _edgeSize = 1.0f, std::string _name = "");
+    virtual void load();
 };
 
 //! A object loaded from a file, it can contain multiple subobjects inside it.

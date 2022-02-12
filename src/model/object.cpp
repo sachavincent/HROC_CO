@@ -11,45 +11,46 @@ size_t Object::id_counter = 0;
 void Object::load()
 {
 #ifndef HROC_TESTS
-    // gen geometry buffers
-    glGenBuffers(1, &m.vbo);
-    glGenBuffers(1, &m.nbo);
-    glGenBuffers(1, &m.tbo);
-    glGenBuffers(1, &m.ebo);
-    glGenVertexArrays(1, &m.vao);
-    std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
+    if(!loaded){
+        // gen geometry buffers
+        glGenBuffers(1, &m.vbo);
+        glGenBuffers(1, &m.nbo);
+        glGenBuffers(1, &m.tbo);
+        glGenBuffers(1, &m.ebo);
+        glGenVertexArrays(1, &m.vao);
+        std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
 
-    // Bind the vao
-    glBindVertexArray(m.vao);
+        // Bind the vao
+        glBindVertexArray(m.vao);
 
-    // create and fill vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, m.vbo);
-    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(GLfloat), m.vertices.data(), GL_STATIC_DRAW);
-    // set vertex attribute pointer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    glEnableVertexAttribArray(0);
+        // create and fill vertex data
+        glBindBuffer(GL_ARRAY_BUFFER, m.vbo);
+        glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(GLfloat), m.vertices.data(), GL_STATIC_DRAW);
+        // set vertex attribute pointer
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+        glEnableVertexAttribArray(0);
 
-    // copy normals to nbo
-    glBindBuffer(GL_ARRAY_BUFFER, m.nbo);
-    glBufferData(GL_ARRAY_BUFFER, m.normals.size() * sizeof(GLfloat), m.normals.data(), GL_STATIC_DRAW);
-    // define array for normals
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    glEnableVertexAttribArray(1);
+        // copy normals to nbo
+        glBindBuffer(GL_ARRAY_BUFFER, m.nbo);
+        glBufferData(GL_ARRAY_BUFFER, m.normals.size() * sizeof(GLfloat), m.normals.data(), GL_STATIC_DRAW);
+        // define array for normals
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+        glEnableVertexAttribArray(1);
 
-    // Copy texture array in element buffer
-    glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
-    glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
-    // define array for texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    glEnableVertexAttribArray(2);
+        // Copy texture array in element buffer
+        glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
+        glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
+        // define array for texture
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+        glEnableVertexAttribArray(2);
 
-    // copy indices to ebo
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(GLfloat), m.indices.data(), GL_STATIC_DRAW);
+        // copy indices to ebo
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(GLfloat), m.indices.data(), GL_STATIC_DRAW);
 
-    // Unbind the VAO
-    glBindVertexArray(0);
-
+        // Unbind the VAO
+        glBindVertexArray(0);
+    }// fin du if
     // load textures if defined
     if (diffuseMapPath != "")
     {

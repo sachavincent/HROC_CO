@@ -18,17 +18,17 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
     //####################### creating models ###########################
 
     std::random_device device;
-    std::mt19937 generator(device());
-    std::uniform_int_distribution<int> distribution(0, 10);
+    std::mt19937 gen(device());
+    std::uniform_int_distribution<int> dist(0, 50);
 
     // enough boxes to get down to 60fps in release
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 200; i++)
     {
         auto cube = std::make_shared<Cube>(1.0f);
-        cube->setPosition({distribution(generator), distribution(generator), distribution(generator)})
+        cube->setPosition({dist(gen), dist(gen), dist(gen)})
             .setDiffuse({0.0f, 1.0f, 0.0f})
             .setSpecular(glm::vec3{0.8});
-        //addObject(cube);
+        addObject(cube);
     }
 
     auto cube0 = std::make_shared<Cube>(1.0f);

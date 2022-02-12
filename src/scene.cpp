@@ -87,8 +87,11 @@ Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), expos
     try
     {
         SceneData sceneData = JsonParser::parseFile(file);
-        sceneData.updateFreeCam(_engine);
-        sceneData.updateStaticCam(_engine);
+        if (sceneData.updateFreeCam)
+            sceneData.updateFreeCam.value()(_engine);
+        if (sceneData.updateStaticCam)
+            sceneData.updateStaticCam.value()(_engine);
+
         lights = sceneData.lights;
         objects = sceneData.objects;
 

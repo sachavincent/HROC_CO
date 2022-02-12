@@ -6,6 +6,7 @@ class Scene;
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <functional>
 
 #include <nlohmann/json.hpp>
@@ -17,8 +18,8 @@ struct SceneData
 {
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
-    std::function<void(Engine *)> updateFreeCam;
-    std::function<void(Engine *)> updateStaticCam;
+    std::optional<std::function<void(Engine *)>> updateFreeCam;
+    std::optional<std::function<void(Engine *)>> updateStaticCam;
 };
 
 class JsonParser
@@ -36,15 +37,23 @@ public:
 
     static SceneData parseFile(std::ifstream &file)
     {
-        json j = json::parse(file);
-        json jLights = j.at("lights");
-        json jCameras = j.at("cameras");
-        json jObjects = j.at("objects");
         SceneData sceneData;
-        parseLights(jLights, sceneData);
-        parseCameras(jCameras, sceneData);
-        parseObjects(jObjects, sceneData);
-
+        json j = json::parse(file);
+        if (j.count("lights") != 0)
+        {
+            json jLights = j.at("lights");
+            parseLights(jLights, sceneData);
+        }
+        if (j.count("cameras") != 0)
+        {
+            json jCameras = j.at("cameras");
+            parseCameras(jCameras, sceneData);
+        }
+        if (j.count("objects") != 0)
+        {
+            json jObjects = j.at("objects");
+            parseObjects(jObjects, sceneData);
+        }
         return sceneData;
     }
 

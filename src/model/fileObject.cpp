@@ -19,7 +19,7 @@ FileObject::FileObject(std::string _path, bool _smoothNormals, std::string _name
 
 	_path = Utils::workingDirectory() + _path;
 
-	std::cout << "loading object from file : "<< _path << " ..." << std::endl;
+	std::cout << "loading object from file : " << _path << " ..." << std::endl;
 
 	const aiScene *scene = _smoothNormals ? importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
 										  : importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);

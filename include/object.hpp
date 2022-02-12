@@ -163,9 +163,7 @@ private:
 public:
     FileObject(std::string _path, bool _smoothNormals);
     FileObject(std::string _path, bool _smoothNormals, std::string _name);
-    void load();
-    void draw(Scene *_scene);
-
+    
     bool hasTextures() { return false; }
 };
 

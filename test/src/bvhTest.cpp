@@ -58,7 +58,6 @@ protected:
 
     virtual void TearDown()
     {
-        boundingBoxes.clear();
         // Code here will be called immediately after each test (right
         // before the destructor).
     }
@@ -101,7 +100,6 @@ TEST_F(BvhTest, Merge_Case_1)
  */
 TEST_F(BvhTest, Merge_Case_2)
 {
-
     IdGenerator idGenerator = IdGenerator();
     BvhNode *nodeLeft = new BvhNode(simpleBBList[2], idGenerator.GetUniqueId());
     auto bb = std::make_shared<AxisBoundingBox>(nodeLeft->getBoundingBox().get()->getCenter(), glm::vec3(2, 0.5, 4));
@@ -159,7 +157,7 @@ TEST_F(BvhTest, CreateMap_Case_1)
     tree.createMap(nodes);
     ///////////////////////////////////////
 
-    std::multimap<float, BvhTree::PairNode> *actual = tree.getMap();
+    std::multimap<float, BvhTree::PairNode> actual = tree.getMap();
     std::vector<glm::vec3> centers2 = {
         {1, 0, 0},
         {-1, 0, 0},
@@ -167,10 +165,10 @@ TEST_F(BvhTest, CreateMap_Case_1)
         {10, 0, 0}};
     std::vector<float> expected{2, 3, 5, 6, 9, 11};
 
-    EXPECT_EQ(expected.size(), actual->size());
+    EXPECT_EQ(expected.size(), actual.size());
 
     int i = 0;
-    for (auto it = actual->begin(); it != actual->end(); it++, i++)
+    for (auto it = actual.begin(); it != actual.end(); it++, i++)
     {
         EXPECT_EQ(expected[i], it->first);
     }
@@ -190,10 +188,10 @@ TEST_F(BvhTest, CreateMap_Case_2)
     tree.createMap(nodes);
     ///////////////////////////////////////
 
-    std::multimap<float, BvhTree::PairNode> *actual = tree.getMap();
+    std::multimap<float, BvhTree::PairNode> actual = tree.getMap();
     std::vector<float> expected{};
 
-    EXPECT_EQ(expected.size(), actual->size());
+    EXPECT_EQ(expected.size(), actual.size());
     EXPECT_EQ(expected.size(), 0);
 }
 
@@ -210,10 +208,10 @@ TEST_F(BvhTest, CreateMap_Case_3)
     tree.createMap(nodes);
     ///////////////////////////////////////
 
-    std::multimap<float, BvhTree::PairNode> *actual = tree.getMap();
+    std::multimap<float, BvhTree::PairNode> actual = tree.getMap();
     std::vector<float> expected{};
 
-    EXPECT_EQ(expected.size(), actual->size());
+    EXPECT_EQ(expected.size(), actual.size());
     EXPECT_EQ(expected.size(), 0);
 }
 
@@ -231,16 +229,16 @@ TEST_F(BvhTest, CreateMap_Case_4)
     tree.createMap(nodes);
     ///////////////////////////////////////
 
-    std::multimap<float, BvhTree::PairNode> *actual = tree.getMap();
+    std::multimap<float, BvhTree::PairNode> actual = tree.getMap();
     std::vector<glm::vec3> centers2 = {
         {1, 0, 0},
         {-1, 0, 0}};
     std::vector<float> expected{2};
 
-    EXPECT_EQ(expected.size(), actual->size());
+    EXPECT_EQ(expected.size(), actual.size());
 
     int i = 0;
-    for (auto it = actual->begin(); it != actual->end(); it++, i++)
+    for (auto it = actual.begin(); it != actual.end(); it++, i++)
     {
         EXPECT_EQ(expected[i], it->first);
     }

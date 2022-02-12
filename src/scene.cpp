@@ -107,9 +107,6 @@ Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), expos
 }
 Scene::~Scene()
 {
-    std::cout << "del Scene" << std::endl;
-    // for (auto &obj : objects)
-    // obj.get()->clear();
     objects.clear();
     lights.clear();
     boundingBoxes.clear();

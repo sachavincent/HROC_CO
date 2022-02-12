@@ -25,11 +25,11 @@ private:
     typedef std::pair<BvhNode *, BvhNode *> PairNode;
 
 #ifdef HROC_TESTS
-    BvhTree()
+    BvhTree(): idGenerator(nullptr), map(nullptr), root(nullptr)
     {
     }
 
-    std::multimap<float, PairNode> *getMap() const { return map; };
+    std::multimap<float, PairNode> getMap() const { return *map; };
     BvhNode *getRoot() { return root; }
 #endif
 private:
@@ -45,7 +45,7 @@ public:
     ~BvhTree();
 
     void destroyRecursive(BvhNode* node);
-    
+
     std::vector<BvhNode *> *extractOccludees(std::vector<BvhNode *> &allNodes);
 
     void createMap(std::vector<BvhNode *> &nodes);

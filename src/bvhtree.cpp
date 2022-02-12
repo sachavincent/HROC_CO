@@ -4,9 +4,8 @@ BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs) : BvhTree(objs
 {
 }
 
-BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGenerator) : root(nullptr)
+BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGenerator) : root(nullptr), map(nullptr), idGenerator(_idGenerator)
 {
-    idGenerator = _idGenerator;
     nodes.clear();
     nodes.reserve(objs.size());
     for (auto &bb : objs)

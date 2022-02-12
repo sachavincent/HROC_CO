@@ -10,14 +10,14 @@ size_t Object::id_counter = 0;
 
 Object::~Object()
 {
-    std::cout << "delete obj: " << name << std::endl;
+#ifndef HROC_TESTS
     glDeleteBuffers(1, &m.vbo);
     glDeleteBuffers(1, &m.nbo);
     glDeleteBuffers(1, &m.ebo);
     if (!m.textureCoord.empty())
         glDeleteBuffers(1, &m.tbo);
     glDeleteVertexArrays(1, &m.vao);
-
+#endif
     observer = nullptr;
 
     if (boundingBox)

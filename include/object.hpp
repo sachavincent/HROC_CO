@@ -87,8 +87,10 @@ public:
         : name(_name), boundingBox(nullptr), scale(1.0), position(0.0), rotationMatrix(1.0)
     {
         id = id_counter++;
+        observer = nullptr;
     }
 
+    ~Object();
     inline size_t getId() const { return id; }
 
     //! Load the object on the gpu. This action is performed after opengl/glfw initialization

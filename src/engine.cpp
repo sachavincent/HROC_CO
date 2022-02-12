@@ -1,6 +1,6 @@
 #include "engine.hpp"
 #include "scene.hpp"
-#include "ioutils.hpp"
+#include "utils/ioutils.hpp"
 
 #include <chrono>
 #include <sstream>
@@ -66,31 +66,25 @@ Engine::~Engine()
 
 void Engine::clear()
 {
-    // TODO:
-    //  unload()
     delete scene;
 }
 
-Scene Engine::loadScene(const std::string &file)
+void Engine::loadScene(const std::string &file)
 {
     if (scene)
     {
         delete scene;
     }
     scene = new Scene(this, file);
-
-    return *scene;
 }
 
-Scene Engine::loadScene()
+void Engine::loadScene()
 {
     if (scene)
     {
-        clear();
+        delete scene;
     }
     scene = new Scene(this);
-
-    return *scene;
 }
 
 void Engine::startLoop()

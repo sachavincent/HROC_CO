@@ -54,6 +54,10 @@ public:
 	 **/
 	Camera(int _width, int _height, glm::vec3 _position = glm::vec3{0.0f, 2.0f, -10.0f}, float _fov = 55.0f);
 
+	~Camera()
+	{
+	}
+
 	//! Get current camera position
 	inline const glm::vec3 &getPosition() const
 	{

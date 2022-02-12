@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "bvhnode.hpp"
-#include "idgenerator.hpp"
+#include "utils/idgenerator.hpp"
 #include "boundingbox.hpp"
 
 class BvhTree
@@ -23,7 +23,7 @@ private:
 #endif
     typedef std::pair<float, std::pair<BvhNode *, BvhNode *>> PairDistanceNode;
     typedef std::pair<BvhNode *, BvhNode *> PairNode;
-    
+
 #ifdef HROC_TESTS
     BvhTree()
     {
@@ -42,6 +42,10 @@ public:
     BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_idGen);
     BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs);
 
+    ~BvhTree();
+
+    void destroyRecursive(BvhNode* node);
+    
     std::vector<BvhNode *> *extractOccludees(std::vector<BvhNode *> &allNodes);
 
     void createMap(std::vector<BvhNode *> &nodes);
@@ -83,12 +87,11 @@ public:
         printBT(root);
     }
 
-    void nodeDepthExploration(std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> &nodeDepths, BvhNode *node, int depth)
+    void nodeDepthExploration(std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> &nodeDepths, BvhNode *node, int depth)
     {
         if (nodeDepths.find(depth) == nodeDepths.end())
-            nodeDepths.insert(std::make_pair(depth, std::vector<BoundingBoxObject>()));
-        BoundingBoxObject *bbo = node->getBoundingBox()->getWireframe();
-        nodeDepths[depth].push_back(*bbo);
+            nodeDepths.insert(std::make_pair(depth, std::vector<std::shared_ptr<BoundingBoxObject>>()));
+        nodeDepths[depth].push_back(std::shared_ptr<BoundingBoxObject>(node->getBoundingBox()->getWireframe()));
 
         if (node->hasLeftChild())
             nodeDepthExploration(nodeDepths, node->getLeftChild(), depth + 1);
@@ -96,9 +99,9 @@ public:
             nodeDepthExploration(nodeDepths, node->getRightChild(), depth + 1);
     }
 
-    std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> getDebugData()
+    std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> getDebugData()
     {
-        std::map<int, std::vector<BoundingBoxObject>, std::greater<int>> nodeDepths;
+        std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> nodeDepths;
         if (root)
             nodeDepthExploration(nodeDepths, root, 0);
 

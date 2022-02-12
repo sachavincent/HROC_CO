@@ -7,6 +7,11 @@ BvhNode::BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id)
 {
 }
 
+BvhNode::~BvhNode()
+{
+    boundingBox.reset();
+}
+
 BvhNode *BvhNode::getChild(const NodeType &_t) const
 {
     if (_t == LEFT)

@@ -16,7 +16,7 @@ class BoundingBox
 private:
     glm::vec3 size;
     glm::vec3 center;
-    BoundingBoxObject *wireframe;
+    std::shared_ptr<BoundingBoxObject> wireframe;
 
 public:
 #ifdef HROC_TESTS
@@ -28,7 +28,9 @@ public:
 
     BoundingBox(glm::vec3 _center, glm::vec3 _size);
 
-    virtual ~BoundingBox() {}
+    virtual ~BoundingBox()
+    {
+    }
 
     inline const glm::vec3 &getSize() const { return size; }
     inline const glm::vec3 &getCenter() const { return center; }
@@ -38,7 +40,7 @@ public:
     static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
     //! Get a model of the BoundingBox object for debug mode rendering
-    inline BoundingBoxObject *getWireframe() { return wireframe; }
+    inline std::shared_ptr<BoundingBoxObject> getWireframe() { return wireframe; }
 };
 
 class OrientedBoundingBox : public BoundingBox
@@ -51,7 +53,7 @@ public:
 
     OrientedBoundingBox(glm::vec3 _center, glm::vec3 _size);
 
-    ~OrientedBoundingBox() override
+    ~OrientedBoundingBox()
     {
     }
 

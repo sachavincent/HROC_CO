@@ -1,16 +1,10 @@
 {
     "cameras": [
         {
-            "type": "FREE",
-            "fov": 55.0,
-            "yaw": 90.0,
-            "pitch": 0.0
+            "type": "FREE"
         },
         {
-            "type": "STATIC",
-            "fov": 55.0,
-            "yaw": 90.0,
-            "pitch": 0.0
+            "type": "STATIC"
         }
     ],
     "objects": [
@@ -76,7 +70,7 @@
             },
             "mesh": {
                 "type": "FileObject",
-                "args": [false, "models/teapot.obj"]
+                "args": [true, "models/teapot.obj"]
             }
         }
     ],

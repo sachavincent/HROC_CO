@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <memory>
 
@@ -27,12 +28,14 @@ private:
     //! maximum level of current bvh
 
     BvhTree *hierarchy;
+    std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
 
 public:
     Scene(Engine *_engine);
 
     Scene(Engine *_engine, const std::string &_file);
 
+    ~Scene();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
     //! render a wireframe view of all bounding boxes in the scene.
@@ -59,7 +62,7 @@ public:
 
 private:
     void load();
-    
+
     void createBoundingBoxes();
 };
 

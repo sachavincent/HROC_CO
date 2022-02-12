@@ -1,4 +1,4 @@
-#include "ioutils.hpp"
+#include "utils/ioutils.hpp"
 #include <iostream>
 
 void IOUtils::framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -138,7 +138,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
     switch (key)
     {
     case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, true);
+        engine->endLoop();
         break;
     case GLFW_KEY_W:
     case GLFW_KEY_UP:

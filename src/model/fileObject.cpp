@@ -1,6 +1,6 @@
 #include "object.hpp"
 #include "scene.hpp"
-#include "utils.hpp"
+#include "utils/utils.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

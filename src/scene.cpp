@@ -1,7 +1,7 @@
 #include "scene.hpp"
 #include "engine.hpp"
 #include "boundingBoxObject.hpp"
-#include "jsonparser.hpp"
+#include "utils/jsonparser.hpp"
 
 #include <random>
 #include <string>
@@ -105,6 +105,16 @@ Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), expos
         std::cerr << "Scene file '" << path << "' contains error:\n\t" << e.what() << std::endl;
     }
 }
+Scene::~Scene()
+{
+    std::cout << "del Scene" << std::endl;
+    // for (auto &obj : objects)
+    // obj.get()->clear();
+    objects.clear();
+    lights.clear();
+    boundingBoxes.clear();
+    delete hierarchy;
+}
 
 //! Load the scene models on GPU before rendering
 void Scene::load()
@@ -133,6 +143,8 @@ void Scene::createBoundingBoxes()
     }
 
     hierarchy = new BvhTree(bbs);
+
+    boundingBoxes = hierarchy->getDebugData();
 }
 //! Render all objects of scene
 void Scene::renderObjects()
@@ -191,11 +203,9 @@ void Scene::renderBoundingBoxes()
         return;
 
     sh.start();
-    static auto debugData = hierarchy->getDebugData();
-
     int bboxLevel;
     int maxBboxLevel = 0;
-    for (auto entry : debugData)
+    for (auto entry : boundingBoxes)
     {
         int numBB = 0;
         bboxLevel = entry.first + 1;
@@ -204,7 +214,7 @@ void Scene::renderBoundingBoxes()
         if (visMode == 0 || bboxLevel == visMode)
         {
             for (auto bbox : bboxs)
-                bbox.draw(this, numBB++);
+                bbox.get()->draw(this, numBB++);
         }
     }
     engine->getUi().setBboxMaxLevel(maxBboxLevel);

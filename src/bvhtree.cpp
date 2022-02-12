@@ -25,6 +25,32 @@ BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_
     }
 }
 
+BvhTree::~BvhTree()
+{
+    if (map)
+    {
+        map->clear();
+        delete map;
+    }
+
+    if (idGenerator)
+        delete idGenerator;
+
+    destroyRecursive(root);
+
+    nodes.clear();
+}
+
+void BvhTree::destroyRecursive(BvhNode *node)
+{
+    if (node)
+    {
+        destroyRecursive(node->getLeftChild());
+        destroyRecursive(node->getRightChild());
+        delete node;
+    }
+}
+
 void BvhTree::createMap(std::vector<BvhNode *> &_nodes)
 {
     map = new std::multimap<float, PairNode>();

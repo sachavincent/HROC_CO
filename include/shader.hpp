@@ -20,7 +20,7 @@
 #include <map>
 #include <utility>
 
-#include "utils.hpp"
+#include "utils/utils.hpp"
 
 class Shader
 {

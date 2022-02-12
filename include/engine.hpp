@@ -27,9 +27,9 @@ public:
 
     void clear();
 
-    Scene loadScene(const std::string &_file);
+    void loadScene(const std::string &_file);
 
-    Scene loadScene();
+    void loadScene();
 
     void startLoop();
 

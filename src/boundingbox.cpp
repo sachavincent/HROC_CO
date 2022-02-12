@@ -61,7 +61,7 @@ BoundingBox::BoundingBox(const Object &_o)
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
 
-    wireframe = new BoundingBoxObject(_o.getName(), center, glm::mat4(1.0), size);
+    wireframe = std::make_shared<BoundingBoxObject>(_o.getName(), center, glm::mat4(1.0), size);
 }
 
 BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size)
@@ -72,7 +72,7 @@ BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size)
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
 
-    wireframe = new BoundingBoxObject("NoObject", center, glm::mat4(1.0), size);
+    wireframe = std::make_shared<BoundingBoxObject>("NoObject", center, glm::mat4(1.0), size);
 }
 
 BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
@@ -106,8 +106,6 @@ BoundingBox *OrientedBoundingBox::merge(BoundingBox *_other)
 
     glm::vec3 minPos(newMinX, newMinY, newMinZ);
     glm::vec3 maxPos(newMaxX, newMaxY, newMaxZ);
-    glm::vec3 newSize(newMaxX - newMinX, newMaxY - newMinY, newMaxZ - newMinZ);
-    glm::vec3 newCenter((newMaxX + newMinX) / 2, (newMaxY + newMinY) / 2, (newMaxZ + newMinZ) / 2);
 
     BoundingBox *newBoundingBox = new OrientedBoundingBox((maxPos + minPos) * glm::vec3(0.5f), maxPos - minPos);
 

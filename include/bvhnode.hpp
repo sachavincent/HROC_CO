@@ -34,6 +34,7 @@ private:
 public:
     BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id);
 
+    ~BvhNode();
     inline const Visibility getVisibility() const { return tag; }
 
     inline const int getId() const { return id; }

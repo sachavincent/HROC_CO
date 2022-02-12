@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
     // Load scene
     engine.loadScene("testScene.json");
-    //engine.loadScene();
+    engine.loadScene();
     //  start the render loop
     engine.startLoop();
 

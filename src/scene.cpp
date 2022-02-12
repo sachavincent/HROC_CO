@@ -64,7 +64,7 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
 
     // gold-ish utah teapot
     auto teapot =
-        std::make_shared<FileObject>("models/teapot.obj", SMOOTH_NORMAL_ENABLE);
+        std::make_shared<FileObject>("models/teapot.obj", true);
     teapot->setScale(glm::vec3{0.3f})
         .setPosition({0.0f, 1.2f, -1.8f})
         .setDiffuse({0.55f, 0.5f, 0.0f});

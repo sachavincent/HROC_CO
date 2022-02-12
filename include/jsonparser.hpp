@@ -119,9 +119,9 @@ public:
             std::string objType = jObjectMesh.at("type").get<std::string>();
             bool hasName = jObject.count("name") != 0;
 
+            json args = jObjectMesh.at("args");
             if (objType == "Cube")
             {
-                json args = jObjectMesh.at("args");
                 if (args.size() != 1)
                     throw std::invalid_argument("Incorrect arguments for object type='" + objType + "'!");
 
@@ -133,7 +133,6 @@ public:
             }
             else if (objType == "UVSphere")
             {
-                json args = jObjectMesh.at("args");
                 if (args.size() != 3)
                     throw std::invalid_argument("Incorrect arguments for object type='" + objType + "'!");
 
@@ -148,7 +147,6 @@ public:
             }
             else if (objType == "Plane")
             {
-                json args = jObjectMesh.at("args");
                 if (args.size() != 3)
                     throw std::invalid_argument("Incorrect arguments for object type='" + objType + "'!");
 
@@ -161,8 +159,16 @@ public:
                 else
                     object = std::make_shared<Plane>(size, nCols, nRows);
             }
-            // else if (objType == "FileObject")
-            //    object = std::make_shared<FileObject>(objName);
+            else if (objType == "FileObject")
+            {
+                if (args.size() != 2)
+                    throw std::invalid_argument("Incorrect arguments for object type='" + objType + "'!");
+
+                if (hasName)
+                    object = std::make_shared<FileObject>(args[1].get<std::string>(), args[0].get<bool>(), jObject.at("name").get<std::string>());
+                else
+                    object = std::make_shared<FileObject>(args[1].get<std::string>(), args[0].get<bool>());
+            }
             else
                 throw std::invalid_argument("Unknown object type='" + objType + "'!");
 

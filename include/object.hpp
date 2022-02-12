@@ -20,12 +20,6 @@
 #include "texture.hpp"
 #include "observable.hpp"
 
-typedef enum
-{
-    SMOOTH_NORMAL_ENABLE = true,
-    SMOOTH_NORMAL_DISABLE = false
-} SMOOTH_NORMAL;
-
 class Scene;
 class BoundingBox;
 
@@ -158,12 +152,12 @@ class FileObject : public Object
 {
 private:
     static int instance;
-    std::vector<OBJECT_DATA> subObjects;
 
     void processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx);
 
 public:
-    FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals);
+    FileObject(std::string _path, bool _smoothNormals);
+    FileObject(std::string _path, bool _smoothNormals, std::string _name);
     void load();
     void draw(Scene *_scene);
 

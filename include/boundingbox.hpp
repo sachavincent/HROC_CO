@@ -20,7 +20,9 @@ private:
 
 public:
 #ifdef HROC_TESTS
-    BoundingBox() : wireframe(nullptr) {}
+    BoundingBox() : wireframe(nullptr)
+    {
+    }
 #endif
     BoundingBox(const Object &_o);
 

@@ -7,8 +7,8 @@
 #include <mutex>
 #include <iomanip>
 
-Engine::Engine(float width, float height) : _width(width), _height(height), _scene(nullptr),
-                                            _camera(new Camera(width, height)), _freeCam(new Camera(width, height)), _currentCamera(CameraType::STATIC)
+Engine::Engine(float _width, float _height) : width(_width), height(_height), scene(nullptr), camera(new Camera(width, height)),
+                                              freeCam(new Camera(_width, _height)), currentCamera(CameraType::STATIC)
 {
     glfwInit();
 
@@ -25,20 +25,20 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
 #endif
     glfwSetErrorCallback(IOUtils::errorCallback); // TODO: Enlever (performances)
 
-    _window = glfwCreateWindow(_width, _height, _windowName.c_str(), nullptr, nullptr);
-    glfwMakeContextCurrent(_window);
+    window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
+    glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
     // Callbacks binding
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(_window, IOUtils::mouseCallback);
-    glfwSetKeyCallback(_window, IOUtils::keyCallback);
-    glfwSetScrollCallback(_window, IOUtils::scrollCallback);
-    glfwSetFramebufferSizeCallback(_window, IOUtils::framebufferSizeCallback);
-    glfwSetWindowSizeCallback(_window, IOUtils::updateScreenRes);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, IOUtils::mouseCallback);
+    glfwSetKeyCallback(window, IOUtils::keyCallback);
+    glfwSetScrollCallback(window, IOUtils::scrollCallback);
+    glfwSetFramebufferSizeCallback(window, IOUtils::framebufferSizeCallback);
+    glfwSetWindowSizeCallback(window, IOUtils::updateScreenRes);
     IOUtils::setEngine(*this);
     // GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glViewport(0, 0, _width, _height);
+    glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glEnable(GL_FRAMEBUFFER_SRGB);
@@ -46,17 +46,17 @@ Engine::Engine(float width, float height) : _width(width), _height(height), _sce
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // ImGui Setup
-    _ui.load(_window);
+    ui.load(window);
 
-    _deltaTime = 0.0;
-    _lastFrame = 0.0;
+    deltaTime = 0.0;
+    lastFrame = 0.0;
 }
 
 Engine::~Engine()
 {
     clear();
-    delete _camera;
-    delete _freeCam;
+    delete camera;
+    delete freeCam;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -68,66 +68,66 @@ void Engine::clear()
 {
     // TODO:
     //  unload()
-    delete _scene;
+    delete scene;
 }
 
 Scene Engine::loadScene(const std::string &file)
 {
-    if (_scene)
+    if (scene)
     {
-        delete _scene;
+        delete scene;
     }
-    _scene = new Scene(this, file);
+    scene = new Scene(this, file);
 
-    return *_scene;
+    return *scene;
 }
 
 Scene Engine::loadScene()
 {
-    if (_scene)
+    if (scene)
     {
         clear();
     }
-    _scene = new Scene(this);
+    scene = new Scene(this);
 
-    return *_scene;
+    return *scene;
 }
 
 void Engine::startLoop()
 {
-    while (!glfwWindowShouldClose(_window))
+    while (!glfwWindowShouldClose(window))
     {
-        double currentFrame = glfwGetTime();
-        _deltaTime = currentFrame - _lastFrame;
-        _lastFrame = currentFrame;
+        double _currentFrame = glfwGetTime();
+        deltaTime = _currentFrame - lastFrame;
+        lastFrame = _currentFrame;
 
         glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         updateFpsCounter(500);
 
-        getCurrentCamera()->move(2.0f * _deltaTime);
+        getCurrentCamera()->move(2.0f * deltaTime);
         // final rendering of scene
 
-        _scene->renderObjects();
+        scene->renderObjects();
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glLineWidth(4.0);
-        _scene->renderBoundingBoxes();
-        glLineWidth(1.0);
+
+        scene->renderBoundingBoxes();
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // imgui part
-        _ui.render(_scene);
+        ui.render(scene);
 
-        glfwSwapBuffers(_window);
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 }
 
 void Engine::endLoop()
 {
-    glfwSetWindowShouldClose(_window, true);
+    glfwSetWindowShouldClose(window, true);
 }
 
 //! Shows fps on window title, update rate in ms
@@ -145,23 +145,23 @@ void Engine::updateFpsCounter(double _updateRateMs)
     {
         counter = 0;
         std::stringstream sstr;
-        sstr << _windowName << "  |  FPS : " << std::fixed << std::setprecision(1) << 1 / _deltaTime;
+        sstr << windowName << "  |  FPS : " << std::fixed << std::setprecision(1) << 1 / deltaTime;
 
-        glfwSetWindowTitle(_window, sstr.str().c_str());
+        glfwSetWindowTitle(window, sstr.str().c_str());
     }
-    counter += _deltaTime;
+    counter += deltaTime;
 }
 
-void Engine::setResolution(int width, int height)
+void Engine::setResolution(int _width, int _height)
 {
-    _width = width;
-    _height = height;
+    width = _width;
+    height = _height;
 
-    _camera->setResolution(width, height);
-    _freeCam->setResolution(width, height);
+    camera->setResolution(width, height);
+    freeCam->setResolution(width, height);
 }
 
 void Engine::switchCamera()
 {
-    _currentCamera = _currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
+    currentCamera = currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
 }

@@ -177,7 +177,7 @@ private:
     void inline pushIndices(int ind_1, int ind_2, int ind_3);
 
 public:
-    UVSphere(float _radius, int _nCols, int _nRows);
+    UVSphere(float _radius, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance));
 };
 
 class Plane : public Object
@@ -186,7 +186,7 @@ private:
     static int instance;
 
 public:
-    Plane(glm::vec2 _size, int _ncol, int _nrows);
+    Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "UVSphere_" + std::to_string(instance));
 };
 
 #endif

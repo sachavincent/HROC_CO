@@ -1,7 +1,6 @@
 #ifndef UI_H
 #define UI_H
 
-
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
@@ -39,14 +38,14 @@ private:
     **/
     int bboxMode = 0;
     bool objectMode = true;
-    
+
 public:
     Ui();
     void load(GLFWwindow *_window);
     void render(Scene *_scene);
-    void setBboxMaxLevel(int _level){bboxMaxLevel = _level;}
-    int getBboxVisMode(){return bboxMode;}
-    int getObjectsVisMode(){return objectMode;}
+    void setBboxMaxLevel(int _level) { bboxMaxLevel = _level; }
+    int getBboxVisMode() { return bboxMode; }
+    int getObjectsVisMode() { return objectMode; }
 };
 
 #endif

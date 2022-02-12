@@ -1,9 +1,8 @@
 #include "object.hpp"
 
 int UVSphere::instance = 0;
-UVSphere::UVSphere(float _radius, int _nCols, int _nRows) : Object()
+UVSphere::UVSphere(float _radius, int _nCols, int _nRows, const std::string& _name) : Object(_name)
 {
-    name = "UVSphere_" + std::to_string(instance);
     instance++;
 
     float x, y, z, xy, s, t;

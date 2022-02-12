@@ -75,25 +75,6 @@ void EXPECT_VEC3(glm::vec3 actual, glm::vec3 expected)
     EXPECT_EQ(actual[1], expected[1]);
     EXPECT_EQ(actual[2], expected[2]);
 }
-/*
-
-BvhNode BvhNode::merge(BvhNode *left, BvhNode *right)
-{
-    const BoundingBox &bbLeft = left->getBoundingBox();
-    const BoundingBox &bbRight = right->getBoundingBox();
-    const BoundingBox *bb = bbLeft.merge(bbRight);
-    BvhNode p = BvhNode(bb);
-    p._leftChild = left;
-    p._rightChild = right;
-
-    left->_type = LEFT;
-    left->_parent = &p;
-
-    right->_type = RIGHT;
-    right->_parent = &p;
-    return p;
-}
-*/
 
 /**
  * Tests BvhNode::merge with 2 BB of same size at different positions
@@ -152,7 +133,7 @@ TEST_F(BvhTest, Merge_Case_3)
     BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
-    glm::vec3 expectedCenter = glm::vec3{-2.5, -1, -2.5};
+    glm::vec3 expectedCenter = glm::vec3{-2.75, -0.75, -3.5};
     glm::vec3 expectedSize = glm::vec3{5.5, 10.5, 12};
 
     EXPECT_VEC3(actual->getBoundingBox()->getCenter(), expectedCenter);
@@ -282,7 +263,10 @@ void getTreeIds(BvhNode *root, std::vector<int> &idList)
  */
 TEST_F(BvhTest, Constructor_Case_1)
 {
+    ///////////////////////////////////////
     BvhTree tree(bbs1);
+    ///////////////////////////////////////
+
     BvhNode *root = tree.getRoot();
 
     std::vector<int> expectedIdList = {12, 11, 9, 4, 0, 6, 10, 8, 7, 2, 1, 3, 5};
@@ -316,13 +300,28 @@ TEST_F(BvhTest, Constructor_Case_2)
     boundingBoxes.reserve(sizes.size());
     for (auto const &value : sizes)
     {
-        boundingBoxes.push_back(std::make_shared<AxisBoundingBox>(center, value));
+        auto bb = std::make_shared<AxisBoundingBox>(center, value);
+        boundingBoxes.push_back(bb);
     }
+
+    ///////////////////////////////////////
     BvhTree tree(boundingBoxes);
+    ///////////////////////////////////////
 
-    tree.print();
+    BvhNode *root = tree.getRoot();
 
-    EXPECT_EQ(0, 0); // TODO
+    std::vector<int> expectedIdList = {12, 11, 9, 5, 4, 8, 3, 2, 10, 7, 0, 1, 6};
+    std::vector<int> actualList;
+
+    getTreeIds(root, actualList);
+
+    EXPECT_EQ(expectedIdList.size(), actualList.size());
+
+    int i = 0;
+    for (auto it = actualList.begin(); it != actualList.end(); it++, i++)
+    {
+        EXPECT_EQ(expectedIdList[i], *it);
+    }
 }
 
 /**
@@ -339,12 +338,29 @@ TEST_F(BvhTest, Constructor_Case_3)
     boundingBoxes.reserve(centers.size());
     for (auto const &value : centers)
     {
-        boundingBoxes.push_back(std::make_shared<AxisBoundingBox>(value, size));
+        auto bb = std::make_shared<AxisBoundingBox>(value, size);
+        boundingBoxes.push_back(bb);
     }
-    BvhTree tree(boundingBoxes);
 
-    tree.print();
-    EXPECT_EQ(0, 0); // TODO
+    ///////////////////////////////////////
+    BvhTree tree(boundingBoxes);
+    ///////////////////////////////////////
+
+    BvhNode *root = tree.getRoot();
+
+    std::vector<int> expectedIdList = {28, 27, 24, 18, 7, 6, 17, 5, 4, 23, 16, 3, 2, 15, 0,
+                                       1, 26, 25, 20, 11, 10, 19, 9, 8, 22, 21, 13, 12, 14};
+    std::vector<int> actualList;
+
+    getTreeIds(root, actualList);
+
+    EXPECT_EQ(expectedIdList.size(), actualList.size());
+
+    int i = 0;
+    for (auto it = actualList.begin(); it != actualList.end(); it++, i++)
+    {
+        EXPECT_EQ(expectedIdList[i], *it);
+    }
 }
 
 /**
@@ -353,7 +369,11 @@ TEST_F(BvhTest, Constructor_Case_3)
 TEST_F(BvhTest, Constructor_Case_4)
 {
     boundingBoxes.push_back(bbs1[1]);
+
+    ///////////////////////////////////////
     BvhTree tree(boundingBoxes);
+    ///////////////////////////////////////
+
     BvhNode *root = tree.getRoot();
 
     std::vector<int> actualList;

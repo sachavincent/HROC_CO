@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
     Engine engine(WIDTH, HEIGHT);
 
     // Load scene
-    engine.loadScene();
-
-    // start the render loop
+    engine.loadScene("testScene.json");
+    //engine.loadScene();
+    //  start the render loop
     engine.startLoop();
 
     return 0;

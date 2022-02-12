@@ -1,74 +1,76 @@
 #include "camera.hpp"
 #include "frustum.hpp"
 
-Camera::Camera(int width, int height, glm::vec3 position, float fov) : _width(width), _height(height), _position(position), _fov(fov), movingFactor({0, 0, 0})
+Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width(_width), height(_height), position(_position), fov(_fov), movingFactor({0, 0, 0})
 {
-	_yaw = 90.0;
-	_pitch = 0.0;
-	_front = glm::vec3(0.0f, 0.0f, 1.0f);
-	_up = glm::vec3(0.0f, 1.0f, 0.0f);
-	_nearDistance = 1.0f;
-	_farDistance = 200.0f;
-	
-	setResolution(width, height);
+	yaw = 90.0;
+	pitch = 0.0;
+	front = glm::vec3(0.0f, 0.0f, 1.0f);
+	up = glm::vec3(0.0f, 1.0f, 0.0f);
+	nearDistance = 1.0f;
+	farDistance = 200.0f;
 
-	_frustum = new Frustum();
+	setResolution(_width, _height);
+
+	frustum = new Frustum();
 }
 
 // direction
 void Camera::updateDirection()
 {
-	glm::vec3 front;
-	front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+	glm::vec3 _front;
+	_front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-	front.y = sin(glm::radians(_pitch));
-	front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
-	_front = glm::normalize(front);
+	_front.y = sin(glm::radians(pitch));
+	_front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front = glm::normalize(_front);
 
-	_right = glm::normalize(glm::cross(_front, {0, 1, 0}));
-	_up = glm::normalize(glm::cross(_right, _front));
+	right = glm::normalize(glm::cross(front, {0, 1, 0}));
+	up = glm::normalize(glm::cross(right, front));
 }
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
 {
-	_pitch += _offset * _sensitivity;
-	if (_pitch >= 85)
+	pitch += _offset * _sensitivity;
+	if (pitch >= 85)
 	{
-		_pitch = 85.0f;
+		pitch = 85.0f;
 	}
-	if (_pitch <= -85)
+	if (pitch <= -85)
 	{
-		_pitch = -85.0f;
+		pitch = -85.0f;
 	}
 
 	updateDirection();
-	return _pitch;
+	return pitch;
 }
 
 float Camera::offsetYaw(float _offset, float _sensitivity)
 {
-	_yaw += _offset * _sensitivity;
-	if (_yaw < 0)
-		_yaw += 360;
-	if (_yaw > 360)
-		_yaw -= 360;
+	yaw += _offset * _sensitivity;
+	if (yaw < 0)
+		yaw += 360;
+	if (yaw > 360)
+		yaw -= 360;
+
 	updateDirection();
-	return _yaw;
+	return yaw;
 }
 
 //_fov
 float Camera::offsetFov(float _offset)
 {
-	if (_fov + _offset > 180)
+	if (fov + _offset > 180)
 	{
-		_fov = 180.0f;
+		fov = 180.0f;
 	}
-	else if (_fov + _offset < 1)
+	else if (fov + _offset < 1)
 	{
-		_fov = 1.0f;
+		fov = 1.0f;
 	}
-	_fov += _offset;
-	return _fov;
+
+	fov += _offset;
+	return fov;
 }
 
 // position
@@ -89,20 +91,27 @@ void Camera::moveZ(float _offset)
 
 void Camera::setResolution(int w, int h)
 {
-	_width = w;
-	_height = h;
-	_lastX = (float)w / 2.0;
-	_lastY = (float)h / 2.0;
+	width = w;
+	height = h;
+	lastX = (float)w / 2.0;
+	lastY = (float)h / 2.0;
 }
 
 void Camera::move(const float delta)
 {
-	_position += movingFactor.x * delta * glm::normalize(glm::cross(_front, _up));
-	_position += movingFactor.y * delta * glm::normalize(_up);
-	_position += movingFactor.z * delta * _front;
+	position += movingFactor.x * delta * glm::normalize(glm::cross(front, up));
+	position += movingFactor.y * delta * glm::normalize(up);
+	position += movingFactor.z * delta * front;
 }
 
-void Camera::rotate(const glm::vec3 delta)
+void Camera::setCameraInfo(CameraInfo _cameraInfo)
 {
-	// TODO
+	if (_cameraInfo.position)
+		position = _cameraInfo.position.value();
+	if (_cameraInfo.fov)
+		fov = _cameraInfo.fov.value();
+	if (_cameraInfo.yaw)
+		yaw = _cameraInfo.yaw.value();
+	if (_cameraInfo.pitch)
+		pitch = _cameraInfo.pitch.value();
 }

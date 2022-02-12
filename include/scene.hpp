@@ -26,13 +26,13 @@ private:
     float exposure;
     //! maximum level of current bvh
 
-    BvhTree* hierarchy;
+    BvhTree *hierarchy;
+
 public:
     Scene(Engine *_engine);
 
     Scene(Engine *_engine, const std::string &_file);
 
-    void load();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
     //! render a wireframe view of all bounding boxes in the scene.
@@ -55,7 +55,12 @@ public:
 
     inline std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
-    Shader& getShader(){return sh;}
+    Shader &getShader() { return sh; }
+
+private:
+    void load();
+    
+    void createBoundingBoxes();
 };
 
 #endif

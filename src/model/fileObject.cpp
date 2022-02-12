@@ -8,9 +8,8 @@
 
 int FileObject::instance = 0;
 
-FileObject::FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals) : Object()
+FileObject::FileObject(std::string _path, SMOOTH_NORMAL _smoothNormals) : Object(_path.substr(_path.find_last_of("/") + 1) + "_" + std::to_string(instance))
 {
-	name = _path.substr(_path.find_last_of("/") + 1) + "_" + std::to_string(instance);
 	instance++;
 
 	Assimp::Importer importer;

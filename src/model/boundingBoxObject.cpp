@@ -11,12 +11,11 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_
 	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 }
 
-void BoundingBoxObject::draw(Scene *_scene, int _depth)
+void BoundingBoxObject::draw(Scene *_scene, int _num)
 {
 	if (!loaded)
 		return;
 
-	//std::cout << "Rendering bounding box object " << name << " with depth = " << _depth << std::endl;
-	_scene->getShader().loadInt("depthBB", _depth);
+	_scene->getShader().loadInt("numBB", _num);
 	Cube::draw(_scene);
 }

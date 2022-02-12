@@ -17,14 +17,14 @@ class IOUtils
 
 private:
     // last mouse pointer position
-    inline static double _lastMouseX;
-    inline static double _lastMouseY;
-    inline static bool _resetFocus = false;
-    inline static int _lastDrawMode = 0;
-    inline static Engine *_engine;
+    inline static double lastMouseX;
+    inline static double lastMouseY;
+    inline static bool resetFocus = false;
+    inline static int lastDrawMode = 0;
+    inline static Engine *engine;
 
 public:
-    static inline void setEngine(Engine &engine) { _engine = &engine; }
+    static inline void setEngine(Engine &_engine) { engine = &_engine; }
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 

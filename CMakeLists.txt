@@ -15,7 +15,8 @@ set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL_PDB OFF)
 set(BUILD_SHARED_LIBS OFF)
-           
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+
 include(external/DisableAssimpImports.cmake)
 disableAssimpImports()
 
@@ -27,9 +28,8 @@ set(GLFW_BUILD_TESTS OFF)
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(external/glfw)
 #set(gtest_force_shared_crt 1 CACHE BOOL "")
-
 add_subdirectory(external/googletest)
-
+add_subdirectory(external/nlohmann_json)
 add_subdirectory(test)
 
 if(MSVC)
@@ -51,6 +51,7 @@ include_directories(include/
 					)
 
 file(GLOB VENDORS_SOURCES external/glad/src/glad.c)
+
 file(GLOB PROJECT_HEADERS include/*.hpp)
 file(GLOB PROJECT_SOURCES src/*.cpp
                           src/model/*.cpp
@@ -75,7 +76,7 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${VENDORS_SOURCES}  "src/main.cpp")
 
 target_link_libraries(${PROJECT_NAME} glfw assimp
-                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} nlohmann_json::nlohmann_json)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

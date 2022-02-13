@@ -7,6 +7,8 @@ UVSphere::UVSphere(float _radius, int _nCols, int _nRows, const std::string& _na
 
     float x, y, z, xy, s, t;
 
+    
+
     m.vertices.reserve(3 * _nCols * _nRows);
     m.normals.reserve(3 * _nCols * _nRows);
     m.indices.reserve(6 * _nCols * _nRows);
@@ -58,8 +60,12 @@ UVSphere::UVSphere(float _radius, int _nCols, int _nRows, const std::string& _na
     position = glm::vec3{1.0};
     scale = glm::vec3{1.0};
     rotationMatrix = glm::mat4{1.0};
-}
 
+    bounds.min = {-_radius,-_radius,-_radius};
+	bounds.max = {_radius,_radius,_radius};
+    m.numIndices = m.indices.size();
+    
+}
 void inline UVSphere::pushIndices(int ind_1, int ind_2, int ind_3)
 {
     m.indices.push_back(ind_1);

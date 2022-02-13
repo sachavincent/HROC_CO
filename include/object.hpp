@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <memory>
+#include <limits>
 
 #include <glad/glad.h>
 #include <assimp/Importer.hpp>
@@ -29,7 +30,7 @@ protected:
     std::string name;
 
     size_t id;
-    static size_t id_counter;
+    static size_t id_counter;  //TODO: reset this field in scene destructor 
 
     // shading
     glm::vec3 diffuseColor = glm::vec3{0.9f};
@@ -61,7 +62,7 @@ protected:
         // nbo = normals
         // ebo = indices
         // tbo = texture coord
-        unsigned int vbo, nbo, ebo, tbo, vao;
+        unsigned int vbo, nbo, ebo, tbo, vao, numIndices;
 
         std::vector<GLfloat> vertices, normals, textureCoord;
         std::vector<GLuint> indices;
@@ -81,6 +82,13 @@ protected:
         _translate = glm::translate(_translate, position);
         transformationMatrix = _translate * rotationMatrix * _scale;
     }
+protected:
+    // LOCAL object maximum and minimum bounds without transformation
+    struct OBJECT_BOUNDS{
+        glm::vec3 max;
+        glm::vec3 min;
+    };
+    OBJECT_BOUNDS bounds;
 
 public:
     Object(std::string _name = "Object")
@@ -125,12 +133,15 @@ public:
 
     inline const glm::mat4 &getTransformationMatrix() const { return transformationMatrix; }
 
-    const std::vector<GLfloat> &getVertices() const { return m.vertices; }
+    //const std::vector<GLfloat> &getVertices() const { return m.vertices; }
+    //! Returns the maximum and minimum bounds after transformation
+    std::pair<glm::vec3,glm::vec3> getBounds() const;
     const glm::vec3 &getDiffuse() const { return diffuseColor; }
     const glm::vec3 &getSpecular() const { return specularColor; }
     float getShininess() const { return shininess; }
 
     const glm::vec2 &getTexScaling() const { return texScaling; }
+
 
     void registerObserver(Observer &o) override;
     void removeObserver(Observer &o) override;
@@ -142,9 +153,9 @@ public:
 //! a simple cube to test shader on
 class Cube : public Object
 {
-    static int instance_counter;
+    static int instance_counter;//TODO: reset this field in scene destructor
     int instance;
-    static unsigned int shared_vao;
+    static unsigned int shared_vao; //TODO: reset this field in scene destructor 
 
 public:
     //! Create a cube of size _edgeSize.
@@ -156,34 +167,39 @@ public:
 class FileObject : public Object
 {
 private:
-    static int instance;
+    static int instance_counter;//TODO: reset this field in scene destructor
+    int instance;
+    std::string abs_path;
+    // map < path of object , <vao, numIndices, bounds>>
+    static std::map<const std::string,
+            std::tuple<uint32_t,uint32_t,Object::OBJECT_BOUNDS>> path_cache;//TODO: reset this field in scene destructor 
 
-    void processMesh(aiMesh *_mesh, const aiScene *_scene, size_t _meshIdx);
+    void processMesh(aiMesh *_mesh, const aiScene *_scene);
 
 public:
-    FileObject(std::string _path, bool _smoothNormals);
-    FileObject(std::string _path, bool _smoothNormals, std::string _name);
-    
+    FileObject(std::string _path, bool _smoothNormals, std::string _name = "");
+    virtual void load();
+
     bool hasTextures() { return false; }
 };
 
 class UVSphere : public Object
 {
 private:
-    static int instance;
+    static int instance;  //TODO: reset this field in scene destructor 
     void inline pushIndices(int ind_1, int ind_2, int ind_3);
 
 public:
-    UVSphere(float _radius, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance));
+    UVSphere(float _radius, int _nCols, int _nRows, const std::string &_name = "UVSphere_" + std::to_string(instance));
 };
 
 class Plane : public Object
 {
 private:
-    static int instance;
+    static int instance;  //TODO: reset this field in scene destructor 
 
 public:
-    Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "UVSphere_" + std::to_string(instance));
+    Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance));
 };
 
 #endif

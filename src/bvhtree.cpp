@@ -131,7 +131,7 @@ BvhTree::PairNode BvhTree::requestMap()
 
 std::vector<BvhNode *> BvhTree::extractOccludees(const std::vector<BvhNode *> &occluders)
 {
-    std::vector<BvhNode *> occludeeGroup;
+    std::vector<BvhNode *> occludeeGroups;
     occludeeGroups.reserve(occluders.size());
     if (occluders.empty())
     {

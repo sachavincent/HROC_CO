@@ -19,3 +19,18 @@ void BoundingBoxObject::draw(Scene *_scene, int _num)
 	_scene->getShader().loadInt("numBB", _num);
 	Cube::draw(_scene);
 }
+
+void BoundingBoxObject::drawQuery(Scene *_scene)
+{
+	if (!loaded)
+		return;
+
+	glBindVertexArray(m.vao);
+
+	Shader &sh = _scene->getSimpleShader();
+	sh.loadMat4("model", transformationMatrix);
+	
+	glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
+
+	glBindVertexArray(0);
+}

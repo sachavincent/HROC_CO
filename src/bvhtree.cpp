@@ -129,21 +129,21 @@ BvhTree::PairNode BvhTree::requestMap()
     return it->second;
 }
 
-std::vector<BvhNode *> *BvhTree::extractOccludees(std::vector<BvhNode *> &allNodes)
+std::vector<BvhNode *> BvhTree::extractOccludees(const std::vector<BvhNode *> &occluders)
 {
-    std::vector<BvhNode *> *occludeeGroups = new std::vector<BvhNode *>();
-    occludeeGroups->reserve(allNodes.size());
-    if (allNodes.empty())
+    std::vector<BvhNode *> occludeeGroup;
+    occludeeGroups.reserve(occluders.size());
+    if (occluders.empty())
     {
-        occludeeGroups->push_back(root);
+        occludeeGroups.push_back(root);
         return occludeeGroups;
     }
-    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
         (*it)->setVisibility(Visibility::null);
     }
 
-    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
         BvhNode *n = (*it);
         while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
@@ -154,11 +154,11 @@ std::vector<BvhNode *> *BvhTree::extractOccludees(std::vector<BvhNode *> &allNod
             n = n->getParent();
         }
     }
-    for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+    for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
         if ((*it)->getVisibility() == Visibility::UNKNOWN)
         {
-            occludeeGroups->push_back(*it);
+            occludeeGroups.push_back(*it);
         }
     }
 

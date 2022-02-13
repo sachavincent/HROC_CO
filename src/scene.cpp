@@ -126,6 +126,7 @@ void Scene::load()
     }
     // load shader
     sh = {"shaders/default.vert", "shaders/phong.frag"};
+    simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
 }
 
 void Scene::createBoundingBoxes()

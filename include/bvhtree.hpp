@@ -25,7 +25,7 @@ private:
     typedef std::pair<BvhNode *, BvhNode *> PairNode;
 
 #ifdef HROC_TESTS
-    BvhTree(): idGenerator(nullptr), map(nullptr), root(nullptr)
+    BvhTree() : idGenerator(nullptr), map(nullptr), root(nullptr)
     {
     }
 
@@ -44,9 +44,7 @@ public:
 
     ~BvhTree();
 
-    void destroyRecursive(BvhNode* node);
-
-    std::vector<BvhNode *> *extractOccludees(std::vector<BvhNode *> &allNodes);
+    std::vector<BvhNode *> extractOccludees(const std::vector<BvhNode *> &occluders);
 
     void createMap(std::vector<BvhNode *> &nodes);
 
@@ -110,6 +108,8 @@ public:
 
 private:
     static void eraseInVector(std::vector<BvhNode *> &nodes, BvhNode *node);
+
+    void destroyRecursive(BvhNode *node);
 };
 
 #endif

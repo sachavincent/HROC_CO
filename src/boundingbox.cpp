@@ -28,38 +28,17 @@ AxisBoundingBox::AxisBoundingBox(const Object &_o) : OrientedBoundingBox(_o, Axi
 
 BoundingBox::BoundingBox(const Object &_o)
 {
-    float maxX = -std::numeric_limits<float>::infinity(), maxY = -std::numeric_limits<float>::infinity(), maxZ = -std::numeric_limits<float>::infinity();
-    float minX = std::numeric_limits<float>::infinity(), minY = std::numeric_limits<float>::infinity(), minZ = std::numeric_limits<float>::infinity();
 
-    for (auto it = _o.getVertices().begin(); it != _o.getVertices().end();)
-    {
-        GLfloat x = *it;
-        it++;
-        GLfloat y = *it;
-        it++;
-        GLfloat z = *it;
-        it++;
+    glm::vec3 minPos = _o.getBounds().first;
+    glm::vec3 maxPos = _o.getBounds().second;
 
-        glm::vec3 pos(x, y, z);
-        pos = glm::vec3(_o.getTransformationMatrix() * glm::vec4(pos, 1.0)); // Apply object rotations & scale
-
-        minX = pos[0] < minX ? pos[0] : minX;
-        maxX = pos[0] > maxX ? pos[0] : maxX;
-
-        minY = pos[1] < minY ? pos[1] : minY;
-        maxY = pos[1] > maxY ? pos[1] : maxY;
-
-        minZ = pos[2] < minZ ? pos[2] : minZ;
-        maxZ = pos[2] > maxZ ? pos[2] : maxZ;
-    }
-
-    glm::vec3 minPos(minX, minY, minZ);
-    glm::vec3 maxPos(maxX, maxY, maxZ);
-
-    center = (maxPos + minPos) * glm::vec3(0.5f);
+    center = _o.getPosition();
     size = maxPos - minPos;
-    if (size[0] < 0 || size[1] < 0 || size[2] < 0)
+
+    if (size[0] < 0 || size[1] < 0 || size[2] < 0){
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
+    }
+        
 
     wireframe = std::make_shared<BoundingBoxObject>(_o.getName(), center, glm::mat4(1.0), size);
 }

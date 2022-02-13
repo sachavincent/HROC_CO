@@ -78,7 +78,7 @@ void Ui::lightsParams()
     if (ImGui::TreeNode("Lights Parameters"))
     {
 
-        // display the light of light to choose from
+        // display the lights to choose from
         const char *items[100];
         std::vector<std::shared_ptr<Light>> &lights = scene->getLights();
         std::vector<std::string> lightsNames;
@@ -93,7 +93,6 @@ void Ui::lightsParams()
         if (ImGui::Button("Add a Light") && lights.size() < 100)
         {
             newLightWindowActive = true;
-            nlMult = 1.0;
         }
         ImGui::PopStyleColor();
         ImGui::ListBox("Select a Light to modify", &lightListIndex, items, lightsNames.size(), 5);
@@ -199,55 +198,24 @@ void Ui::objectsParams()
 void Ui::newLightWindow()
 {
     ImGui::Begin("Add a light");
-    const char *items[] = {"Point Light", "Distant Light"};
-    static int item_current = 0;
-    ImGui::Combo("Light Type", &item_current, items, IM_ARRAYSIZE(items));
 
-    switch (item_current)
-    {
-    case 0:
-        newPointLight();
-        break;
-    case 1:
-        newDistantLight();
-        break;
-    default:
-        break;
-    }
-    ImGui::End();
-}
-
-void Ui::newPointLight()
-{
-    static glm::vec3 nlPos;
-    static glm::vec3 nlColor;
+    static glm::vec3 nlPos = glm::vec3{0.0};
+    static glm::vec3 nlColor = glm::vec3{1.0};
+    static glm::vec3 attn = {0, 0, 1};
+    static float mult = 1.0;
 
     ImGui::DragFloat3("position", &nlPos[0], 0.01, -10.0, 10.0);
-    ImGui::DragFloat("Light Power Multiplier", &nlMult, 0.1, 0.1, 100.0);
+    ImGui::DragFloat("Light Power Multiplier", &mult, 0.1, 0.1, 100.0);
     ImGui::ColorEdit3("Color", &nlColor[0]);
+    ImGui::DragFloat3("Attenuation (const/lin/quad)", &attn[0], 0.001, 0.1, 2.0);
 
     if (ImGui::Button("Add"))
     {
-        auto pl = std::make_shared<Light>(nlPos, nlColor * nlMult);
-        nlMult = 1.0;
+        auto pl = std::make_shared<Light>(nlPos, nlColor * mult,attn);
+        mult = 1.0;
         scene->addLight(pl);
         newLightWindowActive = false;
     }
-}
 
-void Ui::newDistantLight()
-{
-    static glm::vec3 nlPos;
-    static glm::vec3 nlColor;
-
-    ImGui::DragFloat3("Incoming Position", &nlPos[0], 0.01, -1.0, 1.0);
-    ImGui::DragFloat("Light Power Multiplier", &nlMult, 0.1, 0.0, 100.0);
-    ImGui::ColorEdit3("Color", &nlColor[0]);
-
-    if (ImGui::Button("Add"))
-    {
-        auto dl = std::make_shared<Light>(nlPos, nlColor * nlMult);
-        scene->addLight(dl);
-        newLightWindowActive = false;
-    }
+    ImGui::End();
 }

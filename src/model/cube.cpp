@@ -165,6 +165,12 @@ Cube::Cube(float _edgeSize, std::string _name)
 		30, 32, 31,
 		33, 35, 34};
 
+
+	bounds.min = {-0.5f, -0.5f, -0.5f};
+	bounds.max = {0.5f, 0.5f, 0.5f};
+
+	m.numIndices = m.indices.size();
+	
 	setPosition(glm::vec3{0.0});
 	setScale(glm::vec3(_edgeSize));
 	setRotationMatrix(glm::mat4{1.0});
@@ -172,9 +178,11 @@ Cube::Cube(float _edgeSize, std::string _name)
 
 void Cube::load(){
         if(instance == 0){
+			//std::cout << "le cube\n";
             Object::load();
             shared_vao = m.vao;
         } else {
+			//std::cout << "le cube\n";
             m.vao = shared_vao;
 			loaded = true;
 			Object::load();

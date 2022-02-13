@@ -35,7 +35,7 @@ void Object::load()
             glGenBuffers(1, &m.tbo);
         glGenBuffers(1, &m.ebo);
         glGenVertexArrays(1, &m.vao);
-        std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
+        //std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
 
         // Bind the vao
         glBindVertexArray(m.vao);
@@ -125,7 +125,7 @@ void Object::draw(Scene *_scene)
 
     glBindVertexArray(m.vao);
 
-    glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, m.numIndices, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
 }
@@ -200,3 +200,36 @@ void Object::registerObserver(Observer &o) { observer = &o; }
 void Object::removeObserver(Observer &o) { observer = nullptr; }
 
 void Object::notifyObservers() { observer->update(this, visible); }
+
+
+std::pair<glm::vec3,glm::vec3> Object::getBounds() const {
+
+    glm::mat4 tmat = transformationMatrix;
+    //get 8 transformed corners
+    std::vector<glm::vec4> boundsCorners = {
+        {tmat*glm::vec4{bounds.max.x,bounds.max.y,bounds.max.z,1.0}},
+        {tmat*glm::vec4{bounds.min.x,bounds.min.y,bounds.min.z,1.0}},
+
+        {tmat*glm::vec4{bounds.max.x,bounds.min.y,bounds.min.z,1.0}},
+        {tmat*glm::vec4{bounds.min.x,bounds.max.y,bounds.min.z,1.0}},
+        {tmat*glm::vec4{bounds.min.x,bounds.min.y,bounds.max.z,1.0}},
+
+        {tmat*glm::vec4{bounds.max.x,bounds.min.y,bounds.max.z,1.0}},
+        {tmat*glm::vec4{bounds.min.x,bounds.max.y,bounds.max.z,1.0}},
+        {tmat*glm::vec4{bounds.max.x,bounds.max.y,bounds.min.z,1.0}}
+    };
+    //find max & min
+    glm::vec3 min = glm::vec3{std::numeric_limits<float>::max()};
+    glm::vec3 max = glm::vec3{std::numeric_limits<float>::min()};
+    for(auto& corner : boundsCorners){
+        min.x = std::min(corner.x,min.x);
+        min.y = std::min(corner.y,min.y);
+        min.z = std::min(corner.z,min.z);
+
+        max.x = std::max(corner.x,max.x);
+        max.y = std::max(corner.y,max.y);
+        max.z = std::max(corner.z,max.z);
+    }
+
+    return {min,max};
+}

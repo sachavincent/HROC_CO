@@ -23,19 +23,20 @@ private:
     Scene *scene;
     int lightListIndex = 0;
     int lastlightListIndex = 0;
+    int lastLightCount = -1;
     int objectsListIndex = 0;
     bool newLightWindowActive = false;
-    float nlMult;
-    bool staticmultSet = false;
-    bool smEnabled;
+
+
     int bboxMaxLevel;
     /** Mode of bbox visualisation
     // -1 = none visvible
     // 0 = all visvible
-    // 1 = first level visvible
-    // 1 = second level visvible
+    // 1 = first level visible
+    // 1 = second level visible
     // etc..
     **/
+
     int bboxMode = 0;
     bool objectMode = true;
 

@@ -69,4 +69,7 @@ Plane::Plane(glm::vec2 _size, int _nX, int _nY, const std::string &_name) : Obje
     position = glm::vec3{0.0};
     scale = glm::vec3{1.0};
     rotationMatrix = glm::mat4{1.0};
+    bounds.min = {-_size[0] / 2,-_size[1] / 2, 0.0f};
+	bounds.max = {_size[0] / 2,_size[1] / 2, 0.0f};
+    m.numIndices = m.indices.size();
 }

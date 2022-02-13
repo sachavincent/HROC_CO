@@ -72,10 +72,11 @@ private:
     {
         // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
         std::vector<BvhNode *> effectiveOccluders;
-        std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders);
+        std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
         // TODO: VFC => returns occludeeGroups filtered
-        std::vector<BoundingBox *> occludeeGroups_boundingBoxes; // TODO: BvhNode => BoundingBox
-        std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes);
+        std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
+        // TODO: BvhNode => BoundingBox
+        std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes); // = U
         // TODO: D <- effectiveOccluders
         // TODO: D <- D + success of Early-Z with potentiallyVisibleOccludees (object geometry not Bounding box)
         // TODO: Draw D

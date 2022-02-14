@@ -3,6 +3,8 @@
 
 #include "camera.hpp"
 #include "bvh/boundingbox.hpp"
+#include "bvh/bvhnode.hpp"
+#include <vector>
 
 struct Plan
 {
@@ -48,7 +50,7 @@ public:
 
 
 
-    bool isInFrustum(BoundingBox* bb)
+    bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
         return bb->isOnOrForwardPlan(topFace) 
             && bb->isOnOrForwardPlan(bottomFace)
@@ -59,6 +61,16 @@ public:
 
     };
 
+    std::vector<BvhNode*> ViewFrustumCulling(std::vector<BvhNode*> occludeeGroups) const {
+        std::vector<BvhNode*> occ;
+        for(auto it = occludeeGroups.begin();it != occludeeGroups.end();it++){
+            if(isInFrustum((*it)->getBoundingBox()))
+            {
+                occ.push_back(*it);
+            }
+        }
+        return occ;
+    };
 
 
     Plan topFace;

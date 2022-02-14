@@ -2,7 +2,7 @@
 #include "engine.hpp"
 #include "bvh/boundingBoxObject.hpp"
 #include "utils/jsonparser.hpp"
-
+#include "frustum.hpp"
 
 #include <string>
 #include <map>
@@ -53,6 +53,26 @@ Scene::~Scene()
     Object::flushCaches();
     delete hierarchy;
 }
+
+void Scene::updateBvh()
+{
+    // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
+    std::vector<BvhNode *> effectiveOccluders;
+    std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
+
+    const Frustum* f = getCamera()->getFrustum();
+    const std::vector<BvhNode *> occludeeGroupsfiltered = f->ViewFrustumCulling(occludeeGroups);
+
+    // TODO: VFC => returns occludeeGroups filtered
+    std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
+    // TODO: BvhNode => BoundingBox
+    std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes); // = U
+    // TODO: D <- effectiveOccluders
+    // TODO: D <- D + success of Early-Z with potentiallyVisibleOccludees (object geometry not Bounding box)
+    // TODO: Draw D
+    // TODO: V <- These objects
+}
+
 
 //! Load the scene models on GPU before rendering
 void Scene::load()

@@ -68,20 +68,8 @@ public:
 
 private:
     // Called when camera moves
-    void updateBvh()
-    {
-        // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
-        std::vector<BvhNode *> effectiveOccluders;
-        std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
-        // TODO: VFC => returns occludeeGroups filtered
-        std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
-        // TODO: BvhNode => BoundingBox
-        std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes); // = U
-        // TODO: D <- effectiveOccluders
-        // TODO: D <- D + success of Early-Z with potentiallyVisibleOccludees (object geometry not Bounding box)
-        // TODO: Draw D
-        // TODO: V <- These objects
-    }
+    void updateBvh();
+    
 
     std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);
 };

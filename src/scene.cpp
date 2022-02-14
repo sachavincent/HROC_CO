@@ -175,3 +175,49 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
 }
 
 Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
+
+std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups)
+{
+    Camera *staticCam = engine->getStaticCamera();
+    simpleShader.start();
+    simpleShader.loadMat4("view", staticCam->getViewMatrix());
+    simpleShader.loadMat4("projection", staticCam->getProjectionMatrix());
+
+    unsigned int THRESHOLD = 10; // Min samples
+
+    std::sort(occludeeGroups.begin(), occludeeGroups.end(), [staticCam](BoundingBox *a, BoundingBox *b)
+              { return glm::distance(staticCam->getPosition(), a->getCenter()) < glm::distance(staticCam->getPosition(), b->getCenter()); });
+    
+    std::vector<BoundingBox *> potentiallyVisibleOccludees;
+    const size_t nbQueries = occludeeGroups.size();
+    GLuint *queries = new GLuint[nbQueries];
+    glGenQueries(nbQueries, queries);
+
+    unsigned int i = 0;
+    for (BoundingBox *bb : occludeeGroups)
+    {
+        glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
+        bb->getWireframe()->drawQuery(this);
+        glEndQuery(GL_SAMPLES_PASSED);
+    }
+
+    for (unsigned int j = 0; j < i; j++)
+    {
+        unsigned int nbSamples;
+        GLint available = GL_FALSE;
+        while (available == GL_FALSE)
+            glGetQueryObjectiv(queries[j], GL_QUERY_RESULT_AVAILABLE, &available);
+
+        glGetQueryObjectuiv(queries[j], GL_QUERY_RESULT, &nbSamples);
+        if (nbSamples > THRESHOLD)
+            potentiallyVisibleOccludees.push_back(occludeeGroups[j]);
+    }
+
+    glDeleteQueries(nbQueries, queries);
+
+    delete queries;
+
+    simpleShader.stop();
+
+    return potentiallyVisibleOccludees;
+}

@@ -14,4 +14,5 @@ public:
 
     void drawQuery(Scene *_scene);
 };
+
 #endif

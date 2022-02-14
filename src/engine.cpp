@@ -87,6 +87,12 @@ void Engine::loadScene()
     scene = new Scene(this);
 }
 
+void Engine::loadScene(Scene* _scene)
+{
+    _scene->load();
+    scene = _scene;
+}
+
 void Engine::startLoop()
 {
     while (!glfwWindowShouldClose(window))

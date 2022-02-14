@@ -10,8 +10,8 @@
 #include "object.hpp"
 #include "camera.hpp"
 #include "light.hpp"
-#include "boundingbox.hpp"
-#include "bvhtree.hpp"
+#include "bvh/boundingbox.hpp"
+#include "bvh/bvhtree.hpp"
 
 class Engine;
 
@@ -62,11 +62,11 @@ public:
 
     Shader &getSimpleShader() { return simpleShader; }
 
-private:
     void load();
 
-    void createBoundingBoxes();
+    void createBVH();
 
+private:
     // Called when camera moves
     void updateBvh()
     {

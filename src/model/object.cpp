@@ -233,3 +233,12 @@ std::pair<glm::vec3,glm::vec3> Object::getBounds() const {
 
     return {min,max};
 }
+
+void Object::flushCaches(){
+    Cube::instance_counter = 0;
+    Cube::shared_vao = (unsigned int)0;
+    FileObject::instance_counter = 0;
+    FileObject::path_cache.clear();
+    UVSphere::instance = 0;
+    Plane::instance = 0;
+}

@@ -5,6 +5,7 @@
 #include "scene.hpp"
 #include "light.hpp"
 #include "texture.hpp"
+#include "utils/sceneBuilder.hpp"
 
 #ifndef GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_NONE
@@ -29,8 +30,32 @@ int main(int argc, char *argv[])
     Engine engine(WIDTH, HEIGHT);
 
     // Load scene
+
+   
+    
     //engine.loadScene("testScene.json");
-    engine.loadScene();
+
+    // base scene loaded in main
+    Scene* testScene = SceneBuilder::buildDefaultScene(&engine);
+    engine.loadScene(testScene);
+    testScene->createBVH();
+
+
+    //TODO: following procedure should be automated in gui
+
+    // delete previous -> build a scene -> load in to engine -> generate BVH -> repeat 
+    delete testScene;
+    testScene = SceneBuilder::buildDefaultScene(&engine);
+    engine.loadScene(testScene);
+    testScene->createBVH();
+
+    // do it again...
+    delete testScene;
+    testScene = SceneBuilder::buildDefaultScene(&engine);
+    engine.loadScene(testScene);
+    testScene->createBVH();
+
+
     //  start the render loop
     engine.startLoop();
 

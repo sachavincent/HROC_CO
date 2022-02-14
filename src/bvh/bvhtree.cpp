@@ -1,4 +1,4 @@
-#include "bvhtree.hpp"
+#include "bvh/bvhtree.hpp"
 
 BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs) : BvhTree(objs, new IdGenerator())
 {

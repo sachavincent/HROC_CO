@@ -1,90 +1,15 @@
 #include "scene.hpp"
 #include "engine.hpp"
-#include "boundingBoxObject.hpp"
+#include "bvh/boundingBoxObject.hpp"
 #include "utils/jsonparser.hpp"
 
-#include <random>
+
 #include <string>
 #include <map>
 
 Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
-    auto light0 =
-        std::make_shared<Light>(glm::vec3{-0.2, 0.25, -0.8}, glm::vec3{0.8f});
-    addLight(light0);
-
-    auto sunLight =
-        std::make_shared<Light>(glm::vec3{0, 50, -20}, glm::vec3{0.8f});
-    sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
-    addLight(sunLight);
-
-    //####################### creating models ###########################
-
-    std::random_device device;
-    std::mt19937 gen(device());
-    std::uniform_int_distribution<int> dist(3, 20);
-    std::uniform_int_distribution<int> distScale(1, 2);
-    std::uniform_int_distribution<int> distRot(-180, 180);
-    // enough boxes to get down to 60fps in release
-    for (size_t i = 0; i < 80; i++)
-    {
-        //auto cube = std::make_shared<Cube>(1.0f);
-        //cube->setPosition({dist(gen), dist(gen), dist(gen)})
-        //    .setScale({distScale(gen), distScale(gen), distScale(gen)})
-        //    .setRotation(distRot(gen),glm::vec3{-0.1,0.2,1})
-        //    .setDiffuse({0.0f, 1.0f, 0.0f})
-        //    .setSpecular(glm::vec3{0.8});
-        //addObject(cube);
-
-        auto teapot = std::make_shared<FileObject>("models/teapot.obj", true);
-        teapot->setScale(glm::vec3{0.3f})
-        .setPosition({dist(gen), dist(gen), dist(gen)})
-        .setDiffuse({0.55f, 0.5f, 0.0f});
-        addObject(teapot);
-
-
-    }
-
-    //auto cube0 = std::make_shared<Cube>(1.0f);
-    //cube0->setPosition({1.1f, 0.6f, 0.0f})
-    //    .setDiffuse({0.0f, 1.0f, 0.0f})
-    //    .setSpecular(glm::vec3{0.9});
-    //addObject(cube0);
-//
-    //auto cube1 = std::make_shared<Cube>(1.0f);
-    //cube1->setPosition({-2.5f, 0.6f, 0.5f})
-    //    .setScale({2.0, 1.0, 2.0})
-    //    .setTexDiffuse("textures/tiles/basecolor.jpg")
-    //    .setTexSpecular("textures/tiles/roughness.png");
-    //addObject(cube1);
-//
-    //auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-    //sphere1->setPosition({3.5, 0.7, 3.5})
-    //    .setRotation(90, {1, 0, 0})
-    //    .setDiffuse({1.0, 0.0, 1.0});
-//
-    //addObject(sphere1);
-
-    auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
-    plane1->setRotation(-90, {1, 0, 0})
-        .setTexDiffuse("textures/stoneWall/diffuse.png")
-        .setTexSpecular("textures/stoneWall/roughness.png")
-        .setTexScaling({4, 4});
-    addObject(plane1);
-
-    // gold-ish utah teapot
     
-    auto teapot =
-        std::make_shared<FileObject>("models/teapot.obj", true);
-    teapot->setScale(glm::vec3{0.6f})
-        .setPosition({0.0f, 1.5f, 0.0f})
-        .setDiffuse({0.55f, 0.5f, 0.0f});
-    addObject(teapot);
-
-    // TODO: Default scene
-    load();
-
-    createBoundingBoxes();
 }
 
 Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr)
@@ -108,7 +33,7 @@ Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), expos
 
         load();
 
-        createBoundingBoxes();
+        createBVH();
     }
     catch (const json::exception &e)
     {
@@ -119,11 +44,13 @@ Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), expos
         std::cerr << "Scene file '" << path << "' contains error:\n\t" << e.what() << std::endl;
     }
 }
+
 Scene::~Scene()
 {
     objects.clear();
     lights.clear();
     boundingBoxes.clear();
+    Object::flushCaches();
     delete hierarchy;
 }
 
@@ -140,7 +67,7 @@ void Scene::load()
     simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
 }
 
-void Scene::createBoundingBoxes()
+void Scene::createBVH()
 {
     std::vector<std::shared_ptr<BoundingBox>> bbs;
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();

@@ -1,4 +1,4 @@
-#include "boundingbox.hpp"
+#include "bvh/boundingbox.hpp"
 #include <limits>
 
 glm::mat3 AxisBoundingBox::DEFAULT_TRANSFORM = glm::mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};

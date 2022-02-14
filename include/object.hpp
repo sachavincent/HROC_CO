@@ -148,15 +148,20 @@ public:
     void notifyObservers() override;
 
     virtual bool hasTextures() { return diffuseMap != Texture::DEFAULT_TEXTURE(); }
+    //! before creating a new scene, flush the static caches of objects.
+    static void flushCaches();
 };
 
 //! a simple cube to test shader on
 class Cube : public Object
 {
-    static int instance_counter;//TODO: reset this field in scene destructor
+    friend class Object;
     int instance;
-    static unsigned int shared_vao; //TODO: reset this field in scene destructor 
+    
 
+protected:
+    static int instance_counter;//TODO: reset this field in scene destructor
+    static unsigned int shared_vao; //TODO: reset this field in scene destructor 
 public:
     //! Create a cube of size _edgeSize.
     Cube(float _edgeSize = 1.0f, std::string _name = "");
@@ -167,6 +172,7 @@ public:
 class FileObject : public Object
 {
 private:
+friend class Object;
     static int instance_counter;//TODO: reset this field in scene destructor
     int instance;
     std::string abs_path;
@@ -185,6 +191,7 @@ public:
 
 class UVSphere : public Object
 {
+    friend class Object;
 private:
     static int instance;  //TODO: reset this field in scene destructor 
     void inline pushIndices(int ind_1, int ind_2, int ind_3);
@@ -195,6 +202,7 @@ public:
 
 class Plane : public Object
 {
+    friend class Object;
 private:
     static int instance;  //TODO: reset this field in scene destructor 
 

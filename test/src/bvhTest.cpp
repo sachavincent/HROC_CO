@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "boundingbox.hpp"
-#include "bvhtree.hpp"
+#include "bvh/boundingbox.hpp"
+#include "bvh/bvhtree.hpp"
 #include <stdexcept>
 #include <memory>
 

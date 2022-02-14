@@ -55,6 +55,7 @@ file(GLOB VENDORS_SOURCES external/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS include/*.hpp)
 file(GLOB PROJECT_SOURCES src/*.cpp
                           src/model/*.cpp
+                          src/bvh/*.cpp
                           external/imgui/*.cpp
                           external/imgui/backends/*opengl3.cpp
                           external/imgui/backends/*glfw.cpp

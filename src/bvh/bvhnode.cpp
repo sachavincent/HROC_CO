@@ -1,6 +1,6 @@
-#include "bvhnode.hpp"
-#include "boundingbox.hpp"
-#include "boundingBoxObject.hpp"
+#include "bvh/bvhnode.hpp"
+#include "bvh/boundingbox.hpp"
+#include "bvh/boundingBoxObject.hpp"
 
 BvhNode::BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id)
     : boundingBox(_boundingBox), leftChild(nullptr), rightChild(nullptr), parent(nullptr), id(_id), tag(Visibility::null)

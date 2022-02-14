@@ -1,5 +1,6 @@
 #include "bvh/boundingbox.hpp"
 #include <limits>
+#include "frustum.hpp"
 
 glm::mat3 AxisBoundingBox::DEFAULT_TRANSFORM = glm::mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};
 
@@ -9,6 +10,18 @@ float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<Bou
     glm::vec3 centerB = _B.get()->getCenter();
     return glm::distance(centerA, centerB);
 }
+
+
+bool BoundingBox::isOnOrForwardPlan(const Plan& plan) const 
+{
+    // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+    const float r = size.x * std::abs(plan.normal.x) +
+            size.y * std::abs(plan.normal.y) + size.z * std::abs(plan.normal.z);
+
+    return -r <= plan.getSignedDistanceToPlan(center);
+}
+
+
 
 OrientedBoundingBox::OrientedBoundingBox(const Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
 {

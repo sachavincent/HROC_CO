@@ -2,6 +2,7 @@
 #define FRUSTUM_H
 
 #include "camera.hpp"
+#include "bvh/boundingbox.hpp"
 
 struct Plan
 {
@@ -43,6 +44,22 @@ public:
         bottomFace = {camera.getPosition(),
                       glm::cross(frontMultFar + camera.getUpVector() * halfVSide, camera.getRightVector())};
     }
+
+
+
+
+    bool isInFrustum(BoundingBox* bb)
+    {
+        return bb->isOnOrForwardPlan(topFace) 
+            && bb->isOnOrForwardPlan(bottomFace)
+            && bb->isOnOrForwardPlan(rightFace)
+            && bb->isOnOrForwardPlan(leftFace)
+            && bb->isOnOrForwardPlan(farFace)
+            && bb->isOnOrForwardPlan(nearFace);
+
+    };
+
+
 
     Plan topFace;
     Plan bottomFace;

@@ -29,9 +29,11 @@ SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 file(GLOB TEST_SOURCES  src/*.cpp)
 
+file(GLOB APP_HEADERS   ${PROJECT_SOURCE_DIR}/include/frustum.hpp)
 file(GLOB APP_SOURCES   ${PROJECT_SOURCE_DIR}/src/bvh/bvhtree.cpp
                         ${PROJECT_SOURCE_DIR}/src/bvh/bvhnode.cpp
                         ${PROJECT_SOURCE_DIR}/src/bvh/boundingbox.cpp
+                        ${PROJECT_SOURCE_DIR}/src/camera.cpp
                         ${PROJECT_SOURCE_DIR}/src/model/*.cpp
                         ${PROJECT_SOURCE_DIR}/src/texture.cpp
                         ${PROJECT_SOURCE_DIR}/src/shader.cpp

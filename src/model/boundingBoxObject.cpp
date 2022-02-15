@@ -28,7 +28,7 @@ void BoundingBoxObject::drawQuery(Scene *_scene)
 	glBindVertexArray(m.vao);
 
 	Shader &sh = _scene->getSimpleShader();
-	sh.loadMat4("model", transformationMatrix);
+	sh.loadMat4("model", position*rotation*scale);
 	
 	glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
 

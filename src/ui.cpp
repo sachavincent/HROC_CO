@@ -3,8 +3,8 @@
 #include "scene.hpp"
 
 #include <memory>
-#include <type_traits>
 #include <mutex>
+#include <type_traits>
 #include <utility>
 
 Ui::Ui() {}
@@ -27,7 +27,10 @@ void Ui::render(Scene *_scene)
     ImGui::NewFrame();
 
     ImGui::Begin("Scene parameters");
-
+    static float camspeed = scene->getCamera()->getMoveSpeed();
+    ImGui::DragFloat("camera movement speed", &camspeed, 0.1, 0.1, 40.0);
+    scene->getCamera()->setMoveSpeed(camspeed);
+    
     float exposure = scene->getExposure();
     ImGui::DragFloat("exposure", &exposure, 0.01, 0.01, 10.0);
     scene->setExposure(exposure);
@@ -64,8 +67,7 @@ void Ui::render(Scene *_scene)
 
     lightsParams();
     objectsParams();
-    if (newLightWindowActive)
-        newLightWindow();
+    if (newLightWindowActive) newLightWindow();
 
     ImGui::End();
 
@@ -106,11 +108,14 @@ void Ui::lightsParams()
         static std::vector<float> staticmult(100, 1.0f);
         static std::vector<glm::vec3> difColor(100, glm::vec3{1.0f});
         static std::once_flag flag1;
-        std::call_once(flag1, [&]()
+        std::call_once(flag1,
+                       [&]()
                        {
-            for(size_t i = 0; i<lights.size(); i++){
-                difColor[i] = lights[i]->getColor();
-            } });
+                           for (size_t i = 0; i < lights.size(); i++)
+                           {
+                               difColor[i] = lights[i]->getColor();
+                           }
+                       });
 
         ImGui::DragFloat("Color Multiplier", &staticmult[lightListIndex], 0.5, 0.1, 100.0);
         ImGui::ColorEdit3("Color", &difColor[lightListIndex][0]);
@@ -151,10 +156,10 @@ void Ui::objectsParams()
         const char *items[200];
         auto &objects = scene->getObjects();
         std::vector<std::string> objectsNames;
-        for (auto &mo : objects)
-            objectsNames.push_back(mo->getName());
+        for (int i = 0; i < 200; i++)
+            objectsNames.push_back(objects[i]->getName());
 
-        for (int i = 0; i < objectsNames.size(); i++)
+        for (int i = 0; i < 200; i++)
         {
             items[i] = objectsNames[i].c_str();
         }
@@ -211,7 +216,7 @@ void Ui::newLightWindow()
 
     if (ImGui::Button("Add"))
     {
-        auto pl = std::make_shared<Light>(nlPos, nlColor * mult,attn);
+        auto pl = std::make_shared<Light>(nlPos, nlColor * mult, attn);
         mult = 1.0;
         scene->addLight(pl);
         newLightWindowActive = false;

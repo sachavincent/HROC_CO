@@ -25,6 +25,7 @@ private:
 	int height;
 
 	glm::vec3 movingFactor;
+	float moveSpeed;
 	glm::vec3 position;
 	float yaw;
 	float pitch;
@@ -56,6 +57,14 @@ public:
 
 	~Camera()
 	{
+	}
+
+	inline void setMoveSpeed(float _speed){
+		moveSpeed = _speed;
+	}
+
+	inline float getMoveSpeed(){
+		return moveSpeed;
 	}
 
 	//! Get current camera position

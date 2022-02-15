@@ -8,7 +8,8 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	front = glm::vec3(0.0f, 0.0f, 1.0f);
 	up = glm::vec3(0.0f, 1.0f, 0.0f);
 	nearDistance = 1.0f;
-	farDistance = 200.0f;
+	farDistance = 1500.0f;
+	moveSpeed = 1.0;
 
 	setResolution(_width, _height);
 
@@ -99,9 +100,9 @@ void Camera::setResolution(int w, int h)
 
 void Camera::move(const float delta)
 {
-	position += movingFactor.x * delta * glm::normalize(glm::cross(front, up));
-	position += movingFactor.y * delta * glm::normalize(up);
-	position += movingFactor.z * delta * front;
+	position += movingFactor.x * moveSpeed* delta * glm::normalize(glm::cross(front, up));
+	position += movingFactor.y * moveSpeed* delta * glm::normalize(up);
+	position += movingFactor.z * moveSpeed* delta * front;
 }
 
 void Camera::setCameraInfo(CameraInfo _cameraInfo)

@@ -19,7 +19,7 @@
 #include "light.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
-#include "observable.hpp"
+#include "bvh/observable.hpp"
 
 class Scene;
 class BoundingBox;
@@ -44,11 +44,10 @@ protected:
 
     glm::vec2 texScaling = {1, 1};
 
-    glm::vec3 scale;
-    glm::vec3 position;
-    glm::mat4 rotationMatrix;
+    glm::mat4 scale = glm::mat4{1.0};
+    glm::mat4 position = glm::mat4{1.0};
+    glm::mat4 rotation = glm::mat4{1.0};
 
-    glm::mat4 transformationMatrix = glm::mat4(1.0);
     bool loaded = false;
 
     // HROC
@@ -70,18 +69,6 @@ protected:
 
     OBJECT_DATA m;
 
-    void updateTransformationMatrix()
-    {
-        if (loaded)
-            return;
-
-        glm::mat4 _scale(1.0);
-        _scale = glm::scale(_scale, scale);
-
-        glm::mat4 _translate = glm::mat4{1.0};
-        _translate = glm::translate(_translate, position);
-        transformationMatrix = _translate * rotationMatrix * _scale;
-    }
 protected:
     // LOCAL object maximum and minimum bounds without transformation
     struct OBJECT_BOUNDS{
@@ -92,7 +79,7 @@ protected:
 
 public:
     Object(std::string _name = "Object")
-        : name(_name), boundingBox(nullptr), scale(1.0), position(0.0), rotationMatrix(1.0)
+        : name(_name), boundingBox(nullptr)
     {
         id = id_counter++;
         observer = nullptr;
@@ -126,21 +113,18 @@ public:
     inline std::shared_ptr<BoundingBox> getBoundingBox() { return boundingBox; }
     inline std::string getName() const { return name; }
 
-    inline const glm::vec3 &getPosition() const { return position; }
-    inline const glm::vec3 &getScale() const { return scale; }
-
-    inline const glm::mat4 &getRotationMatrix() const { return rotationMatrix; }
-
-    inline const glm::mat4 &getTransformationMatrix() const { return transformationMatrix; }
+    inline const glm::vec3 getPosition() const { return glm::vec3(position[3]); }
+    inline const glm::vec3 getScale() const { return glm::vec3(scale[0][0], scale[1][1], scale[2][2]); }
+    inline const glm::mat4 getRotation() const { return glm::mat4(rotation); }
 
     //const std::vector<GLfloat> &getVertices() const { return m.vertices; }
     //! Returns the maximum and minimum bounds after transformation
     std::pair<glm::vec3,glm::vec3> getBounds() const;
-    const glm::vec3 &getDiffuse() const { return diffuseColor; }
-    const glm::vec3 &getSpecular() const { return specularColor; }
+    const glm::vec3 getDiffuse() const { return diffuseColor; }
+    const glm::vec3 getSpecular() const { return specularColor; }
     float getShininess() const { return shininess; }
 
-    const glm::vec2 &getTexScaling() const { return texScaling; }
+    const glm::vec2 getTexScaling() const { return texScaling; }
 
 
     void registerObserver(Observer &o) override;
@@ -168,7 +152,7 @@ public:
     virtual void load();
 };
 
-//! A object loaded from a file, it can contain multiple subobjects inside it.
+//! A object loaded from a file, only one object per .obj.
 class FileObject : public Object
 {
 private:
@@ -186,7 +170,26 @@ public:
     FileObject(std::string _path, bool _smoothNormals, std::string _name = "");
     virtual void load();
 
-    bool hasTextures() { return false; }
+    bool hasTextures() { return diffuseMapPath != ""; }
+};
+
+//! Load an assimp mesh as an object
+class AssimpMeshObject : public Object
+{
+private:
+friend class Object;
+    static int instance_counter;//TODO: reset this field in scene destructor
+    int instance;
+
+    using Object::setPosition;// AssimpMeshObject cannot be transformed
+    using Object::setScale;
+    using Object::setRotation;
+    using Object::setRotationMatrix;
+ 
+public:
+    AssimpMeshObject(const aiScene *_scene, aiMesh *_mesh, std::string _name = "");
+
+    bool hasTextures() { return diffuseMapPath != ""; }
 };
 
 class UVSphere : public Object

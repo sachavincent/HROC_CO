@@ -51,6 +51,7 @@ Scene::~Scene()
     lights.clear();
     boundingBoxes.clear();
     Object::flushCaches();
+    
     delete hierarchy;
 }
 

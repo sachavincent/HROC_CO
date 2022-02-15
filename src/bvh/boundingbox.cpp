@@ -32,8 +32,8 @@ BoundingBox::BoundingBox(const Object &_o)
     glm::vec3 minPos = _o.getBounds().first;
     glm::vec3 maxPos = _o.getBounds().second;
 
-    center = _o.getPosition();
-    size = maxPos - minPos;
+    center =  _o.getPosition();
+    size = ((maxPos-minPos));
 
     if (size[0] < 0 || size[1] < 0 || size[2] < 0){
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));

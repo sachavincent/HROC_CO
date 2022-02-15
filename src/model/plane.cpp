@@ -37,13 +37,10 @@ Plane::Plane(glm::vec2 _size, int _nX, int _nY, const std::string &_name) : Obje
                                                     -_size[1] / 2 + j * (stepY),
                                                     0.0f,
                                                 });
-            m.normals.insert(m.normals.end(), {0.0f, 0.0f, 1.0f,
-                                               0.0f, 0.0f, 1.0f,
-                                               0.0f, 0.0f, 1.0f,
+            m.normals.insert(m.normals.end(),
+                             {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 
-                                               0.0f, 0.0f, 1.0f,
-                                               0.0f, 0.0f, 1.0f,
-                                               0.0f, 0.0f, 1.0f});
+                              0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f});
 
             m.textureCoord.insert(m.textureCoord.end(), {
                                                             i * (stepX) / _size[0],
@@ -61,15 +58,11 @@ Plane::Plane(glm::vec2 _size, int _nX, int _nY, const std::string &_name) : Obje
                                                             j * (stepY) / _size[1],
                                                         });
 
-            m.indices.insert(m.indices.end(), {idx, idx + 2, idx + 1,
-                                               idx + 3, idx + 5, idx + 4});
+            m.indices.insert(m.indices.end(), {idx, idx + 2, idx + 1, idx + 3, idx + 5, idx + 4});
             idx += 6;
         }
     }
-    position = glm::vec3{0.0};
-    scale = glm::vec3{1.0};
-    rotationMatrix = glm::mat4{1.0};
-    bounds.min = {-_size[0] / 2,-_size[1] / 2, 0.0f};
-	bounds.max = {_size[0] / 2,_size[1] / 2, 0.0f};
+    bounds.min = {-_size[0] / 2, -_size[1] / 2, 0.0f};
+    bounds.max = {_size[0] / 2, _size[1] / 2, 0.0f};
     m.numIndices = m.indices.size();
 }

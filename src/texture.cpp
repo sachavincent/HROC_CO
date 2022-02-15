@@ -1,22 +1,23 @@
 #include "texture.hpp"
 
-std::map<std::string, int> Texture::cache = {};
+std::map<std::string, int> Texture::cache;
 
 Texture::Texture(const std::string &file)
 {
 #ifndef HROC_TESTS
-    std::string path = "" + file;
+    std::string path = Utils::workingDirectory() + file;
 
     // load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (Texture::cache.find(path) == Texture::cache.end())
     {
-        path = Utils::workingDirectory() + path;
+        //path = Utils::workingDirectory() + path;
         glGenTextures(1, &_id);
         Texture::cache[path] = _id;
     }
     else
     {
         _id = Texture::cache.find(path)->second;
+        return;
     }
 
     int width, height, nrComponents;
@@ -26,7 +27,6 @@ Texture::Texture(const std::string &file)
         std::cerr << "Cannot load file image: " << path.c_str() << ", STB Reason: " << stbi_failure_reason() << std::endl;
         return;
     }
-
     size_t numPixels = width * height * nrComponents;
 
     std::vector<float> dataf;

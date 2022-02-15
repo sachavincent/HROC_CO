@@ -17,7 +17,6 @@ bool BoundingBox::isOnOrForwardPlan(const Plan& plan) const
     // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
     const float r = size.x * std::abs(plan.normal.x) +
             size.y * std::abs(plan.normal.y) + size.z * std::abs(plan.normal.z);
-
     return -r <= plan.getSignedDistanceToPlan(center);
 }
 

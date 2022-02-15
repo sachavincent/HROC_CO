@@ -11,7 +11,7 @@
 
 #include "boundingBoxObject.hpp"
 
-class Plan;
+struct Plan;
 
 class BoundingBox
 {

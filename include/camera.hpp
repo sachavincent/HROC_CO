@@ -109,10 +109,10 @@ public:
 	}
 
 	//! Get camera viewport width (in px)
-	int getResWidth() { return width; };
+	int getResWidth() const { return width; };
 
 	//! Get camera viewport height (in px)
-	int getResHeight() { return height; };
+	int getResHeight() const { return height; };
 
 	//! Offset the pitch of camera with a sensitivity factor
 	float offsetPitch(float _offset, float _sensitivity);

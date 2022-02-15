@@ -28,6 +28,7 @@ void Camera::updateDirection()
 
 	right = glm::normalize(glm::cross(front, {0, 1, 0}));
 	up = glm::normalize(glm::cross(right, front));
+
 }
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
@@ -103,6 +104,7 @@ void Camera::move(const float delta)
 	position += movingFactor.x * moveSpeed* delta * glm::normalize(glm::cross(front, up));
 	position += movingFactor.y * moveSpeed* delta * glm::normalize(up);
 	position += movingFactor.z * moveSpeed* delta * front;
+	frustum->update(this);
 }
 
 void Camera::setCameraInfo(CameraInfo _cameraInfo)

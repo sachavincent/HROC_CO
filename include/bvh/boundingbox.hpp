@@ -11,9 +11,11 @@
 
 #include "boundingBoxObject.hpp"
 
+struct Plan;
+
 class BoundingBox
 {
-private:
+protected:
     glm::vec3 size;
     glm::vec3 center;
     std::shared_ptr<BoundingBoxObject> wireframe;
@@ -36,6 +38,8 @@ public:
     inline const glm::vec3 &getCenter() const { return center; }
 
     virtual BoundingBox *merge(BoundingBox *_A) = 0;
+    virtual bool isOnOrForwardPlan(const Plan& plan) const;
+
 
     static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 

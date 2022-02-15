@@ -13,7 +13,7 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 
 	setResolution(_width, _height);
 
-	frustum = new Frustum();
+	frustum = new Frustum(this);
 }
 
 // direction

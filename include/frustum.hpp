@@ -27,6 +27,7 @@ struct Frustum
 {
 public:
     Frustum() {}
+    Frustum(Camera* camera) {update(camera);}
 
     void update(Camera* camera)
     {

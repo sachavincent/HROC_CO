@@ -39,8 +39,7 @@ public:
 
         nearFace = Plan::Plan(camera->getPosition() + camera->getNearDistance() * camera->getDirection(),
                             camera->getDirection());
-        farFace = Plan::Plan(camera->getPosition() + camera->getFarDistance() * camera->getDirection(),
-                            -camera->getDirection());
+        farFace = Plan::Plan(camera->getPosition() + frontMultFar, -camera->getDirection());
         rightFace = Plan::Plan(camera->getPosition() ,
                            glm::cross(camera->getUpVector(), frontMultFar + camera->getRightVector() * halfHSide));
         leftFace = Plan::Plan(camera->getPosition() ,

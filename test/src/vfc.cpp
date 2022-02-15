@@ -57,9 +57,6 @@ TEST_F(VfcTest, Vfc_Case_1)
 
     const Frustum* frustum =  camera.getFrustum();
 
-    Plan plan(glm::vec3(0,3,0),glm::vec3(0,1,0));
-    bb1->isOnOrForwardPlan(plan);
-
     EXPECT_EQ(frustum->isInFrustum(bb1),true);
     EXPECT_EQ(frustum->isInFrustum(bb2),false);
     EXPECT_EQ(frustum->isInFrustum(bb3),false);
@@ -94,20 +91,17 @@ TEST_F(VfcTest, Vfc_Case_2)
     printf(glm::to_string(frustum->topFace.normal).c_str());
 
     Plan plan1(glm::vec3(0,3,0),glm::vec3(0,1,0));
-    Plan plan2(glm::vec3(100,0,0),glm::vec3(1,0,0));
+    Plan plan2(glm::vec3(80,0,0),glm::vec3(1,0,0));
 
 
-    //BB1 in (0,0,5) plan in (0,3,0) with normal (0,1,0) expect no collision 
+    //BB1 in (0,0,5) plan in (0,3,0) with normal (0,1,0)   
     EXPECT_EQ(bb1->isOnOrForwardPlan(plan1),false);
 
-    //BB2 in (100,0,0) plan in (100,0,0) with any normal expect collision 
-    plan2.normal = glm::vec3(0,1,1);
-    EXPECT_EQ(bb2->isOnOrForwardPlan(plan2),true);
-    plan2.normal = glm::vec3(1,1,1);
+    //BB2 in (100,0,0) plan in (100,0,0) with any normal  
+    plan2.normal = glm::vec3(1,0,0);
     EXPECT_EQ(bb2->isOnOrForwardPlan(plan2),true);
     plan2.normal = glm::vec3(0,1,0);
-    EXPECT_EQ(bb2->isOnOrForwardPlan(plan2),true);
-
-
-
+    EXPECT_EQ(bb2->isOnOrForwardPlan(plan2),false);
+    plan2.normal = glm::vec3(0,0,1);
+    EXPECT_EQ(bb2->isOnOrForwardPlan(plan2),false);
 }

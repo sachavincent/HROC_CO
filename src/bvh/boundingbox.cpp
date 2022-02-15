@@ -15,8 +15,9 @@ float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<Bou
 bool BoundingBox::isOnOrForwardPlan(const Plan& plan) const 
 {
     // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-    const float r = size.x * std::abs(plan.normal.x) +
-            size.y * std::abs(plan.normal.y) + size.z * std::abs(plan.normal.z);
+    glm::vec3 extends = size /2.0f;
+    const float r = extends.x / 2.0f * std::abs(plan.normal.x) +
+            extends.y * std::abs(plan.normal.y) + extends.z * std::abs(plan.normal.z);
     return -r <= plan.getSignedDistanceToPlan(center);
 }
 

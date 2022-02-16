@@ -57,21 +57,72 @@ Scene::~Scene()
 
 void Scene::updateBvh()
 {
-    // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
+    /*
+    * 1 - Occlusion Map Rendering
+    * in V indices of previously drawn objects  
+    * Using previous drawn objects indices V  to find effective occluders and give their indices O
+    * Start frame use V with indices of all objects 
+    * => Early-Z to get indices O of on-screen objects using bounding box of nodes rendering
+    * => Store OM (Depth map used later) 
+    * return list of indices of effectives occluders O
+    */
+    
     std::vector<BvhNode *> effectiveOccluders;
-    std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
+    // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
+    // TODO store depth map 
+
+   
+    /*
+    * 2 - Extraction of Occludee Groups
+    * in O indices of effectives occluders 
+    * Using previously found effectives occluders (O) to update BVHnodes visibility
+    * and collect occluders of unknow visibility to add them in G (potential occluders) 
+    * => Traverse the BVH for each occluders using ExtractOccludees from BVH
+    * Then perform View Frustum Culling on potential occludees G 
+    * return indices of culled potentential occludees G 
+    */
+
+
+    std::vector<BvhNode *> potentialOccluders = hierarchy->extractOccludees(effectiveOccluders); // = G
 
     const Frustum *f = getCamera()->getFrustum();
-    const std::vector<BvhNode *> occludeeGroupsfiltered = f->ViewFrustumCulling(occludeeGroups);
+    const std::vector<BvhNode *> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
 
-    // TODO: VFC => returns occludeeGroups filtered
-    std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
-    // TODO: BvhNode => BoundingBox
-    std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes); // = U
-    // TODO: D <- effectiveOccluders
-    // TODO: D <- D + success of Early-Z with potentiallyVisibleOccludees (object geometry not Bounding box)
-    // TODO: Draw D
-    // TODO: V <- These objects
+
+    /*
+    * 3 - Batch Occlusion Test (Paper Original)
+    * in OM occlusion map 
+    * Using the previously calculated occlusion map OM to start conservatives rays (from fragments) testing intersection with
+    * bvhTree.
+    * Explore bvh by starting from "leafest" (closest from leaf) node trigerring early-Z to add intersecting 
+    * objects to potentially visibles occludees U to be drawn.
+    * return indices of potential visible occludees U
+    */
+
+    // TODO Raycast with aabb on GPU to extract U
+
+
+    /*
+    * 3 - Batch Occlusion Test (Our Implementation) 
+    *
+    * return indices of potential visible occludees U
+    */
+    //TODO extract list of boundig boxes from G to initialize occludeeGroups_boundingBoxes
+    std::vector<BoundingBox*> occludeeGroups_boundingBoxes;
+    std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes);
+
+
+    /*
+    * 4 - Occludee Rendering
+    * Make a new pass of early-Z on U and add passing objects to drawn objects D and draw them.
+    * Merge D with potential occluders O to initialize V for the next frame. 
+    */
+    //TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
+    std::vector<Object *> drawnObjects;
+
+    renderObjects(drawnObjects);
+    //TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V 
+    
 }
 
 //! Load the scene models on GPU before rendering
@@ -147,6 +198,92 @@ void Scene::renderObjects()
             objects[i]->draw(sh);
         }
     }
+
+    // unload shader
+    sh.stop();
+}
+
+//! Render all objects of given vector
+void Scene::renderObjects(std::vector<Object*>& vector)
+{
+    // set shaders params
+    sh.start();
+
+    sh.loadMat4("view", getCamera()->getViewMatrix());
+    sh.loadMat4("projection", getCamera()->getProjectionMatrix());
+    sh.loadFloat("exposure", exposure);
+    sh.loadVec3("viewPos", getCamera()->getPosition());
+    // depth parameter only for bboxes
+    sh.loadInt("numBB", -1);
+
+    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
+    {
+        sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
+
+        sh.loadVec3("lights[" + std::to_string(i) + "].position",
+                    lights[i]->getPosition());
+
+        sh.loadVec3("lights[" + std::to_string(i) + "].color",
+                    lights[i]->getColor());
+        sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
+                    lights[i]->getAttenuation());
+    }
+    if (lights.size() < MAXLIGHTS)
+    {
+        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
+        {
+            sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
+        }
+    }
+
+    // draw objects if gui enables it
+    if (engine->getUi().getObjectsVisMode())
+    {
+        for (size_t i = 0; i < objects.size(); i++)
+        {
+            vector[i]->draw(sh);
+        }
+    }
+
+    // unload shader
+    sh.stop();
+}
+
+//!Render one object 
+void Scene::renderObject(Object& obj) 
+{
+// set shaders params
+    sh.start();
+
+    sh.loadMat4("view", getCamera()->getViewMatrix());
+    sh.loadMat4("projection", getCamera()->getProjectionMatrix());
+    sh.loadFloat("exposure", exposure);
+    sh.loadVec3("viewPos", getCamera()->getPosition());
+    // depth parameter only for bboxes
+    sh.loadInt("numBB", -1);
+
+    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
+    {
+        sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
+
+        sh.loadVec3("lights[" + std::to_string(i) + "].position",
+                    lights[i]->getPosition());
+
+        sh.loadVec3("lights[" + std::to_string(i) + "].color",
+                    lights[i]->getColor());
+        sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
+                    lights[i]->getAttenuation());
+    }
+    if (lights.size() < MAXLIGHTS)
+    {
+        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
+        {
+            sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
+        }
+    }
+
+    
+    obj.draw(sh);
 
     // unload shader
     sh.stop();

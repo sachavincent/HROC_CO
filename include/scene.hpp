@@ -39,6 +39,11 @@ public:
     ~Scene();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
+    //!render one object with standard shader (i.e. Phong)
+    void Scene::renderObject(Object& obj);
+    //! Render all objects of given vector with standard shader (i.e. Phong)
+    void Scene::renderObjects(std::vector<Object*>& vector);
+
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
 

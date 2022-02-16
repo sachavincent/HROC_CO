@@ -22,6 +22,7 @@ private:
     std::vector<std::shared_ptr<Light>> lights;
     Shader sh;
     Shader simpleShader;
+    Shader earlyZShader;
     Engine *engine;
 
     float exposure;
@@ -38,6 +39,11 @@ public:
     ~Scene();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
+    //!render one object with standard shader (i.e. Phong)
+    void Scene::renderObject(Object& obj);
+    //! Render all objects of given vector with standard shader (i.e. Phong)
+    void Scene::renderObjects(std::vector<Object*>& vector);
+
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
 
@@ -58,9 +64,7 @@ public:
 
     inline std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
-    Shader &getShader() { return sh; }
-
-    Shader &getSimpleShader() { return simpleShader; }
+    //Shader &getShader() { return sh; }
 
     void load();
 
@@ -70,6 +74,7 @@ private:
     // Called when camera moves
     void updateBvh();
     
+    void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
 
     std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);
 };

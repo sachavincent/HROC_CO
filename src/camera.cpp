@@ -1,6 +1,10 @@
 #include "camera.hpp"
 #include "frustum.hpp"
 
+#include "bvh/boundingBoxObject.hpp"
+#include "scene.hpp"
+
+
 Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width(_width), height(_height), position(_position), fov(_fov), movingFactor({0, 0, 0})
 {
 	yaw = 90.0;
@@ -13,7 +17,7 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 
 	setResolution(_width, _height);
 
-	frustum = new Frustum();
+	frustum = new Frustum(this);
 }
 
 // direction
@@ -28,8 +32,11 @@ void Camera::updateDirection()
 
 	right = glm::normalize(glm::cross(front, {0, 1, 0}));
 	up = glm::normalize(glm::cross(right, front));
-
+	
+	frustum->update(this);
 }
+
+
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
 {
@@ -104,6 +111,7 @@ void Camera::move(const float delta)
 	position += movingFactor.x * moveSpeed* delta * glm::normalize(glm::cross(front, up));
 	position += movingFactor.y * moveSpeed* delta * glm::normalize(up);
 	position += movingFactor.z * moveSpeed* delta * front;
+	
 	frustum->update(this);
 }
 

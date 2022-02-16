@@ -31,7 +31,7 @@ private:
 public:
 	unsigned int ID;
 	Shader() {}
-	Shader(std::string computePath);
+	Shader(std::string _path, int _type);
 	Shader(std::string vertexPath, std::string fragmentPath);
 
 	void start();

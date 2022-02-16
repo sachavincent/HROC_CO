@@ -20,13 +20,43 @@ const char *Shader::loadShader(std::string path)
 	}
 	strcpy(cstr, str.c_str());
 	file.close();
-	
+
 	return cstr;
 }
 
-Shader::Shader(std::string computePath)
+Shader::Shader(std::string _path, int _type)
 {
-	// TODO
+	assert(_type == GL_VERTEX_SHADER || _type == GL_COMPUTE_SHADER);
+
+	std::pair<std::string, std::string> paths = {_path, ""};
+	auto it = buffer.find(paths);
+	if (it != buffer.end())
+	{
+		ID = it->second;
+		std::cout << it->second << std::endl;
+		return;
+	}
+
+	const char *source = Shader::loadShader(_path);
+	// shader creation and compilation
+	unsigned int shader;
+	shader = glCreateShader(_type);
+	glShaderSource(shader, 1, &source, NULL);
+	glCompileShader(shader);
+
+	// shader program creation
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, shader);
+	glLinkProgram(shaderProgram);
+	// shader program creation
+	glUseProgram(shaderProgram);
+
+	// temp shader deletion
+	glDeleteShader(shader);
+
+	ID = shaderProgram;
+	buffer[paths] = ID;
 }
 
 Shader::Shader(std::string vertexPath, std::string fragmentPath)

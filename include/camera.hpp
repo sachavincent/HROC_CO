@@ -17,6 +17,7 @@ struct CameraInfo
 };
 
 struct Frustum;
+class Scene;
 //!  A perspective camera with parameters that can be updated, outputs a view matrix
 class Camera
 {
@@ -144,6 +145,9 @@ public:
 	inline const Frustum *getFrustum() const { return frustum; }
 
 	void setCameraInfo(CameraInfo _cameraInfo);
+
+
+
 };
 
 #endif

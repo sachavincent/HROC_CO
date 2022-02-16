@@ -92,7 +92,7 @@ public:
     virtual void load();
 
     //! Render the object on screen.
-    void draw(Scene *_scene);
+    void draw(Shader &_shader);
 
     Object &setPosition(const glm::vec3 &_pos);
     Object &setScale(const glm::vec3 &_scale);

@@ -14,12 +14,14 @@ Object::~Object()
     glDeleteBuffers(1, &m.vbo);
     glDeleteBuffers(1, &m.nbo);
     glDeleteBuffers(1, &m.ebo);
-    if (!m.textureCoord.empty()) glDeleteBuffers(1, &m.tbo);
+    if (!m.textureCoord.empty())
+        glDeleteBuffers(1, &m.tbo);
     glDeleteVertexArrays(1, &m.vao);
 #endif
     observer = nullptr;
 
-    if (boundingBox) boundingBox.reset();
+    if (boundingBox)
+        boundingBox.reset();
 }
 
 void Object::load()
@@ -30,7 +32,8 @@ void Object::load()
         // gen geometry buffers
         glGenBuffers(1, &m.vbo);
         glGenBuffers(1, &m.nbo);
-        if (!m.textureCoord.empty()) glGenBuffers(1, &m.tbo);
+        if (!m.textureCoord.empty())
+            glGenBuffers(1, &m.tbo);
         glGenBuffers(1, &m.ebo);
         glGenVertexArrays(1, &m.vao);
         // std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
@@ -87,12 +90,12 @@ void Object::load()
 #endif
 }
 
-void Object::draw(Scene *_scene)
+void Object::draw(Shader &sh)
 {
-    if (!loaded) return;
-    Shader &sh = _scene->getShader();
+    if (!loaded)
+        return;
 
-    sh.loadMat4("model", position*rotation*scale);
+    sh.loadMat4("model", position * rotation * scale);
     sh.loadVec2("texScaling", texScaling);
     sh.loadFloat("material.specularStrength", 0.5f);
     sh.loadFloat("material.shininess", shininess);
@@ -134,7 +137,7 @@ void Object::draw(Scene *_scene)
 Object &Object::setScale(const glm::vec3 &_scale)
 {
     scale = glm::mat4{1.0};
-    scale = glm::scale(scale,_scale);
+    scale = glm::scale(scale, _scale);
     return *this;
 }
 
@@ -154,7 +157,7 @@ Object &Object::setRotationMatrix(const glm::mat4 &_rotationMatrix)
 Object &Object::setPosition(const glm::vec3 &_pos)
 {
     position = glm::mat4{1.0};
-    position = glm::translate(position,_pos);
+    position = glm::translate(position, _pos);
     return *this;
 }
 
@@ -203,7 +206,7 @@ void Object::notifyObservers() { observer->update(this, visible); }
 std::pair<glm::vec3, glm::vec3> Object::getBounds() const
 {
 
-    glm::mat4 tmat = rotation*scale;
+    glm::mat4 tmat = rotation * scale;
     // get 8 transformed corners
     std::vector<glm::vec4> boundsCorners = {
         {tmat * glm::vec4{bounds.max.x, bounds.max.y, bounds.max.z, 1.0}},

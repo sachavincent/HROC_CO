@@ -22,6 +22,7 @@ private:
     std::vector<std::shared_ptr<Light>> lights;
     Shader sh;
     Shader simpleShader;
+    Shader earlyZShader;
     Engine *engine;
 
     float exposure;
@@ -58,9 +59,7 @@ public:
 
     inline std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
-    Shader &getShader() { return sh; }
-
-    Shader &getSimpleShader() { return simpleShader; }
+    //Shader &getShader() { return sh; }
 
     void load();
 
@@ -70,6 +69,7 @@ private:
     // Called when camera moves
     void updateBvh();
     
+    void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
 
     std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);
 };

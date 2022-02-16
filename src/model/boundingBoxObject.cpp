@@ -11,25 +11,24 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_
 	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 }
 
-void BoundingBoxObject::draw(Scene *_scene, int _num)
+void BoundingBoxObject::draw(Shader &_shader, int _num)
 {
 	if (!loaded)
 		return;
 
-	_scene->getShader().loadInt("numBB", _num);
-	Cube::draw(_scene);
+	_shader.loadInt("numBB", _num);
+	Cube::draw(_shader);
 }
 
-void BoundingBoxObject::drawQuery(Scene *_scene)
+void BoundingBoxObject::drawQuery(Shader &_shader)
 {
 	if (!loaded)
 		return;
 
 	glBindVertexArray(m.vao);
 
-	Shader &sh = _scene->getSimpleShader();
-	sh.loadMat4("model", position*rotation*scale);
-	
+	_shader.loadMat4("model", position * rotation * scale);
+
 	glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);

@@ -34,9 +34,9 @@ add_subdirectory(test)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 
-        /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
+        /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018 /DUSE_BOOKMARK")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC -DUSE_BOOKMARK ")
 endif()
 
 include_directories(include/
@@ -48,17 +48,23 @@ include_directories(include/
                     external/imgui/
                     external/imgui/backends/
                     external/assimp/include/
+                    external/implot/
+                    external/ImGuiFileDialog/
+                    external/ImGuiFileDialog/*.h
 					)
 
 file(GLOB VENDORS_SOURCES external/glad/src/glad.c)
 
-file(GLOB PROJECT_HEADERS include/*.hpp)
+file(GLOB PROJECT_HEADERS include/*.hpp )
 file(GLOB PROJECT_SOURCES src/*.cpp
                           src/model/*.cpp
                           src/bvh/*.cpp
                           external/imgui/*.cpp
                           external/imgui/backends/*opengl3.cpp
                           external/imgui/backends/*glfw.cpp
+                          external/implot/implot_items.cpp
+                          external/implot/implot.cpp
+                          external/ImGuiFileDialog/ImGuiFileDialog.cpp
                         )
 
 file(GLOB PROJECT_SHADERS shaders/*.frag

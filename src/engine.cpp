@@ -46,7 +46,7 @@ Engine::Engine(float _width, float _height) : width(_width), height(_height), sc
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // ImGui Setup
-    ui.load(window);
+    ui.load(window,this);
 
     deltaTime = 0.0;
     lastFrame = 0.0;
@@ -118,7 +118,7 @@ void Engine::startLoop()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // imgui part
-        ui.render(scene);
+        ui.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

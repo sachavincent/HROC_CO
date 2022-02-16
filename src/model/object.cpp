@@ -217,8 +217,8 @@ std::pair<glm::vec3, glm::vec3> Object::getBounds() const
         {tmat * glm::vec4{bounds.min.x, bounds.max.y, bounds.max.z, 1.0}},
         {tmat * glm::vec4{bounds.max.x, bounds.max.y, bounds.min.z, 1.0}}};
     // find max & min
-    glm::vec3 min = glm::vec3{std::numeric_limits<float>::max()};
-    glm::vec3 max = glm::vec3{std::numeric_limits<float>::min()};
+    glm::vec3 min = glm::vec3{FLT_MAX};
+    glm::vec3 max = glm::vec3{-FLT_MAX};
     for (auto &corner : boundsCorners)
     {
         min.x = std::min(corner.x, min.x);

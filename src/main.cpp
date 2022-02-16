@@ -35,19 +35,15 @@ int main(int argc, char *argv[])
 
 
     // base scene loaded in main
-    //Scene* testScene = SceneBuilder::buildMultiMesh(&engine,"models/paul_sab/paul_sab_527.obj");
+    //Scene* testScene = SceneBuilder::buildMultiMesh(&engine,"models/toulouse/toulouse__80k_objs__1.5M_tris_.obj");
     Scene* testScene = SceneBuilder::buildDefaultScene(&engine);
     //Scene* testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{35,35,100}, glm::vec3{0.0f,0.0f,55.0f}, 300, 1.0, 0.1);
     engine.loadScene(testScene);
-    testScene->createBVH();
-
-
-    // TODO: following procedure should be automated in gui
-    // delete previous -> build a scene -> load it to engine -> generate BVH -> repeat
-    // delete testScene;
-    // testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{40,40,150}, glm::vec3{0.0f,0.0f,70.0f}, 2000, 0.8, 0.5);
-    // engine.loadScene(testScene);
-    // testScene->createBVH();
+    //double start = glfwGetTime();
+    //testScene->createBVH();
+    //double elapsed = glfwGetTime() - start;
+    //std::cout << elapsed << std::endl;
+    
 
 
     //  start the render loop

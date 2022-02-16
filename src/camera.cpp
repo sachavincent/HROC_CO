@@ -8,8 +8,8 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	front = glm::vec3(0.0f, 0.0f, 1.0f);
 	up = glm::vec3(0.0f, 1.0f, 0.0f);
 	nearDistance = 1.0f;
-	farDistance = 1500.0f;
-	moveSpeed = 1.0;
+	farDistance = 5000.0f;
+	moveSpeed = 4.0;
 
 	setResolution(_width, _height);
 

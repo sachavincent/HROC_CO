@@ -8,19 +8,27 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
-class Scene;
 
+#include <implot.h>
+#include <ImGuiFileDialog.h>
+
+
+#include "utils/sceneBuilder.hpp"
+
+class Scene;
+class Engine;
 class Ui
 {
 private:
     void lightsParams();
     void objectsParams();
+    void sceneParams();
+
+    void newSceneWindow();
     void newLightWindow();
-    void newPointLight();
-    void newDistantLight();
 
 private:
-    Scene *scene;
+    Engine *engine;
     int lightListIndex = 0;
     int lastlightListIndex = 0;
     int lastLightCount = -1;
@@ -42,8 +50,8 @@ private:
 
 public:
     Ui();
-    void load(GLFWwindow *_window);
-    void render(Scene *_scene);
+    void load(GLFWwindow *_window,Engine* _engine);
+    void render();
     void setBboxMaxLevel(int _level) { bboxMaxLevel = _level; }
     int getBboxVisMode() { return bboxMode; }
     int getObjectsVisMode() { return objectMode; }

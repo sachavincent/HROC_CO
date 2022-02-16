@@ -27,7 +27,8 @@ Object::~Object()
 void Object::load()
 {
 #ifndef HROC_TESTS
-    if(!loaded){
+    if (!loaded)
+    {
         // gen geometry buffers
         glGenBuffers(1, &m.vbo);
         glGenBuffers(1, &m.nbo);
@@ -35,7 +36,7 @@ void Object::load()
             glGenBuffers(1, &m.tbo);
         glGenBuffers(1, &m.ebo);
         glGenVertexArrays(1, &m.vao);
-        //std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
+        // std::cout << "\tLoaded object " << name << " vbo=" << m.vbo << std::endl;
 
         // Bind the vao
         glBindVertexArray(m.vao);
@@ -54,16 +55,16 @@ void Object::load()
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
         glEnableVertexAttribArray(1);
 
-    if (!m.textureCoord.empty())
-    {
-        // Copy texture array in element buffer
-        glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
-        glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
-    }
+        if (!m.textureCoord.empty())
+        {
+            // Copy texture array in element buffer
+            glBindBuffer(GL_ARRAY_BUFFER, m.tbo);
+            glBufferData(GL_ARRAY_BUFFER, m.textureCoord.size() * sizeof(GLfloat), m.textureCoord.data(), GL_STATIC_DRAW);
+        }
 
-    // define array for texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-    glEnableVertexAttribArray(2);
+        // define array for texture
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+        glEnableVertexAttribArray(2);
 
         // copy indices to ebo
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.ebo);
@@ -71,7 +72,7 @@ void Object::load()
 
         // Unbind the VAO
         glBindVertexArray(0);
-    }// fin du if
+    } // fin du if
     // load textures if defined
     if (diffuseMapPath != "")
     {
@@ -201,40 +202,39 @@ void Object::removeObserver(Observer &o) { observer = nullptr; }
 
 void Object::notifyObservers() { observer->update(this, visible); }
 
-
-std::pair<glm::vec3,glm::vec3> Object::getBounds() const {
-
+std::pair<glm::vec3, glm::vec3> Object::getBounds() const
+{
     glm::mat4 tmat = transformationMatrix;
-    //get 8 transformed corners
+    // get 8 transformed corners
     std::vector<glm::vec4> boundsCorners = {
-        {tmat*glm::vec4{bounds.max.x,bounds.max.y,bounds.max.z,1.0}},
-        {tmat*glm::vec4{bounds.min.x,bounds.min.y,bounds.min.z,1.0}},
+        {tmat * glm::vec4{bounds.max.x, bounds.max.y, bounds.max.z, 1.0}},
+        {tmat * glm::vec4{bounds.min.x, bounds.min.y, bounds.min.z, 1.0}},
 
-        {tmat*glm::vec4{bounds.max.x,bounds.min.y,bounds.min.z,1.0}},
-        {tmat*glm::vec4{bounds.min.x,bounds.max.y,bounds.min.z,1.0}},
-        {tmat*glm::vec4{bounds.min.x,bounds.min.y,bounds.max.z,1.0}},
+        {tmat * glm::vec4{bounds.max.x, bounds.min.y, bounds.min.z, 1.0}},
+        {tmat * glm::vec4{bounds.min.x, bounds.max.y, bounds.min.z, 1.0}},
+        {tmat * glm::vec4{bounds.min.x, bounds.min.y, bounds.max.z, 1.0}},
 
-        {tmat*glm::vec4{bounds.max.x,bounds.min.y,bounds.max.z,1.0}},
-        {tmat*glm::vec4{bounds.min.x,bounds.max.y,bounds.max.z,1.0}},
-        {tmat*glm::vec4{bounds.max.x,bounds.max.y,bounds.min.z,1.0}}
-    };
-    //find max & min
+        {tmat * glm::vec4{bounds.max.x, bounds.min.y, bounds.max.z, 1.0}},
+        {tmat * glm::vec4{bounds.min.x, bounds.max.y, bounds.max.z, 1.0}},
+        {tmat * glm::vec4{bounds.max.x, bounds.max.y, bounds.min.z, 1.0}}};
+    // find max & min
     glm::vec3 min = glm::vec3{std::numeric_limits<float>::max()};
-    glm::vec3 max = glm::vec3{std::numeric_limits<float>::min()};
-    for(auto& corner : boundsCorners){
-        min.x = std::min(corner.x,min.x);
-        min.y = std::min(corner.y,min.y);
-        min.z = std::min(corner.z,min.z);
+    glm::vec3 max = glm::vec3{-std::numeric_limits<float>::max()};
+    for (auto &corner : boundsCorners)
+    {
+        min.x = std::min(corner.x, min.x);
+        min.y = std::min(corner.y, min.y);
+        min.z = std::min(corner.z, min.z);
 
-        max.x = std::max(corner.x,max.x);
-        max.y = std::max(corner.y,max.y);
-        max.z = std::max(corner.z,max.z);
+        max.x = std::max(corner.x, max.x);
+        max.y = std::max(corner.y, max.y);
+        max.z = std::max(corner.z, max.z);
     }
-
-    return {min,max};
+    return {min, max};
 }
 
-void Object::flushCaches(){
+void Object::flushCaches()
+{
     Cube::instance_counter = 0;
     Cube::shared_vao = (unsigned int)0;
     FileObject::instance_counter = 0;

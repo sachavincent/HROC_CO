@@ -21,8 +21,8 @@
 #include "texture.hpp"
 #include "observable.hpp"
 
+struct BoundingBox;
 class Scene;
-class BoundingBox;
 
 class Object : public Observable
 {
@@ -30,7 +30,7 @@ protected:
     std::string name;
 
     size_t id;
-    static size_t id_counter;  //TODO: reset this field in scene destructor 
+    static size_t id_counter; // TODO: reset this field in scene destructor
 
     // shading
     glm::vec3 diffuseColor = glm::vec3{0.9f};
@@ -82,9 +82,11 @@ protected:
         _translate = glm::translate(_translate, position);
         transformationMatrix = _translate * rotationMatrix * _scale;
     }
+
 protected:
     // LOCAL object maximum and minimum bounds without transformation
-    struct OBJECT_BOUNDS{
+    struct OBJECT_BOUNDS
+    {
         glm::vec3 max;
         glm::vec3 min;
     };
@@ -133,15 +135,14 @@ public:
 
     inline const glm::mat4 &getTransformationMatrix() const { return transformationMatrix; }
 
-    //const std::vector<GLfloat> &getVertices() const { return m.vertices; }
+    // const std::vector<GLfloat> &getVertices() const { return m.vertices; }
     //! Returns the maximum and minimum bounds after transformation
-    std::pair<glm::vec3,glm::vec3> getBounds() const;
+    std::pair<glm::vec3, glm::vec3> getBounds() const;
     const glm::vec3 &getDiffuse() const { return diffuseColor; }
     const glm::vec3 &getSpecular() const { return specularColor; }
     float getShininess() const { return shininess; }
 
     const glm::vec2 &getTexScaling() const { return texScaling; }
-
 
     void registerObserver(Observer &o) override;
     void removeObserver(Observer &o) override;
@@ -157,11 +158,10 @@ class Cube : public Object
 {
     friend class Object;
     int instance;
-    
 
 protected:
-    static int instance_counter;//TODO: reset this field in scene destructor
-    static unsigned int shared_vao; //TODO: reset this field in scene destructor 
+    static int instance_counter;    // TODO: reset this field in scene destructor
+    static unsigned int shared_vao; // TODO: reset this field in scene destructor
 public:
     //! Create a cube of size _edgeSize.
     Cube(float _edgeSize = 1.0f, std::string _name = "");
@@ -172,13 +172,12 @@ public:
 class FileObject : public Object
 {
 private:
-friend class Object;
-    static int instance_counter;//TODO: reset this field in scene destructor
+    friend class Object;
+    static int instance_counter; // TODO: reset this field in scene destructor
     int instance;
     std::string abs_path;
     // map < path of object , <vao, numIndices, bounds>>
-    static std::map<const std::string,
-            std::tuple<uint32_t,uint32_t,Object::OBJECT_BOUNDS>> path_cache;//TODO: reset this field in scene destructor 
+    static std::map<const std::string, std::tuple<uint32_t, uint32_t, Object::OBJECT_BOUNDS>> path_cache; // TODO: reset this field in scene destructor
 
     void processMesh(aiMesh *_mesh, const aiScene *_scene);
 
@@ -192,8 +191,9 @@ public:
 class UVSphere : public Object
 {
     friend class Object;
+
 private:
-    static int instance;  //TODO: reset this field in scene destructor 
+    static int instance; // TODO: reset this field in scene destructor
     void inline pushIndices(int ind_1, int ind_2, int ind_3);
 
 public:
@@ -203,8 +203,9 @@ public:
 class Plane : public Object
 {
     friend class Object;
+
 private:
-    static int instance;  //TODO: reset this field in scene destructor 
+    static int instance; // TODO: reset this field in scene destructor
 
 public:
     Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance));

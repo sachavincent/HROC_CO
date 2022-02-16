@@ -1,15 +1,12 @@
 #include "scene.hpp"
 #include "engine.hpp"
-#include "bvh/boundingBoxObject.hpp"
 #include "utils/jsonparser.hpp"
-
-
+#include "bvh/locally_ordered_clustering_builder.hpp"
 #include <string>
 #include <map>
 
 Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
-    
 }
 
 Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr)
@@ -51,7 +48,7 @@ Scene::~Scene()
     lights.clear();
     boundingBoxes.clear();
     Object::flushCaches();
-    delete hierarchy;
+    // delete hierarchy;//TODO: Causes issues
 }
 
 //! Load the scene models on GPU before rendering
@@ -69,21 +66,31 @@ void Scene::load()
 
 void Scene::createBVH()
 {
+    double start = glfwGetTime();
     std::vector<std::shared_ptr<BoundingBox>> bbs;
+
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
     for (auto obj : _objects)
     {
         Object *bbo = obj.get();
-        auto newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
-        bbo->setBoundingBox(newBoundingBox);
-        newBoundingBox.get()->getWireframe()->load();
+        std::shared_ptr<AxisBoundingBox> newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
+        std::shared_ptr<BoundingBox> b = newBoundingBox;
+        bbo->setBoundingBox(b);
+        // newBoundingBox.get()->getWireframe()->load();
         if (bbo)
             bbs.push_back(bbo->getBoundingBox());
     }
 
-    hierarchy = new BvhTree(bbs);
+    bvh::Bvh bvh;
+    hierarchy = &bvh;
+    bvh::LocallyOrderedClusteringBuilder<bvh::Bvh, uint32_t> builder(bvh);
 
-    boundingBoxes = hierarchy->getDebugData();
+    BoundingBox globalBox = bvh::compute_bounding_boxes_union(bbs);
+    builder.build(globalBox, bbs);
+    boundingBoxes = bvh.getDebugData();
+
+    double stop = glfwGetTime();
+    std::cout << "BVH constructed in " << (stop - start) << " seconds" << std::endl;
 }
 //! Render all objects of scene
 void Scene::renderObjects()
@@ -178,6 +185,7 @@ Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
 
 std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups)
 {
+    std::vector<BoundingBox *> potentiallyVisibleOccludees;
     Camera *staticCam = engine->getStaticCamera();
     simpleShader.start();
     simpleShader.loadMat4("view", staticCam->getViewMatrix());
@@ -186,9 +194,8 @@ std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> 
     unsigned int THRESHOLD = 10; // Min samples
 
     std::sort(occludeeGroups.begin(), occludeeGroups.end(), [staticCam](BoundingBox *a, BoundingBox *b)
-              { return glm::distance(staticCam->getPosition(), a->getCenter()) < glm::distance(staticCam->getPosition(), b->getCenter()); });
-    
-    std::vector<BoundingBox *> potentiallyVisibleOccludees;
+              { return glm::distance(staticCam->getPosition(), a->center()) < glm::distance(staticCam->getPosition(), b->center()); });
+
     const size_t nbQueries = occludeeGroups.size();
     GLuint *queries = new GLuint[nbQueries];
     glGenQueries(nbQueries, queries);

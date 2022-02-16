@@ -9,11 +9,13 @@
 #include <random>
 
 //! Builds a scene for
-class SceneBuilder {
+class SceneBuilder
+{
 
-  public:
+public:
     //! Builds the stating screen scene
-    static Scene *buildDefaultScene(Engine* _engine) {
+    static Scene *buildDefaultScene(Engine *_engine)
+    {
         Scene *sc = new Scene(_engine);
         auto light0 = std::make_shared<Light>(glm::vec3{-0.2, 0.25, -0.8},
                                               glm::vec3{0.8f});
@@ -26,42 +28,21 @@ class SceneBuilder {
 
         //####################### creating models ###########################
 
-        std::random_device device;
-        std::mt19937 gen(device());
-        std::uniform_int_distribution<int> dist(3, 100);
-        std::uniform_int_distribution<int> distScale(1, 2);
-        std::uniform_int_distribution<int> distRot(-45, 45);
+        std::mt19937 gen(12);
+        std::uniform_real_distribution<float> dist(-50, 50);
+        std::uniform_real_distribution<float> distScale(1, 2);
+        std::uniform_real_distribution<float> distRot(-1, 1);
 
-        for (size_t i = 0; i < 10; i++) {
+        for (size_t i = 0; i < 10; i++)
+        {
             auto cube = std::make_shared<Cube>(1.0f);
             cube->setPosition({dist(gen), dist(gen), dist(gen)})
                 .setScale({distScale(gen), distScale(gen), distScale(gen)})
-                .setRotation(distRot(gen), glm::vec3{distRot(gen), distRot(gen),
-                                                     distRot(gen)})
+                .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
                 .setDiffuse({0.0f, 1.0f, 0.0f})
                 .setSpecular(glm::vec3{0.8});
             sc->addObject(cube);
         }
-
-        auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere1->setPosition({3.5, 0.7, 3.5})
-            .setRotation(90, {1, 0, 0})
-            .setDiffuse({1.0, 0.0, 1.0});
-
-        sc->addObject(sphere1);
-
-        auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
-        plane1->setRotation(-90, {1, 0, 0})
-            .setTexDiffuse("textures/stoneWall/diffuse.png")
-            .setTexSpecular("textures/stoneWall/roughness.png")
-            .setTexScaling({4, 4});
-        sc->addObject(plane1);
-
-        auto teapot = std::make_shared<FileObject>("models/teapot.obj", true);
-        teapot->setScale(glm::vec3{0.6f})
-            .setPosition({0.0f, 1.5f, 0.0f})
-            .setDiffuse({0.55f, 0.5f, 0.0f});
-        sc->addObject(teapot);
         return sc;
     }
 

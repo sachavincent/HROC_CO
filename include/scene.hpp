@@ -10,11 +10,12 @@
 #include "object.hpp"
 #include "camera.hpp"
 #include "light.hpp"
-#include "bvh/boundingbox.hpp"
-#include "bvh/bvhtree.hpp"
+#include "bvh/bvh.hpp"
+#include "bvh/bounding_box.hpp"
+#include "bvh/boundingBoxObject.hpp"
+#include "bvh/utilities.hpp"
 
 class Engine;
-
 class Scene
 {
 private:
@@ -27,7 +28,7 @@ private:
     float exposure;
     //! maximum level of current bvh
 
-    BvhTree *hierarchy;
+    bvh::Bvh *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
 
 public:
@@ -71,8 +72,8 @@ private:
     void updateBvh()
     {
         // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
-        std::vector<BvhNode *> effectiveOccluders;
-        std::vector<BvhNode *> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
+        std::vector<unsigned int> effectiveOccluders;
+        std::vector<unsigned int> occludeeGroups = hierarchy->extractOccludees(effectiveOccluders); // = G
         // TODO: VFC => returns occludeeGroups filtered
         std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
         // TODO: BvhNode => BoundingBox

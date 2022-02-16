@@ -11,11 +11,10 @@ Cube::Cube(float _edgeSize, std::string _name)
 {
 	instance = instance_counter;
 	instance_counter++;
-
+	if (instance == 18)
+		std::cout << "";
 	Object();
-	Object::name = (_name.size()>0)?_name:"Cube_" + std::to_string(instance);
-	
-	
+	Object::name = (_name.size() > 0) ? _name : "Cube_" + std::to_string(instance);
 
 	m.vertices = {
 		-0.5f, -0.5f, -0.5f,
@@ -165,26 +164,30 @@ Cube::Cube(float _edgeSize, std::string _name)
 		30, 32, 31,
 		33, 35, 34};
 
-
 	bounds.min = {-0.5f, -0.5f, -0.5f};
 	bounds.max = {0.5f, 0.5f, 0.5f};
 
 	m.numIndices = m.indices.size();
-	
+
 	setPosition(glm::vec3{0.0});
 	setScale(glm::vec3(_edgeSize));
 	setRotationMatrix(glm::mat4{1.0});
 }
 
-void Cube::load(){
-        if(instance == 0){
-			//std::cout << "le cube\n";
-            Object::load();
-            shared_vao = m.vao;
-        } else {
-			//std::cout << "le cube\n";
-            m.vao = shared_vao;
-			loaded = true;
-			Object::load();
-        }
-    }
+void Cube::load()
+{
+
+	if (instance == 0)
+	{
+		// std::cout << "le cube\n";
+		Object::load();
+		shared_vao = m.vao;
+	}
+	else
+	{
+		// std::cout << "le cube\n";
+		m.vao = shared_vao;
+		loaded = true;
+		Object::load();
+	}
+}

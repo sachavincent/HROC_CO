@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     Scene* testScene = SceneBuilder::buildDefaultScene(&engine);
     engine.loadScene(testScene);
     testScene->createBVH();
-
+/*
 
     //TODO: following procedure should be automated in gui
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     delete testScene;
     testScene = SceneBuilder::buildDefaultScene(&engine);
     engine.loadScene(testScene);
-    testScene->createBVH();
+    testScene->createBVH();*/
 
 
     //  start the render loop

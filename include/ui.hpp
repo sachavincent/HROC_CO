@@ -5,6 +5,7 @@
 #include <GLFW/glfw3native.h>
 
 #include <imgui.h>
+//#include <implot/implot.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
@@ -26,6 +27,9 @@ private:
 
     void newSceneWindow();
     void newLightWindow();
+    void newPointLight();
+    void newDistantLight();
+    void plotTimer();
 
 private:
     Engine *engine;

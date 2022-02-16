@@ -14,6 +14,7 @@ void Ui::load(GLFWwindow *_window, Engine *_engine)
     engine = _engine;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    //ImPlot::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
@@ -31,12 +32,7 @@ void Ui::render()
 
     //TODO: test implot
     ImPlot::CreateContext();
-    int   bar_data[8] = {1,3,1,3,5,2,7,3};
-    if (ImPlot::BeginPlot("My Plot")) {
-        ImPlot::PlotBars("My Bar Plot", bar_data, 8);
-        ImPlot::EndPlot();
-    }
-
+    plotTimer();
 
     ImGui::Begin("Parameters");
     static float camspeed = scene.getCamera()->getMoveSpeed();
@@ -84,7 +80,6 @@ void Ui::render()
     if (newLightWindowActive) newLightWindow();
 
     ImGui::End();
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -284,4 +279,21 @@ void Ui::newLightWindow()
     }
 
     ImGui::End();
+}
+
+void Ui::plotTimer()
+{
+    Scene &scene = engine->getScene();
+    double timers[9];
+    for (int i = 0;i<9;i++){
+        timers[i] = round(scene.timers[i] * 1000);
+        if (timers[i]<0){
+            timers[i] = 0;
+        }
+    }
+    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250,250))) {
+        ImPlot::PlotPieChart(scene.timerLabels,timers, 9, 0.5f, 0.5f, 0.4f);
+        ImPlot::EndPlot();
+    }
+
 }

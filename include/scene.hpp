@@ -71,8 +71,6 @@ public:
 
     inline std::vector<std::shared_ptr<Object>> &getObjects() { return objects; }
 
-    //Shader &getShader() { return sh; }
-
     void load();
 
     void createBVH();

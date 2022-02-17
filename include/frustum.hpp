@@ -11,7 +11,7 @@ struct Plan
 public:
     glm::vec3 normal = {0.f, 1.f, 0.f}; // unit vector
     float distance = 0.f;               // Distance with origin
-    
+
     Plan() = default;
 
     Plan(const glm::vec3 &p1, const glm::vec3 &norm) : normal(glm::normalize(norm)), distance(glm::dot(normal, p1))
@@ -27,9 +27,9 @@ struct Frustum
 {
 public:
     Frustum() {}
-    Frustum(Camera* camera) {update(camera);}
+    Frustum(Camera *camera) { update(camera); }
 
-    void update(Camera* camera)
+    void update(Camera *camera)
     {
         float fov = camera->getFov();
         float aspect = (double)camera->getResWidth() / camera->getResHeight();
@@ -37,45 +37,36 @@ public:
         float halfHSide = halfVSide * aspect;
         glm::vec3 frontMultFar = camera->getFarDistance() * camera->getDirection();
 
-        nearFace = Plan::Plan(camera->getPosition() + camera->getNearDistance() * camera->getDirection(),
-                            camera->getDirection());
-        farFace = Plan::Plan(camera->getPosition() + frontMultFar, -camera->getDirection());
-        rightFace = Plan::Plan(camera->getPosition() ,
-                           glm::cross(camera->getUpVector(), frontMultFar + camera->getRightVector() * halfHSide));
-        leftFace = Plan::Plan(camera->getPosition() ,
-                           glm::cross(frontMultFar - camera->getRightVector() * halfHSide, camera->getUpVector()));
-        topFace = Plan::Plan(camera->getPosition() ,
-                           glm::cross(camera->getRightVector(), frontMultFar - camera->getUpVector() * halfVSide));
-        bottomFace = Plan::Plan(camera->getPosition() ,
-                           glm::cross(frontMultFar + camera->getUpVector() * halfVSide, camera->getRightVector()));
-
+        nearFace = Plan(camera->getPosition() + camera->getNearDistance() * camera->getDirection(),
+                        camera->getDirection());
+        farFace = Plan(camera->getPosition() + frontMultFar, -camera->getDirection());
+        rightFace = Plan(camera->getPosition(),
+                         glm::cross(camera->getUpVector(), frontMultFar + camera->getRightVector() * halfHSide));
+        leftFace = Plan(camera->getPosition(),
+                        glm::cross(frontMultFar - camera->getRightVector() * halfHSide, camera->getUpVector()));
+        topFace = Plan(camera->getPosition(),
+                       glm::cross(camera->getRightVector(), frontMultFar - camera->getUpVector() * halfVSide));
+        bottomFace = Plan(camera->getPosition(),
+                          glm::cross(frontMultFar + camera->getUpVector() * halfVSide, camera->getRightVector()));
     }
-
-
-
 
     bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
-        return bb->isOnOrForwardPlan(topFace) 
-            && bb->isOnOrForwardPlan(bottomFace)
-            && bb->isOnOrForwardPlan(rightFace)
-            && bb->isOnOrForwardPlan(leftFace)
-            && bb->isOnOrForwardPlan(farFace)
-            && bb->isOnOrForwardPlan(nearFace);
-
+        return bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(rightFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace);
     };
 
-    std::vector<BvhNode*> ViewFrustumCulling(std::vector<BvhNode*> occludeeGroups) const {
-        std::vector<BvhNode*> occ;
-        for(auto it = occludeeGroups.begin();it != occludeeGroups.end();it++){
-            if(isInFrustum((*it)->getBoundingBox()))
+    std::vector<BvhNode *> ViewFrustumCulling(std::vector<BvhNode *> occludeeGroups) const
+    {
+        std::vector<BvhNode *> occ;
+        for (auto it = occludeeGroups.begin(); it != occludeeGroups.end(); it++)
+        {
+            if (isInFrustum((*it)->getBoundingBox()))
             {
                 occ.push_back(*it);
             }
         }
         return occ;
     };
-
 
     Plan topFace;
     Plan bottomFace;

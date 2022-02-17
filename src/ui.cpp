@@ -33,6 +33,7 @@ void Ui::render()
     //TODO: test implot
     ImPlot::CreateContext();
     plotTimer();
+    plotFpsRate();
 
     ImGui::Begin("Parameters");
     static float camspeed = scene.getCamera()->getMoveSpeed();
@@ -293,6 +294,23 @@ void Ui::plotTimer()
     }
     if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250,250))) {
         ImPlot::PlotPieChart(scene.timerLabels,timers, 9, 0.5f, 0.5f, 0.4f);
+        ImPlot::EndPlot();
+    }
+
+}
+
+void Ui::plotFpsRate()
+{
+    std::vector<double> & fpsVector = engine->fpsVector;
+    int length = fpsVector.size();
+    double * fps = fpsVector.data();
+
+    static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit;
+    static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit;
+
+    if (ImPlot::BeginPlot("Fps rate", NULL, NULL, ImVec2(250,250))) {
+        ImPlot::SetupAxes("X","Y",xflags,yflags);
+        ImPlot::PlotLine("Courbe des fps",fps,length);
         ImPlot::EndPlot();
     }
 

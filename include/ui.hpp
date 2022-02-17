@@ -30,6 +30,7 @@ private:
     void newPointLight();
     void newDistantLight();
     void plotTimer();
+    void plotFpsRate();
 
 private:
     Engine *engine;

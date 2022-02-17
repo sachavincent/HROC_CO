@@ -146,7 +146,7 @@ void Engine::updateFpsCounter(double _updateRateMs)
         counter = 0;
         std::stringstream sstr;
         sstr << windowName << "  |  FPS : " << std::fixed << std::setprecision(1) << 1 / deltaTime;
-
+        fpsVector.push_back(1/deltaTime);
         glfwSetWindowTitle(window, sstr.str().c_str());
     }
     counter += deltaTime;

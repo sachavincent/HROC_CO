@@ -14,6 +14,7 @@ void Ui::load(GLFWwindow *_window, Engine *_engine)
     engine = _engine;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    //ImPlot::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
@@ -26,6 +27,11 @@ void Ui::render()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
+    //TODO: test implot
+    ImPlot::CreateContext();
+    plotTimer();
+    plotFpsRate();
 
     ImGui::Begin("Parameters");
 
@@ -256,6 +262,7 @@ void Ui::sceneParams()
             ImGui::Text((std::string{"Current file:\n"}+mmesh_path).c_str());
             break;
         }
+
         ImGui::Checkbox("Build Bvh Tree", &buildBvh);
         if (ImGui::Button("Load Scene"))
         {
@@ -318,4 +325,38 @@ void Ui::newLightWindow()
     }
 
     ImGui::End();
+}
+
+void Ui::plotTimer()
+{
+    Scene* scene = engine->getScene();
+    double timers[9];
+    for (int i = 0;i<9;i++){
+        timers[i] = round(scene->timers[i] * 1000);
+        if (timers[i]<0){
+            timers[i] = 0;
+        }
+    }
+    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250,250))) {
+        ImPlot::PlotPieChart(scene->timerLabels,timers, 9, 0.5f, 0.5f, 0.4f);
+        ImPlot::EndPlot();
+    }
+
+}
+
+void Ui::plotFpsRate()
+{
+    std::vector<double> & fpsVector = engine->fpsVector;
+    int length = fpsVector.size();
+    double * fps = fpsVector.data();
+
+    static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit;
+    static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit;
+
+    if (ImPlot::BeginPlot("Fps rate", NULL, NULL, ImVec2(250,250))) {
+        ImPlot::SetupAxes("X","Y",xflags,yflags);
+        ImPlot::PlotLine("Courbe des fps",fps,length);
+        ImPlot::EndPlot();
+    }
+
 }

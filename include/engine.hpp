@@ -21,6 +21,7 @@ enum CameraType
 class Engine
 {
 public:
+    std::vector<double> fpsVector;
     Engine(float _width, float _height);
 
     ~Engine();

@@ -7,7 +7,6 @@
 #include <execution>
 #include <string>
 #include <map>
-
 Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullptr)
 {
 }
@@ -57,6 +56,7 @@ Scene::~Scene()
 
 void Scene::updateBvh()
 {
+    double start,end;
     /*
     * 1 - Occlusion Map Rendering
     * in V indices of previously drawn objects  
@@ -66,11 +66,15 @@ void Scene::updateBvh()
     * => Store OM (Depth map used later) 
     * return list of indices of effectives occluders O
     */
-    
+
+    start = glfwGetTime();
     std::vector<BvhNode *> effectiveOccluders;
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map 
-
+    end = glfwGetTime();
+    
+    timers[0] = end - start;
+start = glfwGetTime();
    
     /*
     * 2 - Extraction of Occludee Groups
@@ -84,9 +88,18 @@ void Scene::updateBvh()
 
 
     std::vector<BvhNode *> potentialOccluders = hierarchy->extractOccludees(effectiveOccluders); // = G
+    end = glfwGetTime();
+    
+    
+    timers[1] = end - start;
+start = glfwGetTime();
 
     const Frustum *f = getCamera()->getFrustum();
     const std::vector<BvhNode *> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
+    end = glfwGetTime();
+    
+    timers[2] = end - start;
+start = glfwGetTime();
 
 
     /*
@@ -100,7 +113,10 @@ void Scene::updateBvh()
     */
 
     // TODO Raycast with aabb on GPU to extract U
-
+    end = glfwGetTime();
+    
+    timers[3] = end - start;
+start = glfwGetTime();
 
     /*
     * 3 - Batch Occlusion Test (Our Implementation) 
@@ -108,8 +124,16 @@ void Scene::updateBvh()
     * return indices of potential visible occludees U
     */
     //TODO extract list of boundig boxes from G to initialize occludeeGroups_boundingBoxes
+    end = glfwGetTime();
+    
+    timers[4] = end - start;
+start = glfwGetTime();
     std::vector<BoundingBox*> occludeeGroups_boundingBoxes;
     std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes);
+    end = glfwGetTime();
+    
+    timers[5] = end - start;
+start = glfwGetTime();
 
 
     /*
@@ -118,11 +142,21 @@ void Scene::updateBvh()
     * Merge D with potential occluders O to initialize V for the next frame. 
     */
     //TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
+
+    end = glfwGetTime();
+    timers[6] = end - start;
+start = glfwGetTime();
     std::vector<Object *> drawnObjects;
 
     renderObjects(drawnObjects);
-    //TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V 
+    end = glfwGetTime();
     
+    timers[7] = end - start;
+    start = glfwGetTime();
+    //TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V 
+     end = glfwGetTime();
+    
+    timers[8] = end - start;
 }
 
 //! Load the scene models on GPU before rendering

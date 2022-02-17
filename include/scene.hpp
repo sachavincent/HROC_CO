@@ -6,13 +6,17 @@
 #include <map>
 #include <iostream>
 #include <memory>
+#include <list>
 
 #include "object.hpp"
 #include "camera.hpp"
 #include "light.hpp"
 #include "bvh/boundingbox.hpp"
 #include "bvh/bvhtree.hpp"
-
+#include <string>
+#include <time.h>
+#include <chrono>
+#include <ctime>
 class Engine;
 
 class Scene
@@ -30,6 +34,9 @@ private:
 
     BvhTree *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
+
+
+
 
 public:
     Scene(Engine *_engine);
@@ -69,6 +76,10 @@ public:
     void load();
 
     void createBVH();
+    
+    // Timers for pipeline 
+    double timers[9];
+    const char * timerLabels[9]{"EarlyZ","Extract","VFC","Raycast","Bb extract","Batch occlusion Test","Early Z on Rendering","Draw objects","Merge"};
 
 private:
     // Called when camera moves

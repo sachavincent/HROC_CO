@@ -23,6 +23,7 @@ private:
     void lightsParams();
     void objectsParams();
     void sceneParams();
+    void displayParams();
 
     void newSceneWindow();
     void newLightWindow();

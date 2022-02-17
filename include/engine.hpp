@@ -41,7 +41,7 @@ public:
 
     void setResolution(int width, int height);
 
-    inline Scene &getScene() const { return *scene; }
+    inline Scene *getScene() const { return scene; }
 
     inline double getDeltaTime() const { return deltaTime; }
 

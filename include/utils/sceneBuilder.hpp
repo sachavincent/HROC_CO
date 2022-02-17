@@ -33,41 +33,40 @@ class SceneBuilder
 
         //std::random_device device;
         //std::mt19937 gen(device());
-        std::mt19937 gen(12);
-        std::uniform_real_distribution<float> dist(5, 20);
-        std::uniform_real_distribution<float> distScale(1, 2);
-        std::uniform_real_distribution<float> distRot(-1, 1);
+        //std::uniform_real_distribution<float> dist(5, 20);
+        //std::uniform_real_distribution<float> distScale(1, 2);
+        //std::uniform_real_distribution<float> distRot(-1, 1);
+//
+        //for (size_t i = 0; i < 10; i++)
+        //{
+        //    auto cube = std::make_shared<Cube>(1.0f);
+        //    cube->setPosition({dist(gen), dist(gen), dist(gen)})
+        //        .setScale({distScale(gen), distScale(gen), distScale(gen)})
+        //        .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
+        //    .setDiffuse({0.0f, 1.0f, 0.3f})
+        //    .setSpecular(glm::vec3{0.8});
+        //    sc->addObject(cube);
+        //}
 
-        for (size_t i = 0; i < 10; i++)
-        {
-            auto cube = std::make_shared<Cube>(1.0f);
-            cube->setPosition({dist(gen), dist(gen), dist(gen)})
-                .setScale({distScale(gen), distScale(gen), distScale(gen)})
-                .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
-            .setDiffuse({0.0f, 1.0f, 0.3f})
-            .setSpecular(glm::vec3{0.8});
-            sc->addObject(cube);
-        }
+        auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
+        sphere1->setPosition({3.5, 0.7, 3.5})
+            .setRotation(90, {1, 0, 0})
+            .setDiffuse({1.0, 0.0, 1.0});
 
-        //auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-        //sphere1->setPosition({3.5, 0.7, 3.5})
-        //    .setRotation(90, {1, 0, 0})
-        //    .setDiffuse({1.0, 0.0, 1.0});
-//
-        //sc->addObject(sphere1);
-//
-        //auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
-        //plane1->setRotation(-90, {1, 0, 0})
-        //    .setTexDiffuse("textures/stoneWall/diffuse.png")
-        //    .setTexSpecular("textures/stoneWall/roughness.png")
-        //    .setTexScaling({4, 4});
-        //sc->addObject(plane1);
-//
-        //auto teapot = std::make_shared<FileObject>("models/teapot.obj", true);
-        //teapot->setScale(glm::vec3{0.6f})
-        //    .setPosition({0.0f, 1.5f, 0.0f})
-        //    .setDiffuse({0.55f, 0.5f, 0.0f});
-        //sc->addObject(teapot);
+        sc->addObject(sphere1);
+
+        auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
+        plane1->setRotation(-90, {1, 0, 0})
+            .setTexDiffuse("textures/stoneWall/diffuse.png")
+            .setTexSpecular("textures/stoneWall/roughness.png")
+            .setTexScaling({4, 4});
+        sc->addObject(plane1);
+
+        auto teapot = std::make_shared<FileObject>("models/teapot.obj", true);
+        teapot->setScale(glm::vec3{0.6f})
+            .setPosition({0.0f, 1.5f, 0.0f})
+            .setDiffuse({0.55f, 0.5f, 0.0f});
+        sc->addObject(teapot);
         return sc;
     }
 
@@ -121,10 +120,15 @@ class SceneBuilder
         }
         return scene;
     }
-
+    /**
+     * @brief Build a scene from a given multi mesh .obj file
+     * 
+     * @param _engine A pointer to current engine
+     * @param _path The ABSOLUTE path of the .obj file
+     * @return Scene* A pointer to the created scene
+     */
     static Scene *buildMultiMesh(Engine *_engine, std::string _path)
     {
-        std::string abs_path = Utils::workingDirectory() + _path;
         
         Scene *scene = new Scene(_engine);
 
@@ -138,10 +142,10 @@ class SceneBuilder
         sunLight3->setAttenuation({1.0f, 0.0f, 0.0f});
         scene->addLight(sunLight3);
 
-        std::cout << "loading city from file : " << abs_path << " ..." << std::endl;
+        std::cout << "loading city from file : " << _path << " ..." << std::endl;
 
         Assimp::Importer importer;
-        const aiScene *assimpScene = importer.ReadFile(abs_path, aiProcess_Triangulate | aiProcess_FlipUVs |
+        const aiScene *assimpScene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs |
                                                              aiProcess_GenNormals);
 
 

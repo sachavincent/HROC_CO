@@ -23,29 +23,37 @@ void Ui::load(GLFWwindow *_window, Engine *_engine)
 
 void Ui::render()
 {
-    Scene &scene = engine->getScene();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-
-    //TODO: test implot
-    ImPlot::CreateContext();
-    int   bar_data[8] = {1,3,1,3,5,2,7,3};
-    if (ImPlot::BeginPlot("My Plot")) {
-        ImPlot::PlotBars("My Bar Plot", bar_data, 8);
-        ImPlot::EndPlot();
-    }
-
-
     ImGui::Begin("Parameters");
-    static float camspeed = scene.getCamera()->getMoveSpeed();
-    ImGui::DragFloat("camera movement speed", &camspeed, 0.1, 0.1, 40.0);
-    scene.getCamera()->setMoveSpeed(camspeed);
 
-    float exposure = scene.getExposure();
+    displayParams();
+    ImGui::Separator();
+    sceneParams();
+    ImGui::Separator();
+    lightsParams();
+    ImGui::Separator();
+    objectsParams();
+
+    if (newLightWindowActive) newLightWindow();
+
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Ui::displayParams()
+{
+    Scene *scene = engine->getScene();
+    static float camspeed = scene->getCamera()->getMoveSpeed();
+    ImGui::DragFloat("camera movement speed", &camspeed, 0.1, 0.1, 40.0);
+    scene->getCamera()->setMoveSpeed(camspeed);
+
+    float exposure = scene->getExposure();
     ImGui::DragFloat("exposure", &exposure, 0.01, 0.01, 10.0);
-    scene.setExposure(exposure);
+    scene->setExposure(exposure);
 
     ImGui::Checkbox("Display Objects", &objectMode);
 
@@ -62,41 +70,26 @@ void Ui::render()
         if (dispSpecificBbox)
         {
             ImGui::SliderInt("Level to Display", &dispBboxLevel, 1, bboxMaxLevel);
-            bboxMode = dispBboxLevel;
+            bboxMode = dispBboxLevel; // level num
         }
         else
         {
-            // display all
-            bboxMode = 0;
+            bboxMode = 0; // all
         }
     }
     else
     {
-        bboxMode = -1;
+        bboxMode = -1; // none
     }
-
-    ImGui::Separator();
-
-    sceneParams();
-
-    lightsParams();
-    objectsParams();
-    if (newLightWindowActive) newLightWindow();
-
-    ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void Ui::lightsParams()
 {
     if (ImGui::TreeNode("Lights Parameters"))
     {
-
         // display the lights to choose from
         const char *items[100];
-        std::vector<std::shared_ptr<Light>> &lights = engine->getScene().getLights();
+        std::vector<std::shared_ptr<Light>> &lights = engine->getScene()->getLights();
         std::vector<std::string> lightsNames;
 
         for (size_t i = 0; i < lights.size(); i++)
@@ -169,7 +162,7 @@ void Ui::objectsParams()
     if (ImGui::TreeNode("Objects Parameters"))
     {
         const char *items[200];
-        auto &objects = engine->getScene().getObjects();
+        auto &objects = engine->getScene()->getObjects();
         std::vector<std::string> objectsNames;
         for (int i = 0; i < 200; i++)
             objectsNames.push_back(objects[i]->getName());
@@ -220,34 +213,75 @@ void Ui::sceneParams()
 
     if (ImGui::TreeNode("Scene Loading"))
     {
-        static const char *items[2] = {"asteroid", "Scene from Obj"};
+        static const char *items[3] = {"Base Scene", "Asteroid Scene", "Scene from .obj"};
         static int sceneTypeIndex = 0;
-        static int numAst = 0;
 
+        static int numAst = 20;
+        static float astSize = 1.0f;
+        static float astScaleRatio = 0.2f;
+        static glm::vec3 domainSize = {30, 30, 100};
+        static glm::vec3 domainCenter = {0, 0, 50};
+        static bool buildBvh = true;
+        static std::string mmesh_path = "";
 
-            ImGui::ListBox("Select a Type of Scene", &sceneTypeIndex, items, 2, 2);
+        ImGui::Combo("Select a Type of Scene", &sceneTypeIndex, items, 3);
 
         switch (sceneTypeIndex)
         {
         case 0:
-            //ImGui::InputInt("Number of asteroids",&numAst,1000,100000);
             break;
         case 1:
-            //ImGui::InputStr("Number of asteroids",&numAst,1000,100000);
+        {
+            ImGui::DragInt("Number of asteroids", &numAst, 10, 1, 1000000);
+            ImGui::DragFloat3("Domain size", &domainSize[0], 1.0, 1.0, 10000.0);
+            ImGui::DragFloat3("Domain center", &domainCenter[0], 1.0, 1.0, 10000.0);
+            ImGui::DragFloat("Asteroid Base Size", &astSize, 0.01, 0.1, 100.0);
+            ImGui::DragFloat("Random Scale Factor ]0,1[", &astScaleRatio, 0.01, 0.001, 0.999);
+        }
+        break;
+        case 2:
+            if (ImGui::Button("Choose File"))
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File",
+                                                        ".obj", ".");
+
+            // display
+            if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    mmesh_path = ImGuiFileDialog::Instance()->GetFilePathName();
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+            ImGui::Text((std::string{"Current file:\n"}+mmesh_path).c_str());
             break;
         }
+        ImGui::Checkbox("Build Bvh Tree", &buildBvh);
         if (ImGui::Button("Load Scene"))
         {
+            Scene *scene = nullptr;
+            delete engine->getScene();
             switch (sceneTypeIndex)
             {
             case 0:
-                //Scene *scene = SceneBuilder::buildAsteroidField(
-                //    engine, glm::vec3{40, 40, 150}, glm::vec3{0.0f, 0.0f, 70.0f}, 2000, 0.8, 0.5);
-                //engine->loadScene(scene);
-                //break;
+            {
+                scene = SceneBuilder::buildDefaultScene(engine);
+            }
+            break;
             case 1:
-
+            {
+                scene = SceneBuilder::buildAsteroidField(engine, domainSize, domainCenter, numAst,
+                                                         astSize, astScaleRatio);
+            }
+            break;
+            case 2:
+                scene = SceneBuilder::buildMultiMesh(engine, mmesh_path);
                 break;
+            }
+            engine->loadScene(scene);
+            if (buildBvh)
+            {
+                scene->createBVH();
             }
         }
         // TODO: following procedure should be automated in gui
@@ -279,7 +313,7 @@ void Ui::newLightWindow()
     {
         auto pl = std::make_shared<Light>(nlPos, nlColor * mult, attn);
         mult = 1.0;
-        engine->getScene().addLight(pl);
+        engine->getScene()->addLight(pl);
         newLightWindowActive = false;
     }
 

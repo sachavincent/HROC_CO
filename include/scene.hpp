@@ -44,7 +44,8 @@ private:
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
     DrawElementsCommand *earlyZcmds;
     DrawElementsCommand *cmds;
-
+    int *visibility;
+    //std::set<OBJECT_DATA>
 public:
     Scene(Engine *_engine);
 
@@ -153,7 +154,7 @@ private:
         earlyZcmds[4].baseVertex = 0;
         earlyZcmds[4].baseInstance = 0;
 
-        int *visibility = new int[objects.size()];
+        visibility = new int[objects.size()];
 
         for (size_t i = 0; i < objects.size(); i++)
             visibility[i] = 0;

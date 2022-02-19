@@ -521,8 +521,15 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
 {
     // Camera *staticCam = engine->getStaticCamera();
     Camera *staticCam = getCamera();
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    int *visibility = new int[objects.size()];
+    int *_visibility = new int[objects.size()];
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
+    std::vector<int> valuesQ(_visibility, _visibility + objects.size());
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     // glEnable(GL_DEPTH_TEST);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
@@ -539,15 +546,15 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, size_t(5), 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), visibility);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glBindVertexArray(0);
     earlyZShader.stop();
-    std::vector<int> values(visibility, visibility + objects.size());
+    std::vector<int> values(_visibility, _visibility + objects.size());
 
     glDepthFunc(GL_EQUAL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
     // glDisable(GL_DEPTH_TEST);
-    delete visibility;
+    delete _visibility;
 }

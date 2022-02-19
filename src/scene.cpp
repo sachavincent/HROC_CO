@@ -454,6 +454,23 @@ void Scene::renderBoundingBoxes()
     bbShader.stop();
 }
 
+void Scene::renderFrustum(){
+    if (!hierarchy)
+        return;
+
+    bbShader.start();
+
+    bbShader.loadMat4("view", getCamera()->getViewMatrix());
+    bbShader.loadMat4("projection", getCamera()->getProjectionMatrix());
+    Object * Frustum = new Object("Frustum");
+    /*
+        Object &setPosition(const glm::vec3 &_pos);
+    Object &setScale(const glm::vec3 &_scale);
+    Object &setRotation(float _angle, glm::vec3 _axis);
+    Object &setRotationMatrix(const glm::mat4 &_rotationMatrix);
+    */
+}
+
 //! Add an object to scene
 Scene &Scene::addObject(std::shared_ptr<Object> _object)
 {

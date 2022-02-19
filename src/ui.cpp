@@ -14,7 +14,7 @@ void Ui::load(GLFWwindow *_window, Engine *_engine)
     engine = _engine;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // ImPlot::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
@@ -27,9 +27,6 @@ void Ui::render()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
-    // TODO: test implot
-    ImPlot::CreateContext();
     plotTimer();
     plotFpsRate();
 

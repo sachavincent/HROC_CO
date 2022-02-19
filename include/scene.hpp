@@ -62,6 +62,10 @@ public:
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
 
+    
+    void renderFrustum();
+
+
     Scene &addObject(std::shared_ptr<Object> _object);
     Scene &addLight(std::shared_ptr<Light> _light);
 

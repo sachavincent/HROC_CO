@@ -122,7 +122,7 @@ private:
         earlyZcmds[0].instanceCount = 1;
         earlyZcmds[0].firstIndex = 42;
         earlyZcmds[0].baseVertex = 40;
-        earlyZcmds[0].baseInstance = 0;
+        earlyZcmds[0].baseInstance = 11;
         baseIdx += teapotData.numIndices;
         baseInstance += 1;
 
@@ -130,28 +130,28 @@ private:
         earlyZcmds[1].instanceCount = 1;
         earlyZcmds[1].firstIndex = 36;
         earlyZcmds[1].baseVertex = 36;
-        earlyZcmds[1].baseInstance = baseInstance;
+        earlyZcmds[1].baseInstance = 10;
         baseInstance += 1;
 
         earlyZcmds[2].vertexCount = teapotData.numIndices;
         earlyZcmds[2].instanceCount = 1;
         earlyZcmds[2].firstIndex = 42;
         earlyZcmds[2].baseVertex = 40;
-        earlyZcmds[2].baseInstance = baseInstance;
+        earlyZcmds[2].baseInstance = 12;
         baseInstance += 1;
 
         earlyZcmds[3].vertexCount = sphereData.numIndices;
         earlyZcmds[3].instanceCount = 2;
         earlyZcmds[3].firstIndex = 19002;
         earlyZcmds[3].baseVertex = 19000;
-        earlyZcmds[3].baseInstance = baseInstance;
+        earlyZcmds[3].baseInstance = 13;
         baseInstance += 2;
 
         earlyZcmds[4].vertexCount = cubeData.numIndices;
         earlyZcmds[4].instanceCount = 10;
         earlyZcmds[4].firstIndex = 0;
         earlyZcmds[4].baseVertex = 0;
-        earlyZcmds[4].baseInstance = baseInstance;
+        earlyZcmds[4].baseInstance = 0;
 
         int *visibility = new int[objects.size()];
 

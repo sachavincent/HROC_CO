@@ -330,7 +330,6 @@ void Scene::renderObjects()
     if (engine->getUi().getObjectsVisMode())
     {
         glBindVertexArray(vao);
-
         glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);

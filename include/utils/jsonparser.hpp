@@ -170,13 +170,10 @@ public:
             }
             else if (objType == "FileObject")
             {
-                if (args.size() != 2)
+                if (args.size() != 1)
                     throw std::invalid_argument("Incorrect arguments for object type='" + objType + "'!");
 
-                if (hasName)
-                    object = std::make_shared<FileObject>(args[1].get<std::string>(), args[0].get<bool>(), jObject.at("name").get<std::string>());
-                else
-                    object = std::make_shared<FileObject>(args[1].get<std::string>(), args[0].get<bool>());
+                object = std::make_shared<FileObject>(args[1].get<std::string>());
             }
             else
                 throw std::invalid_argument("Unknown object type='" + objType + "'!");
@@ -201,17 +198,12 @@ public:
             {
                 json jSpecular = jObject.at("specular");
                 std::string specType = jSpecular.at("type").get<std::string>();
-                object->setShininess(jSpecular.at("shininess").get<float>());
                 if (specType == "color")
                     object->setSpecular(parseVec3(jSpecular.at("value")));
                 else if (specType == "texture")
                     object->setTexSpecular(jSpecular.at("value").get<std::string>());
                 else
                     throw std::invalid_argument("Incorrect object diffuse type='" + specType + "'!");
-            }
-            if (jObject.count("tex_scale") != 0)
-            {
-                object->setTexScaling(parseVec2(jObject.at("tex_scale")));
             }
             objects.push_back(object);
         }

@@ -41,7 +41,6 @@ AxisBoundingBox::AxisBoundingBox(const Object &_o) : OrientedBoundingBox(_o, Axi
 
 BoundingBox::BoundingBox(const Object &_o)
 {
-
     glm::vec3 minPos = _o.getBounds().first;
     glm::vec3 maxPos = _o.getBounds().second;
 

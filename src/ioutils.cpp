@@ -70,14 +70,8 @@ void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 {
     switch (key)
     {
-    case GLFW_KEY_E:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        break;
-    case GLFW_KEY_R:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        break;
-    case GLFW_KEY_T:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    case GLFW_KEY_P:
+        engine->switchPolygonMode();
         break;
 
     case GLFW_KEY_W:

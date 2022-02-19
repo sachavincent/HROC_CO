@@ -4,18 +4,31 @@
 #include "glm/gtx/string_cast.hpp"
 #include <algorithm>
 
-int Cube::instance_counter = 0;
-unsigned int Cube::shared_vao = 0;
+OBJECT_DATA Cube::data;
+bool *Cube::visible;
 
-Cube::Cube(float _edgeSize, std::string _name)
+unsigned int Cube::instance_counter = 0;
+
+Cube::Cube(float _edgeSize, const std::string &_name) : Object(_name)
 {
-	instance = instance_counter;
-	instance_counter++;
+	instance = instance_counter++;
 
-	Object();
-	Object::name = (_name.size() > 0) ? _name : "Cube_" + std::to_string(instance);
+	setPosition(glm::vec3{0.0});
+	setScale(glm::vec3(_edgeSize));
+	setRotationMatrix(glm::mat4{1.0});
+	
+	visible[instance] = true;
+}
 
-	m.vertices = {
+void Cube::create(int nbInstances)
+{
+	data.numInstances = nbInstances;
+	visible = new bool[nbInstances];
+
+	data.bounds.min = {-0.5f, -0.5f, -0.5f};
+	data.bounds.max = {0.5f, 0.5f, 0.5f};
+
+	std::vector<GLfloat> vertices = {
 		-0.5f, -0.5f, -0.5f,
 		0.5f, -0.5f, -0.5f,
 		0.5f, 0.5f, -0.5f,
@@ -58,7 +71,7 @@ Cube::Cube(float _edgeSize, std::string _name)
 		-0.5f, 0.5f, 0.5f,
 		-0.5f, 0.5f, -0.5f};
 
-	m.normals = {
+	std::vector<GLfloat> normals = {
 		0.0f, 0.0f, -1.0f,
 		0.0f, 0.0f, -1.0f,
 		0.0f, 0.0f, -1.0f,
@@ -101,7 +114,7 @@ Cube::Cube(float _edgeSize, std::string _name)
 		0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f};
 
-	m.textureCoord = {
+	std::vector<GLfloat> textureCoord = {
 		0.0f, 0.0f,
 		1.0f, 0.0f,
 		1.0f, 1.0f,
@@ -144,7 +157,7 @@ Cube::Cube(float _edgeSize, std::string _name)
 		0.0f, 0.0f,
 		0.0f, 1.0f};
 
-	m.indices = {
+	std::vector<GLuint> indices = {
 		0, 2, 1,
 		3, 5, 4,
 
@@ -163,29 +176,24 @@ Cube::Cube(float _edgeSize, std::string _name)
 		30, 32, 31,
 		33, 35, 34};
 
-	bounds.min = {-0.5f, -0.5f, -0.5f};
-	bounds.max = {0.5f, 0.5f, 0.5f};
+	data.numVertices = vertices.size() / 3;
+	data.vertices = new Vertex[data.numVertices];
+	for (size_t i = 0; i < data.numVertices; i++)
+	{
+		Vertex vertex;
+		vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
+		vertex.Normal = {normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]};
+		vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
+		data.vertices[i] = vertex;
+	}
 
-	m.numIndices = m.indices.size();
-
-	setPosition(glm::vec3{0.0});
-	setScale(glm::vec3(_edgeSize));
-	setRotationMatrix(glm::mat4{1.0});
+	data.numIndices = indices.size();
+	data.indices = new GLuint[data.numIndices];
+	for (size_t i = 0; i < data.numIndices; i++)
+		data.indices[i] = indices[i];
 }
 
-void Cube::load()
+OBJECT_DATA Cube::getData()
 {
-	if (instance == 0)
-	{
-		// std::cout << "le cube\n";
-		Object::load();
-		shared_vao = m.vao;
-	}
-	else
-	{
-		// std::cout << "le cube\n";
-		m.vao = shared_vao;
-		loaded = true;
-		Object::load();
-	}
+	return data;
 }

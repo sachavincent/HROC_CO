@@ -14,7 +14,7 @@ void Ui::load(GLFWwindow *_window, Engine *_engine)
     engine = _engine;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    //ImPlot::CreateContext();
+    // ImPlot::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
@@ -28,7 +28,7 @@ void Ui::render()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //TODO: test implot
+    // TODO: test implot
     ImPlot::CreateContext();
     plotTimer();
     plotFpsRate();
@@ -43,7 +43,8 @@ void Ui::render()
     ImGui::Separator();
     objectsParams();
 
-    if (newLightWindowActive) newLightWindow();
+    if (newLightWindowActive)
+        newLightWindow();
 
     ImGui::End();
     ImGui::Render();
@@ -191,25 +192,25 @@ void Ui::objectsParams()
         glm::vec3 scale = object->getScale();
         ImGui::DragFloat3("Scale", &scale[0], 0.01, 0.01, 10.0);
         object->setScale(scale);
+        /*
+                glm::vec3 diffuse = object->getDiffuse();
+                ImGui::ColorEdit3("Diffuse", &diffuse[0]);
+                object->setDiffuse(diffuse);
+                glm::vec3 specular = object->getSpecular();
+                ImGui::ColorEdit3("Specular", &specular[0]);
+                object->setSpecular(specular);
+                float shininess = object->getShininess();
+                ImGui::DragFloat("Shininess", &shininess, 1.0, 5.0, 256.0);
+                object->setShininess(shininess);
 
-        glm::vec3 diffuse = object->getDiffuse();
-        ImGui::ColorEdit3("Diffuse", &diffuse[0]);
-        object->setDiffuse(diffuse);
-        glm::vec3 specular = object->getSpecular();
-        ImGui::ColorEdit3("Specular", &specular[0]);
-        object->setSpecular(specular);
-        float shininess = object->getShininess();
-        ImGui::DragFloat("Shininess", &shininess, 1.0, 5.0, 256.0);
-        object->setShininess(shininess);
-
-        ImGui::Text("Texture Parameters:");
-        if (object->hasTextures())
-        {
-            glm::vec2 texScale = object->getTexScaling();
-            ImGui::DragFloat2("Texture Scaling", &texScale[0], 0.1, 0.1, 20.0);
-            object->setTexScaling(texScale);
-        }
-
+                ImGui::Text("Texture Parameters:");
+                if (object->hasTextures())
+                {
+                    glm::vec2 texScale = object->getTexScaling();
+                    ImGui::DragFloat2("Texture Scaling", &texScale[0], 0.1, 0.1, 20.0);
+                    object->setTexScaling(texScale);
+                }
+        */
         ImGui::TreePop();
     }
 }
@@ -259,7 +260,7 @@ void Ui::sceneParams()
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
-            ImGui::Text((std::string{"Current file:\n"}+mmesh_path).c_str());
+            ImGui::Text((std::string{"Current file:\n"} + mmesh_path).c_str());
             break;
         }
 
@@ -329,34 +330,36 @@ void Ui::newLightWindow()
 
 void Ui::plotTimer()
 {
-    Scene* scene = engine->getScene();
+    Scene *scene = engine->getScene();
     double timers[9];
-    for (int i = 0;i<9;i++){
+    for (int i = 0; i < 9; i++)
+    {
         timers[i] = round(scene->timers[i] * 1000);
-        if (timers[i]<0){
+        if (timers[i] < 0)
+        {
             timers[i] = 0;
         }
     }
-    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250,250))) {
-        ImPlot::PlotPieChart(scene->timerLabels,timers, 9, 0.5f, 0.5f, 0.4f);
+    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250, 250)))
+    {
+        ImPlot::PlotPieChart(scene->timerLabels, timers, 9, 0.5f, 0.5f, 0.4f);
         ImPlot::EndPlot();
     }
-
 }
 
 void Ui::plotFpsRate()
 {
-    std::vector<double> & fpsVector = engine->fpsVector;
+    std::vector<double> &fpsVector = engine->fpsVector;
     int length = fpsVector.size();
-    double * fps = fpsVector.data();
+    double *fps = fpsVector.data();
 
     static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit;
     static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit;
 
-    if (ImPlot::BeginPlot("Fps rate", NULL, NULL, ImVec2(250,250))) {
-        ImPlot::SetupAxes("X","Y",xflags,yflags);
-        ImPlot::PlotLine("Courbe des fps",fps,length);
+    if (ImPlot::BeginPlot("Fps rate", NULL, NULL, ImVec2(250, 250)))
+    {
+        ImPlot::SetupAxes("X", "Y", xflags, yflags);
+        ImPlot::PlotLine("Courbe des fps", fps, length);
         ImPlot::EndPlot();
     }
-
 }

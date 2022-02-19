@@ -9,7 +9,39 @@
 #else
 #include <Windows.h>
 #endif
+#include <glm/glm.hpp>
 
+#include <glad/glad.h>
+
+struct OBJECT_BOUNDS
+{
+    glm::vec3 max;
+    glm::vec3 min;
+};
+struct Vertex
+{
+    glm::vec3 Position;
+    glm::vec2 TexCoord;
+    glm::vec3 Normal;
+};
+struct OBJECT_DATA
+{
+    Vertex *vertices;
+    GLuint *indices;
+    unsigned int numVertices, numIndices;
+    unsigned int numInstances;
+
+    // LOCAL object maximum and minimum bounds without transformation
+    OBJECT_BOUNDS bounds;
+};
+struct DrawElementsCommand
+{
+    GLuint vertexCount;
+    GLuint instanceCount;
+    GLuint firstIndex;
+    GLuint baseVertex;
+    GLuint baseInstance;
+};
 class Utils
 {
 public:

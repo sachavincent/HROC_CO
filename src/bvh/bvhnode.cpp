@@ -49,7 +49,7 @@ BvhNode *BvhNode::merge(BvhNode *_left, BvhNode *_right, int _newId)
     AxisBoundingBox *bbLeft = dynamic_cast<AxisBoundingBox *>(ptrLeftBox.get());
     AxisBoundingBox *bbRight = dynamic_cast<AxisBoundingBox *>(ptrRightBox.get());
     BoundingBox *bb = bbLeft->merge(bbRight);
-    bb->getWireframe()->load();
+    //bb->getWireframe()->load();
     std::shared_ptr<BoundingBox> bbPtr(bb);
     BvhNode *p = new BvhNode(bbPtr, _newId);
     p->leftChild = _left;

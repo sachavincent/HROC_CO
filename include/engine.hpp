@@ -58,6 +58,10 @@ public:
     // This method switches between the two available cameras
     void switchCamera();
 
+    void switchPolygonMode()
+    {
+        polygonMode = polygonMode == GL_FILL ? GL_LINE : GL_FILL;
+    }
 private:
     Ui ui;
     float width;
@@ -70,6 +74,7 @@ private:
     GLFWwindow *window;
     std::string windowName = WINDOW_NAME;
 
+    int polygonMode = GL_FILL;
     double deltaTime;
     double lastFrame;
 };

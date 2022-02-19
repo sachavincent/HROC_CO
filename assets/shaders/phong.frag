@@ -1,23 +1,9 @@
-#version 440 core
+#version 460 core
 
 #define NR_LIGHTS 10
 #define gamma 2.2
 
 // PHONG SHADER
-
-
-#define MAX_PER_DEPTH_BB 16
-
-const vec3 colorsBB[MAX_PER_DEPTH_BB] = { vec3(244.0 / 255, 67.0 / 255, 54.0 / 255), vec3(233.0 / 255, 30.0 / 255, 99.0 / 255),
-                                    vec3(156.0 / 255, 39.0 / 255, 176.0 / 255), vec3(103.0 / 255, 58.0 / 255, 183.0 / 255),
-                                    vec3(63.0 / 255, 81.0 / 255, 181.0 / 255), vec3(33.0 / 255, 150.0 / 255, 243.0 / 255),
-                                    vec3(3.0 / 255, 169.0 / 255, 244.0 / 255), vec3(0.0 / 255, 188.0 / 255, 212.0 / 255),
-                                    vec3(0.0 / 255, 150.0 / 255, 136.0 / 255), vec3(76.0 / 255, 175.0 / 255, 80.0 / 255),
-                                    vec3(139.0 / 255, 195.0 / 255, 74.0 / 255), vec3(205.0 / 255, 220.0 / 255, 57.0 / 255),
-                                    vec3(255.0 / 255, 235.0 / 255, 59.0 / 255), vec3(255.0 / 255, 193.0 / 255, 7.0 / 255),
-                                    vec3(255.0 / 255, 152.0 / 255, 0.0 / 255), vec3(255.0 / 255, 87.0 / 255, 34.0 / 255) };
-
-const float ALPHA_BB = 1;
 
 out vec4 FragColor;
 
@@ -51,11 +37,14 @@ struct Light {
 in vec3 FragPos_in;
 in vec2 TexCoords_in;
 in vec3 Normal_in;
+flat in uint ObjectID_in;
   
+layout (binding = 0) uniform sampler2DArray textureArray;
+
+
 uniform vec3 viewPos;
 uniform float exposure;
 uniform vec2 texScaling;
-uniform int numBB;
 
 
 uniform Light lights[NR_LIGHTS];
@@ -69,25 +58,19 @@ mat3 CalcTBN(vec3 normal, vec3 viewDir);
     
 void main()
 {
-    float alpha;
     vec3 result;
-    if(numBB == -1) // Not a bounding box
-    {
-        vec3 viewDir = normalize(viewPos - FragPos_in);
-        result = vec3(0,0,0);
-        
-        for(int i = 0; i < NR_LIGHTS; i++)
-            if(lights[i].enabled)
-                result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
-        alpha = 1;
-    }
-    else // This object is a bounding box
-    {
-        result = colorsBB[numBB % MAX_PER_DEPTH_BB];
-        alpha = ALPHA_BB;
-    }
+    vec3 viewDir = normalize(viewPos - FragPos_in);
+    result = vec3(0,0,0);
+    
+    for(int i = 0; i < NR_LIGHTS; i++)
+        if(lights[i].enabled)
+            result += CalcLight(lights[i], Normal_in, FragPos_in, viewDir);    
+    
 
-    FragColor = vec4(result, alpha);
+    result = colorsBB[test];
+        
+    FragColor = vec4(result, 1);
+    FragColor = texture(textureArray, vec3(TexCoords_in.x, TexCoords_in.y, ObjectID_in));
 }
 
 // Calculate values for point lights

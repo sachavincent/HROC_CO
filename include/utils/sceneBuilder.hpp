@@ -12,12 +12,11 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-
 //! Builds a scene for
 class SceneBuilder
 {
 
-  public:
+public:
     //! Builds the stating screen scene
     static Scene *buildDefaultScene(Engine *_engine)
     {
@@ -31,42 +30,59 @@ class SceneBuilder
 
         //####################### creating models ###########################
 
-        //std::random_device device;
-        //std::mt19937 gen(device());
-        //std::uniform_real_distribution<float> dist(5, 20);
-        //std::uniform_real_distribution<float> distScale(1, 2);
-        //std::uniform_real_distribution<float> distRot(-1, 1);
-//
-        //for (size_t i = 0; i < 10; i++)
-        //{
-        //    auto cube = std::make_shared<Cube>(1.0f);
-        //    cube->setPosition({dist(gen), dist(gen), dist(gen)})
-        //        .setScale({distScale(gen), distScale(gen), distScale(gen)})
-        //        .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
-        //    .setDiffuse({0.0f, 1.0f, 0.3f})
-        //    .setSpecular(glm::vec3{0.8});
-        //    sc->addObject(cube);
-        //}
+        std::random_device device;
+        std::mt19937 gen(3);
+        std::uniform_real_distribution<float> dist(5, 20);
+        std::uniform_real_distribution<float> distScale(1, 2);
+        std::uniform_real_distribution<float> distRot(-1, 1);
 
-        auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere1->setPosition({3.5, 0.7, 3.5})
-            .setRotation(90, {1, 0, 0})
-            .setDiffuse({1.0, 0.0, 1.0});
+        Texture::createTextureArray(15);
+        Cube::create(10);
+        for (size_t i = 0; i < 10; i++)
+        {
+            auto cube = std::make_shared<Cube>(1.0f);
+            cube->setPosition({dist(gen), dist(gen), dist(gen)})
+                .setScale({distScale(gen), distScale(gen), distScale(gen)})
+                .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
+                .setDiffuse({0.0f, 1.0f, 0.3f})
+                .setSpecular(glm::vec3{0.8});
+            sc->addObject(cube);
+        }
 
-        sc->addObject(sphere1);
-
+        Plane::create(1);
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
         plane1->setRotation(-90, {1, 0, 0})
             .setTexDiffuse("textures/stoneWall/diffuse.png")
-            .setTexSpecular("textures/stoneWall/roughness.png")
-            .setTexScaling({4, 4});
+            .setTexSpecular("textures/stoneWall/roughness.png");
         sc->addObject(plane1);
 
-        auto teapot = std::make_shared<FileObject>("models/teapot.obj", true);
+        FileObject::create("models/teapot.obj", 2);
+        auto teapot = std::make_shared<FileObject>("models/teapot.obj");
         teapot->setScale(glm::vec3{0.6f})
             .setPosition({0.0f, 1.5f, 0.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot);
+
+        auto teapot2 = std::make_shared<FileObject>("models/teapot.obj");
+        teapot2->setScale(glm::vec3{0.7f})
+            .setPosition({-3.0f, 1.5f, 2.0f})
+            .setDiffuse({0.55f, 0.5f, 0.0f});
+        sc->addObject(teapot2);
+
+        UVSphere::create(2);
+        auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
+        sphere1->setPosition({3.5, 0.7, 3.5})
+            .setRotation(90, {1, 0, 0})
+            .setDiffuse({1.0, 0.0, 0.8f});
+
+        sc->addObject(sphere1);
+        auto sphere2 = std::make_shared<UVSphere>(1.0, 25, 20);
+        sphere2->setPosition({-3.5, 0.7, 3.5})
+            .setRotation(90, {1, 0, 0})
+            .setDiffuse({1.0, 0.0, 0.0});
+
+        sc->addObject(sphere2);
+
         return sc;
     }
 
@@ -106,14 +122,15 @@ class SceneBuilder
         std::uniform_real_distribution<float> distScale(_aSize - (_aSize * _aScaleMult),
                                                         _aSize + (_aSize * _aScaleMult));
 
-        std::uniform_int_distribution<int> distRot(-1,1);
-        std::uniform_int_distribution<int> distAxisRot(0,2);
+        std::uniform_int_distribution<int> distRot(-1, 1);
+        std::uniform_int_distribution<int> distAxisRot(0, 2);
+        FileObject::create("models/asteroid/Asteroid1.obj", _aCount);
         for (size_t i = 0; i < _aCount; i++)
         {
-            auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj", false);
+            auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj");
             asteroid->setPosition({distPosX(gen), distPosY(gen), distPosZ(gen)})
-                .setScale(glm::vec3{distScale(gen),distScale(gen),distScale(gen)})
-                .setRotation(distRot(gen)*90,{distAxisRot(gen)==0?1:0,distAxisRot(gen)==1?1:0,distAxisRot(gen)==2?1:0})
+                .setScale(glm::vec3{distScale(gen), distScale(gen), distScale(gen)})
+                .setRotation(distRot(gen) * 90, {distAxisRot(gen) == 0 ? 1 : 0, distAxisRot(gen) == 1 ? 1 : 0, distAxisRot(gen) == 2 ? 1 : 0})
                 .setTexDiffuse("models/asteroid/asteroidDiffuse.jpg")
                 .setTexSpecular("models/asteroid/asteroidSpecular.png");
             scene->addObject(asteroid);
@@ -122,45 +139,45 @@ class SceneBuilder
     }
     /**
      * @brief Build a scene from a given multi mesh .obj file
-     * 
+     *
      * @param _engine A pointer to current engine
      * @param _path The ABSOLUTE path of the .obj file
      * @return Scene* A pointer to the created scene
      */
     static Scene *buildMultiMesh(Engine *_engine, std::string _path)
     {
-        
+
         Scene *scene = new Scene(_engine);
+        /*
+                auto sunLight = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.5});
+                sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
+                scene->addLight(sunLight);
+                auto sunLight2 = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.4});
+                sunLight2->setAttenuation({1.0f, 0.0f, 0.0f});
+                scene->addLight(sunLight2);
+                auto sunLight3 = std::make_shared<Light>(glm::vec3{0, 5000, 0}, glm::vec3{0.25});
+                sunLight3->setAttenuation({1.0f, 0.0f, 0.0f});
+                scene->addLight(sunLight3);
 
-        auto sunLight = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.5});
-        sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
-        scene->addLight(sunLight);
-        auto sunLight2 = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.4});
-        sunLight2->setAttenuation({1.0f, 0.0f, 0.0f});
-        scene->addLight(sunLight2);
-        auto sunLight3 = std::make_shared<Light>(glm::vec3{0, 5000, 0}, glm::vec3{0.25});
-        sunLight3->setAttenuation({1.0f, 0.0f, 0.0f});
-        scene->addLight(sunLight3);
+                std::cout << "loading city from file : " << _path << " ..." << std::endl;
 
-        std::cout << "loading city from file : " << _path << " ..." << std::endl;
-
-        Assimp::Importer importer;
-        const aiScene *assimpScene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs |
-                                                             aiProcess_GenNormals);
+                Assimp::Importer importer;
+                const aiScene *assimpScene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs |
+                                                                     aiProcess_GenNormals);
 
 
-        if (!scene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
-        {
-            std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-            return scene;
-        }
+                if (!scene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
+                {
+                    std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+                    return scene;
+                }
 
-        std::string name;
-        for(size_t i = 0; i< assimpScene->mNumMeshes;i++){
-            name = _path+std::to_string(i);
-            auto mesh = std::make_shared<AssimpMeshObject>(assimpScene,assimpScene->mMeshes[i],name);
-            scene->addObject(mesh);
-        }
+                std::string name;
+                for(size_t i = 0; i< assimpScene->mNumMeshes;i++){
+                    name = _path+std::to_string(i);
+                    auto mesh = std::make_shared<AssimpMeshObject>(assimpScene,assimpScene->mMeshes[i],name);
+                    scene->addObject(mesh);
+                }*/
         return scene;
     }
 

@@ -22,21 +22,25 @@ class Engine;
 class Scene
 {
 private:
+    Engine *engine;
+
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
+
     Shader sh;
     Shader simpleShader;
     Shader earlyZShader;
-    Engine *engine;
+    Shader bbShader;
 
+    GLuint vao;
+    GLuint vbo, ebo, inst, cmd, idVBO, colorVBO;
+    size_t nbObjects;
     float exposure;
-    //! maximum level of current bvh
+    
+    std::vector<glm::mat4> models;
 
     BvhTree *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
-
-
-
 
 public:
     Scene(Engine *_engine);
@@ -46,10 +50,10 @@ public:
     ~Scene();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
-    //!render one object with standard shader (i.e. Phong)
-    void Scene::renderObject(Object& obj);
+    //! render one object with standard shader (i.e. Phong)
+    void Scene::renderObject(Object &obj);
     //! Render all objects of given vector with standard shader (i.e. Phong)
-    void Scene::renderObjects(std::vector<Object*>& vector);
+    void Scene::renderObjects(std::vector<Object *> &vector);
 
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
@@ -74,15 +78,15 @@ public:
     void load();
 
     void createBVH();
-    
-    // Timers for pipeline 
+
+    // Timers for pipeline
     double timers[9];
-    const char * timerLabels[9]{"EarlyZ","Extract","VFC","Raycast","Bb extract","Batch occlusion Test","Early Z on Rendering","Draw objects","Merge"};
+    const char *timerLabels[9]{"EarlyZ", "Extract", "VFC", "Raycast", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Draw objects", "Merge"};
 
 private:
     // Called when camera moves
     void updateBvh();
-    
+
     void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
 
     std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);

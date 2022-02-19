@@ -1,68 +1,68 @@
 #include "object.hpp"
 
-int Plane::instance = 0;
+OBJECT_DATA Plane::data;
+bool *Plane::visible;
+
+unsigned int Plane::instance_counter = 0;
 
 Plane::Plane(glm::vec2 _size, int _nX, int _nY, const std::string &_name) : Object(_name)
 {
-    instance++;
+    instance = instance_counter++;
 
-    GLuint idx = 0;
+    setPosition(glm::vec3{0.0});
+    setScale(glm::vec3(_size, 0));
+    setRotationMatrix(glm::mat4{1.0});
 
-    float stepX = _size[0] / _nX;
-    float stepY = _size[1] / _nY;
+    visible[instance] = true;
+}
 
-    for (int i = 0; i < _nX; i++)
+void Plane::create(int nbInstances)
+{
+    data.numInstances = nbInstances;
+    visible = new bool[nbInstances];
+    data.bounds.min = {-0.5f, -0.5f, 0.0f};
+    data.bounds.max = {0.5f, 0.5f, 0.0f};
+
+    std::vector<GLfloat> vertices = {
+        -0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f};
+
+    std::vector<GLfloat> normals = {
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f};
+
+    std::vector<GLfloat> textureCoord = {
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f};
+
+    std::vector<GLuint> indices = {
+        1, 2, 0,
+        1, 3, 2};
+
+    data.numVertices = vertices.size() / 3;
+    data.vertices = new Vertex[data.numVertices];
+    for (size_t i = 0; i < data.numVertices; i++)
     {
-        for (int j = 0; j < _nY; j++)
-        {
-
-            m.vertices.insert(m.vertices.end(), {
-                                                    -_size[0] / 2 + i * (stepX),
-                                                    -_size[1] / 2 + j * (stepY),
-                                                    0.0f,
-                                                    -_size[0] / 2 + (i + 1) * (stepX),
-                                                    -_size[1] / 2 + j * (stepY),
-                                                    0.0f,
-                                                    -_size[0] / 2 + (i + 1) * (stepX),
-                                                    -_size[1] / 2 + (j + 1) * (stepY),
-                                                    0.0f,
-
-                                                    -_size[0] / 2 + (i + 1) * (stepX),
-                                                    -_size[1] / 2 + (j + 1) * (stepY),
-                                                    0.0f,
-                                                    -_size[0] / 2 + i * (stepX),
-                                                    -_size[1] / 2 + (j + 1) * (stepY),
-                                                    0.0f,
-                                                    -_size[0] / 2 + i * (stepX),
-                                                    -_size[1] / 2 + j * (stepY),
-                                                    0.0f,
-                                                });
-            m.normals.insert(m.normals.end(),
-                             {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-
-                              0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f});
-
-            m.textureCoord.insert(m.textureCoord.end(), {
-                                                            i * (stepX) / _size[0],
-                                                            j * (stepY) / _size[1],
-                                                            (i + 1) * (stepX) / _size[0],
-                                                            j * (stepY) / _size[1],
-                                                            (i + 1) * (stepX) / _size[0],
-                                                            (j + 1) * (stepY) / _size[1],
-
-                                                            (i + 1) * (stepX) / _size[0],
-                                                            (j + 1) * (stepY) / _size[1],
-                                                            i * (stepX) / _size[0],
-                                                            (j + 1) * (stepY) / _size[1],
-                                                            i * (stepX) / _size[0],
-                                                            j * (stepY) / _size[1],
-                                                        });
-
-            m.indices.insert(m.indices.end(), {idx, idx + 2, idx + 1, idx + 3, idx + 5, idx + 4});
-            idx += 6;
-        }
+        Vertex vertex;
+        vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
+        vertex.Normal = {normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]};
+        vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
+        data.vertices[i] = vertex;
     }
-    bounds.min = {-_size[0] / 2, -_size[1] / 2, 0.0f};
-    bounds.max = {_size[0] / 2, _size[1] / 2, 0.0f};
-    m.numIndices = m.indices.size();
+
+    data.numIndices = indices.size();
+    data.indices = new GLuint[data.numIndices];
+    for (size_t i = 0; i < data.numIndices; i++)
+        data.indices[i] = indices[i];
+}
+
+OBJECT_DATA Plane::getData()
+{
+    return data;
 }

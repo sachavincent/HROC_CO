@@ -13,38 +13,38 @@
 class Texture
 {
 private:
-    Texture(int id) : _id(id) {}
-    Texture(const std::string &file);
+    static std::map<std::string, std::vector<float>> cache;
+
+    static GLuint id;
+    static bool arrayInit;
+    static unsigned int currObj;
+    static unsigned int maxObjects;
 
 public:
-    static Texture &DEFAULT_TEXTURE()
+    static void createTextureArray(unsigned int nbObjects)
     {
-        static Texture tex("default.png");
-        return tex;
+        maxObjects = nbObjects;
+
+        glGenTextures(1, &id);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+
+        // Create storage for the texture. (100 layers of 1x1 texels)
+        glTexStorage3D(GL_TEXTURE_2D_ARRAY,
+                       1,
+                       GL_RGBA16F, // Internal format
+                       1024, 1024, // width,height
+                       maxObjects  // Number of layers
+        );
+        arrayInit = true;
     }
+    static void loadTexture(const std::string &_file, unsigned int _id);
 
-    static Texture loadTexture(const std::string &file);
+    static void load();
 
-    void load();
+    static void unload();
 
-    void unload();
-
-    inline const GLuint &getId() const { return _id; }
-
-    bool operator==(const Texture &t)
-    {
-        return t.getId() == _id;
-    }
-
-    bool operator!=(const Texture &t)
-    {
-        return t.getId() != _id;
-    }
-
-private:
-    static std::map<std::string, int> cache;
-
-    GLuint _id;
+    inline static const GLuint &getId() { return id; }
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "object.hpp"
+/*#include "object.hpp"
 
 int AssimpMeshObject::instance_counter = 0;
 
@@ -103,3 +103,4 @@ AssimpMeshObject::AssimpMeshObject(const aiScene *_scene, aiMesh *_mesh, std::st
         bounds.min.z = std::min(bounds.min.z, m.vertices[i + 2]);
     }
 }
+*/

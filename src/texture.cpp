@@ -1,95 +1,95 @@
 #include "texture.hpp"
 
-std::map<std::string, int> Texture::cache;
+std::map<std::string, std::vector<float>> Texture::cache;
 
-Texture::Texture(const std::string &file)
+GLuint Texture::id;
+bool Texture::arrayInit = false;
+unsigned int Texture::currObj = 0;
+unsigned int Texture::maxObjects = 0;
+
+void Texture::loadTexture(const std::string &_file, unsigned int _id)
 {
 #ifndef HROC_TESTS
-    std::string path = Utils::workingDirectory() + file;
+    if (currObj > maxObjects)
+    {
+        std::cerr << "Texture array size too small! (" << currObj << " < " << maxObjects << ")" << std::endl;
+        return;
+    }
+
+    if (!arrayInit)
+    {
+        std::cerr << "Texture array not initialized!" << std::endl;
+        return;
+    }
+
+    std::string path = Utils::workingDirectory() + _file;
 
     // load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (Texture::cache.find(path) == Texture::cache.end())
     {
-        //path = Utils::workingDirectory() + path;
-        glGenTextures(1, &_id);
-        Texture::cache[path] = _id;
-    }
-    else
-    {
-        _id = Texture::cache.find(path)->second;
-        return;
-    }
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
-    if (!data)
-    {
-        std::cerr << "Cannot load file image: " << path.c_str() << ", STB Reason: " << stbi_failure_reason() << std::endl;
-        return;
-    }
-    size_t numPixels = width * height * nrComponents;
-
-    std::vector<float> dataf;
-    dataf.reserve(width * height * 4);
-    if (nrComponents == 4)
-    {
-        for (size_t i = 0; i < numPixels; i++)
+        int width, height, nrComponents;
+        unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
+        if (!data)
         {
-            dataf.push_back((float)(data[i] - '0') / 255);
+            std::cerr << "Cannot load file image: " << path.c_str() << ", STB Reason: " << stbi_failure_reason() << std::endl;
+            return;
         }
-    }
-    else if (nrComponents == 3)
-    {
-        for (size_t i = 0; i < numPixels; i += 3)
+        if (width != 1024 && height != 1024)
         {
-            dataf.push_back((float)(data[i] - '0') / 255);
-            dataf.push_back((float)(data[i + 1] - '0') / 255);
-            dataf.push_back((float)(data[i + 2] - '0') / 255);
-            dataf.push_back(1.0);
+            std::cerr << "Textures must be 1024x1024!" << std::endl;
+            return;
         }
-    }
-    else if (nrComponents == 1)
-    {
-        for (size_t i = 0; i < numPixels; i++)
+        size_t numPixels = width * height * nrComponents;
+
+        std::vector<float> dataf;
+        dataf.reserve(width * height * 4);
+        if (nrComponents == 4)
         {
-            dataf.push_back((float)(data[i] - '0') / 255);
-            dataf.push_back((float)(data[i] - '0') / 255);
-            dataf.push_back((float)(data[i] - '0') / 255);
-            dataf.push_back(1);
+            for (size_t i = 0; i < numPixels; i++)
+            {
+                dataf.push_back((float)(data[i] - '0') / 255);
+            }
         }
+        else if (nrComponents == 3)
+        {
+            for (size_t i = 0; i < numPixels; i += 3)
+            {
+                dataf.push_back((float)(data[i] - '0') / 255);
+                dataf.push_back((float)(data[i + 1] - '0') / 255);
+                dataf.push_back((float)(data[i + 2] - '0') / 255);
+                dataf.push_back(1.0);
+            }
+        }
+        else if (nrComponents == 1)
+        {
+            for (size_t i = 0; i < numPixels; i++)
+            {
+                dataf.push_back((float)(data[i] - '0') / 255);
+                dataf.push_back((float)(data[i] - '0') / 255);
+                dataf.push_back((float)(data[i] - '0') / 255);
+                dataf.push_back(1);
+            }
+        }
+        Texture::cache[path] = dataf;
     }
 
-    if (data)
-    {
-        GLenum format = GL_RGBA16F;
-        GLenum iformat = GL_RGBA;
+    std::vector<float> data = Texture::cache[path];
 
-        glBindTexture(GL_TEXTURE_2D, _id);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, iformat, GL_FLOAT, &dataf[0]);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    std::cout << "Added tex at texture idx=" << currObj << std::endl;
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+                    0,             // Mipmap number
+                    0, 0, _id,     // xoffset, yoffset, zoffset
+                    1024, 1024, 1, // width, height, depth
+                    GL_RGBA,       // format
+                    GL_FLOAT,      // type
+                    &data[0]);     // pointer to data
 #endif
-}
-
-Texture Texture::loadTexture(const std::string &file)
-{
-    return Texture(file);
 }
 
 void Texture::load()
 {
-    glBindTexture(GL_TEXTURE_2D, _id);
+    glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture::unload()

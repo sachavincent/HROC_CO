@@ -24,11 +24,9 @@ const char *Shader::loadShader(std::string path)
 	return cstr;
 }
 
-Shader::Shader(std::string _path, int _type)
+Shader::Shader(std::string computePath)
 {
-	assert(_type == GL_VERTEX_SHADER || _type == GL_COMPUTE_SHADER);
-
-	std::pair<std::string, std::string> paths = {_path, ""};
+	std::pair<std::string, std::string> paths = {computePath, ""};
 	auto it = buffer.find(paths);
 	if (it != buffer.end())
 	{
@@ -37,10 +35,10 @@ Shader::Shader(std::string _path, int _type)
 		return;
 	}
 
-	const char *source = Shader::loadShader(_path);
+	const char *source = Shader::loadShader(computePath);
 	// shader creation and compilation
 	unsigned int shader;
-	shader = glCreateShader(_type);
+	shader = glCreateShader(GL_COMPUTE_SHADER);
 	glShaderSource(shader, 1, &source, NULL);
 	glCompileShader(shader);
 

@@ -169,13 +169,13 @@ void Scene::load()
 {
     OBJECT_DATA cubeData = Cube::getData();
     OBJECT_DATA planeData = Plane::getData();
-    OBJECT_DATA sphereData = UVSphere::getData();
     std::vector<OBJECT_DATA> objD = FileObject::getData();
     std::vector<OBJECT_DATA> objDatas;
     objDatas.push_back(cubeData);
     objDatas.push_back(planeData);
     for (auto &d : objD)
         objDatas.push_back(d);
+    OBJECT_DATA sphereData = UVSphere::getData();
     objDatas.push_back(sphereData);
 
     std::vector<GLuint> ids;
@@ -186,7 +186,7 @@ void Scene::load()
         colors.push_back(o->getDiffuse());
 
     nbObjects = objDatas.size();
-    DrawElementsCommand *cmds = new DrawElementsCommand[nbObjects];
+    cmds = new DrawElementsCommand[nbObjects];
 
     GLuint baseVert = 0;
     GLuint baseIdx = 0;
@@ -236,8 +236,8 @@ void Scene::load()
     glNamedBufferStorage(inst, std::size(models) * sizeof(glm::mat4), models.data(), 0);
     glNamedBufferStorage(idVBO, std::size(ids) * sizeof(GLuint), ids.data(), 0);
     glNamedBufferStorage(colorVBO, std::size(colors) * sizeof(glm::vec3), colors.data(), 0);
-    glNamedBufferStorage(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, 0);
-
+    // glNamedBufferStorage(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, 0);
+    glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
     glVertexArrayElementBuffer(vao, ebo);                      // link vao to ebo
     glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex)); // vbo bound to location 0 of vao
 
@@ -270,22 +270,12 @@ void Scene::load()
     glVertexArrayVertexBuffer(vao, 3, colorVBO, 0, sizeof(glm::vec3));
     glVertexArrayBindingDivisor(vao, 3, 1);
 
-    delete cmds;
-
     sh = {"shaders/default.vert", "shaders/simple.frag"};
     simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
 
-    int *visibility = new int[objects.size()];
-
-    for (size_t i = 0; i < objects.size(); i++)
-        visibility[i] = 0;
-    glGenBuffers(1, &ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
-    // glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+    setupEarlyZCommand();
 }
 
 void Scene::createBVH()
@@ -341,6 +331,7 @@ void Scene::renderObjects()
     {
         glBindVertexArray(vao);
 
+        glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);
 
@@ -531,11 +522,9 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
 {
     // Camera *staticCam = engine->getStaticCamera();
     Camera *staticCam = getCamera();
-    std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
-              { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
     int *visibility = new int[objects.size()];
-    //glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
@@ -545,8 +534,10 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     earlyZShader.loadMat4("projection", staticCam->getProjectionMatrix());
     glBindVertexArray(vao);
 
+    // glNamedBufferData(cmd, 1 * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferData(cmd, 5 * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, size_t(5), 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), visibility);
@@ -558,6 +549,6 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glDepthFunc(GL_EQUAL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
-    //glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
     delete visibility;
 }

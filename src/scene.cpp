@@ -4,7 +4,7 @@
 #include "utils/jsonparser.hpp"
 #include "frustum.hpp"
 
-#include <execution>
+//#include <execution>
 #include <string>
 #include <map>
 
@@ -271,7 +271,7 @@ void Scene::load()
     glVertexArrayBindingDivisor(vao, 3, 1);
 
     delete cmds;
-    
+
     sh = {"shaders/default.vert", "shaders/simple.frag"};
     simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
@@ -480,7 +480,7 @@ std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> 
 
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(std::execution::par_unseq, occludeeGroups.begin(), occludeeGroups.end(), [staticCam](BoundingBox *a, BoundingBox *b)
+    std::sort(/*std::execution::par_unseq, */ occludeeGroups.begin(), occludeeGroups.end(), [staticCam](BoundingBox *a, BoundingBox *b)
               { return glm::distance(staticCam->getPosition(), a->getCenter()) < glm::distance(staticCam->getPosition(), b->getCenter()); });
 
     std::vector<BoundingBox *> potentiallyVisibleOccludees;
@@ -520,7 +520,7 @@ std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> 
 void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
 {
     Camera *staticCam = engine->getStaticCamera();
-    std::sort(std::execution::par_unseq, _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
+    std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
               { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);

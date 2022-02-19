@@ -12,7 +12,6 @@
 #include <glm/glm.hpp>
 
 #include <glad/glad.h>
-
 struct OBJECT_BOUNDS
 {
     glm::vec3 max;

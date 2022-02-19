@@ -34,6 +34,7 @@ private:
 
     GLuint vao;
     GLuint vbo, ebo, inst, cmd, idVBO, colorVBO;
+    GLuint ssbo;
     size_t nbObjects;
     float exposure;
 
@@ -83,11 +84,11 @@ public:
     double timers[9];
     const char *timerLabels[9]{"EarlyZ", "Extract", "VFC", "Raycast", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Draw objects", "Merge"};
 
+    void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
 private:
     // Called when camera moves
     void updateBvh();
 
-    void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
 
     std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);
 };

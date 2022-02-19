@@ -179,7 +179,7 @@ void Scene::load()
     objDatas.push_back(sphereData);
 
     std::vector<GLuint> ids;
-    for (GLuint i = 0; i < 15; i++)
+    for (GLuint i = 0; i < objects.size(); i++)
         ids.push_back(i);
     std::vector<glm::vec3> colors;
     for (auto &o : objects)
@@ -276,6 +276,16 @@ void Scene::load()
     simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
+
+    int *visibility = new int[objects.size()];
+
+    for (size_t i = 0; i < objects.size(); i++)
+        visibility[i] = 0;
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
+    // glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
 }
 
 void Scene::createBVH()
@@ -519,17 +529,35 @@ std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> 
 
 void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
 {
-    Camera *staticCam = engine->getStaticCamera();
+    // Camera *staticCam = engine->getStaticCamera();
+    Camera *staticCam = getCamera();
     std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
               { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
+    int *visibility = new int[objects.size()];
+    //glEnable(GL_DEPTH_TEST);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
-    // for (auto o : _objects)
-    //   o.get()->draw(earlyZShader);
+
+    earlyZShader.start();
+    earlyZShader.loadMat4("view", staticCam->getViewMatrix());
+    earlyZShader.loadMat4("projection", staticCam->getProjectionMatrix());
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), visibility);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindVertexArray(0);
+    earlyZShader.stop();
+    std::vector<int> values(visibility, visibility + objects.size());
 
     glDepthFunc(GL_EQUAL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
+    //glDisable(GL_DEPTH_TEST);
+    delete visibility;
 }

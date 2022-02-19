@@ -46,7 +46,7 @@ Engine::Engine(float _width, float _height) : width(_width), height(_height), sc
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // ImGui Setup
-    ui.load(window,this);
+    ui.load(window, this);
 
     deltaTime = 0.0;
     lastFrame = 0.0;
@@ -87,7 +87,7 @@ void Engine::loadScene()
     scene = new Scene(this);
 }
 
-void Engine::loadScene(Scene* _scene)
+void Engine::loadScene(Scene *_scene)
 {
     _scene->load();
     scene = _scene;
@@ -109,6 +109,7 @@ void Engine::startLoop()
         getCurrentCamera()->move(2.0f * deltaTime);
         // final rendering of scene
 
+        scene->doEarlyZ(scene->getObjects());
         scene->renderObjects();
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -146,7 +147,7 @@ void Engine::updateFpsCounter(double _updateRateMs)
         counter = 0;
         std::stringstream sstr;
         sstr << windowName << "  |  FPS : " << std::fixed << std::setprecision(1) << 1 / deltaTime;
-        fpsVector.push_back(1/deltaTime);
+        fpsVector.push_back(1 / deltaTime);
         glfwSetWindowTitle(window, sstr.str().c_str());
     }
     counter += deltaTime;

@@ -2,12 +2,12 @@
 
 layout(early_fragment_tests) in;
 
-buffer visibilityBuffer
+flat in uint pass_objectID;
+
+layout(std430, binding = 0) buffer visibilityBuffer
 {
     int visibility[];
 };
-
-flat in int pass_objectID;
 
 void main()
 {

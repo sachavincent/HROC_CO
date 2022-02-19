@@ -18,8 +18,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 
-void main(){
-
+void main()
+{
     FragPos_in = vec3((instanceMatrix*vec4(aPos,1.0)));
     Normal_in = mat3(transpose(inverse(instanceMatrix))) * aNormal;
     Normal_in = normalize(Normal_in);

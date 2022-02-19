@@ -97,7 +97,7 @@ private:
     // Called when camera moves
     void updateBvh();
 
-    std::vector<BoundingBox *> batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups);
+    std::vector<std::shared_ptr<BvhNode>> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups);
 
     void setupEarlyZCommand()
     {

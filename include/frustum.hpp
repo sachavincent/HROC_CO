@@ -55,14 +55,14 @@ public:
         return bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(rightFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace);
     };
 
-    std::vector<BvhNode *> ViewFrustumCulling(std::vector<BvhNode *> occludeeGroups) const
+    std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<BvhNode *> occludeeGroups) const
     {
-        std::vector<BvhNode *> occ;
+        std::vector<std::shared_ptr<BvhNode>> occ;
         for (auto it = occludeeGroups.begin(); it != occludeeGroups.end(); it++)
         {
             if (isInFrustum((*it)->getBoundingBox()))
             {
-                occ.push_back(*it);
+                occ.push_back(std::shared_ptr<BvhNode>(*it));
             }
         }
         return occ;

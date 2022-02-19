@@ -102,7 +102,7 @@ void Scene::updateBvh()
     start = glfwGetTime();
 
     const Frustum *f = getCamera()->getFrustum();
-    const std::vector<BvhNode *> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
+    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
     end = glfwGetTime();
 
     timers[2] = end - start;
@@ -129,13 +129,13 @@ void Scene::updateBvh()
      *
      * return indices of potential visible occludees U
      */
-    // TODO extract list of boundig boxes from G to initialize occludeeGroups_boundingBoxes
     end = glfwGetTime();
 
     timers[4] = end - start;
     start = glfwGetTime();
-    std::vector<BoundingBox *> occludeeGroups_boundingBoxes;
-    std::vector<BoundingBox *> potentiallyVisibleOccludees = batchOcclusionTest(occludeeGroups_boundingBoxes);
+
+
+    std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
     end = glfwGetTime();
 
     timers[5] = end - start;
@@ -488,7 +488,7 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
 
 Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
 
-std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> &occludeeGroups)
+std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups)
 {
     Camera *staticCam = engine->getStaticCamera();
     simpleShader.start();
@@ -497,19 +497,22 @@ std::vector<BoundingBox *> Scene::batchOcclusionTest(std::vector<BoundingBox *> 
 
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(/*std::execution::par_unseq, */ occludeeGroups.begin(), occludeeGroups.end(), [staticCam](BoundingBox *a, BoundingBox *b)
-              { return glm::distance(staticCam->getPosition(), a->getCenter()) < glm::distance(staticCam->getPosition(), b->getCenter()); });
+    std::sort(/*std::execution::par_unseq, */occludeeGroups.begin(),occludeeGroups.end(), 
+                [staticCam](std::shared_ptr<BvhNode> a, std::shared_ptr<BvhNode> b)
+            { return glm::distance(staticCam->getPosition(), a->getBoundingBox()->getCenter()) 
+                < glm::distance(staticCam->getPosition(), b->getBoundingBox()->getCenter()); 
+            });
 
-    std::vector<BoundingBox *> potentiallyVisibleOccludees;
+    std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees;
     const size_t nbQueries = occludeeGroups.size();
     GLuint *queries = new GLuint[nbQueries];
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    for (BoundingBox *bb : occludeeGroups)
+    for (std::shared_ptr<BvhNode>bb : occludeeGroups)
     {
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
-        bb->getWireframe()->drawQuery(simpleShader);
+        bb->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
         glEndQuery(GL_SAMPLES_PASSED);
     }
 

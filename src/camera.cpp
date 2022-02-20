@@ -4,7 +4,7 @@
 #include "bvh/boundingBoxObject.hpp"
 #include "scene.hpp"
 
-
+int i = 0;
 Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width(_width), height(_height), position(_position), fov(_fov), movingFactor({0, 0, 0})
 {
 	yaw = 90.0;
@@ -12,7 +12,14 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	front = glm::vec3(0.0f, 0.0f, 1.0f);
 	up = glm::vec3(0.0f, 1.0f, 0.0f);
 	nearDistance = 1.0f;
-	farDistance = 5000.0f;
+	// for debug purpose
+	if (i == 0){
+
+		farDistance = 3.0f;
+		i++;
+	}
+	else
+		farDistance = 5000.0f;
 	moveSpeed = 4.0;
 
 	setResolution(_width, _height);

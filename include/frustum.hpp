@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "bvh/boundingbox.hpp"
 #include "bvh/bvhnode.hpp"
+#include "object.hpp"
 #include <vector>
 
 struct Plan
@@ -76,5 +77,25 @@ public:
 
     Plan farFace;
     Plan nearFace;
+};
+
+class FrustumObject : public Object
+{
+private:
+    static bool loaded;
+    static Shader shader;
+    static GLuint vao;
+    static int numIndices;
+
+    glm::mat4 transformationMatrix;
+public:
+    FrustumObject(std::string _parentName,const glm::vec3 _edge[8],const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale);
+
+    void draw(Shader &_shader);
+
+    void drawQuery(Shader &_shader);
+
+    static inline void bind() { glBindVertexArray(vao); }
+    static inline void unbind() { glBindVertexArray(0); }
 };
 #endif

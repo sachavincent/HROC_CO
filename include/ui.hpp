@@ -52,6 +52,7 @@ private:
     **/
 
     int bboxMode = 0;
+    bool frustumMode = false;
     bool objectMode = true;
 
 public:
@@ -60,6 +61,7 @@ public:
     void render();
     void setBboxMaxLevel(int _level) { bboxMaxLevel = _level; }
     int getBboxVisMode() { return bboxMode; }
+    int getFrustumVisMode(){return frustumMode;}
     int getObjectsVisMode() { return objectMode; }
 };
 

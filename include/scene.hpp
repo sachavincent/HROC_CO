@@ -31,6 +31,7 @@ private:
     Shader simpleShader;
     Shader earlyZShader;
     Shader bbShader;
+    Shader frustumShader;
 
     GLuint vao;
     GLuint vbo, ebo, inst, cmd, idVBO, colorVBO;

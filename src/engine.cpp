@@ -114,8 +114,8 @@ void Engine::startLoop()
 
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        scene->renderFrustum();
         scene->renderBoundingBoxes();
+        scene->renderFrustum();
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 

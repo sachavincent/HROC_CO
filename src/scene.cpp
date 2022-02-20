@@ -274,6 +274,7 @@ void Scene::load()
     simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
+    frustumShader = {"shaders/frustum.vert", "shaders/frustum.frag"};
 
     setupEarlyZCommand();
 }
@@ -455,20 +456,69 @@ void Scene::renderBoundingBoxes()
 }
 
 void Scene::renderFrustum(){
-    if (!hierarchy)
+    
+    bool frustumVisMode = engine->getUi().getFrustumVisMode();
+    if (!frustumVisMode)
         return;
+    glm::mat4 view, inv,proj;
+    Camera * camera = engine->getStaticCamera();
+    //Camera * camera = getCamera();
+    proj = camera->getProjectionMatrix();
+    view = camera->getViewMatrix();
+    inv = glm::inverse(view);    
+    float farPlan = camera->getFarDistance();
+    float nearPlan = camera->getNearDistance();
+    float fov = camera->getFov();
+    float aspect = (double)camera->getResWidth() / camera->getResHeight();
+    float halfHeight = tanf(fov * .5f);
+    float halfWidth = halfHeight * aspect;
+    float xn = halfWidth * nearPlan;
+    float xf = halfWidth * farPlan;
+    float yn = halfHeight * nearPlan;
+    float yf = halfHeight * farPlan;
+    glm::vec4 initialFrustumEdge[8] = {
+    // near face
+    {-xn, -yn,nearPlan , 1.f},
+    {xn, -yn, nearPlan, 1.f},
+    {xn, yn, nearPlan, 1.f},
+    {-xn, yn, nearPlan, 1.f},
 
-    bbShader.start();
+    // far face
+    {-xf, -yf,farPlan, 1.f},
+    {xf, -yf,farPlan , 1.f},
+    {xf, yf, farPlan, 1.f},
+    {-xf, yf,farPlan , 1.f},
+};
+    glm::vec3 frustumEdge[8];
+    for (int i = 0; i < 8; i++)
+    {
+        glm::vec4 invInit = inv * initialFrustumEdge[i];
+        frustumEdge[i].x = invInit.x / invInit.w;
+        frustumEdge[i].y = invInit.y / invInit.w;
+        frustumEdge[i].z = -invInit.z / invInit.w;
+        std::cout <<"x" << i << " : " << frustumEdge[i].x<< std::endl;
+        std::cout <<"y" << i << " : " << frustumEdge[i].y<< std::endl;
+        std::cout <<"z" << i << " : " << frustumEdge[i].z<< std::endl;
+    }
+    glm::mat4 rotationMatrix{
+        1.0f,0.0f,0.0f,0.0f,
+        0.0f,1.0f,0.0f,0.0f,
+        0.0f,0.0f,1.0f,0.0f,
+        0.0f,0.0f,0.0f,1.0f
+    };
+    auto pos = camera->getPosition();
+    auto scale = glm::vec3(1.0f,1.0f,1.0f);
+    FrustumObject FObject("debugFrustum", frustumEdge,pos,rotationMatrix,scale);
 
-    bbShader.loadMat4("view", getCamera()->getViewMatrix());
-    bbShader.loadMat4("projection", getCamera()->getProjectionMatrix());
-    Object * Frustum = new Object("Frustum");
-    /*
-        Object &setPosition(const glm::vec3 &_pos);
-    Object &setScale(const glm::vec3 &_scale);
-    Object &setRotation(float _angle, glm::vec3 _axis);
-    Object &setRotationMatrix(const glm::mat4 &_rotationMatrix);
-    */
+    FrustumObject::bind();    
+    
+    frustumShader.start();
+
+    frustumShader.loadMat4("view", view);
+    frustumShader.loadMat4("projection", proj);
+    FObject.draw(frustumShader);
+    FrustumObject::unbind();
+    frustumShader.stop();
 }
 
 //! Add an object to scene

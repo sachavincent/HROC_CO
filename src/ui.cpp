@@ -62,6 +62,8 @@ void Ui::displayParams()
     ImGui::Checkbox("Display Objects", &objectMode);
 
     ImGui::Separator();
+    ImGui::Checkbox("Display Frustum", &frustumMode);
+    ImGui::Separator();
 
     static bool dispBbox = false;
     static bool dispSpecificBbox = false;

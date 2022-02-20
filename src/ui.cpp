@@ -52,6 +52,10 @@ void Ui::displayParams()
 {
     Scene *scene = engine->getScene();
     static float camspeed = scene->getCamera()->getMoveSpeed();
+    std::string cameraType;
+    engine->getCurrentCameraType() == CameraType::FREE ? cameraType = "Free Cam" : cameraType = "Static Cam";
+    ImGui::Text(cameraType.c_str());
+    ImGui::Separator();
     ImGui::DragFloat("camera movement speed", &camspeed, 0.1, 0.1, 40.0);
     scene->getCamera()->setMoveSpeed(camspeed);
 

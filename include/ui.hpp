@@ -52,7 +52,7 @@ private:
     **/
 
     int bboxMode = 0;
-    bool frustumMode = false;
+    bool frustumMode = true;
     bool objectMode = true;
 
 public:

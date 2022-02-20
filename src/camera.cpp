@@ -15,7 +15,7 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	// for debug purpose
 	if (i == 0){
 
-		farDistance = 3.0f;
+		farDistance = 10.0f;
 		i++;
 	}
 	else

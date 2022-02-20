@@ -416,7 +416,7 @@ void Scene::renderObject(Object &obj)
         }
     }
 
-    // obj.draw(sh);
+    //obj.draw(sh);
     // unload shader
     sh.stop();
 }
@@ -454,20 +454,67 @@ void Scene::renderBoundingBoxes()
     engine->getUi().setBboxMaxLevel(maxBboxLevel);
     bbShader.stop();
 }
-
+bool firesi = true;
+FrustumObject FObject;
 void Scene::renderFrustum(){
     
     bool frustumVisMode = engine->getUi().getFrustumVisMode();
     if (!frustumVisMode)
         return;
-    glm::mat4 view, inv,proj;
+    glm::mat4 view, proj;
     Camera * camera = engine->getStaticCamera();
+    glm::mat4 rotationMatrix(1.0f);
+    rotationMatrix = glm::rotate(rotationMatrix,glm::radians(camera->getYaw()),glm::vec3(1,0,0));
+    rotationMatrix = glm::rotate(rotationMatrix,glm::radians(camera->getPitch()),glm::vec3(0,1,0));
     //Camera * camera = getCamera();
     proj = camera->getProjectionMatrix();
     view = camera->getViewMatrix();
-    inv = glm::inverse(view);    
-    float farPlan = camera->getFarDistance();
-    float nearPlan = camera->getNearDistance();
+    std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
+    {
+        { -1.0f, -1.0f, 1.0f }, { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { -1.0f, 1.0f, 1.0f },
+        { -1.0f, -1.0f, -1.0f }, { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, -1.0f }, { -1.0f, 1.0f, -1.0f },
+    }
+    };
+
+
+    const auto inv = glm::inverse(proj * view);
+    std::array<glm::vec3, 8> _frustumVertices;
+
+    std::transform(
+        _cameraFrustumCornerVertices.begin(),
+        _cameraFrustumCornerVertices.end(),
+        _frustumVertices.begin(),
+        [&](glm::vec3 p) {
+            auto v =  inv * glm::vec4(p, 1.0f) ;
+            v.z = v.z;
+            // version cpu
+            //auto u = glm::vec4(glm::vec3(v) / v.w,1.0f);
+            //return glm::vec3(engine->getFreeCam()->getProjectionMatrix() * engine->getFreeCam()->getViewMatrix() * u);
+            return glm::vec3(v) / v.w;
+        }
+    );
+    glm::vec3 * vertices = _frustumVertices.data();
+    std::cout << glm::to_string(vertices[0]) << std::endl;
+    std::cout << glm::to_string(vertices[4]) << std::endl;
+    FObject = FrustumObject("debugFrustum", camera->getPosition(),rotationMatrix,glm::vec3(1.f,1.f,1.f),vertices);
+    FrustumObject::bind();    
+    
+    frustumShader.start();
+    frustumShader.loadMat4("view", getCamera()->getViewMatrix());
+    frustumShader.loadMat4("projection", getCamera()->getProjectionMatrix());
+    FObject.draw(frustumShader);
+    FrustumObject::unbind();
+    frustumShader.stop();
+    /*
+    glm::mat4 view, inv,proj;
+    Camera * camera = engine->getStaticCamera();
+    std::cout <<  glm::to_string(camera->getPosition()) << std::endl;
+    //Camera * camera = getCamera();
+    proj = camera->getProjectionMatrix();
+    view = camera->getViewMatrix();
+    inv = glm::inverse(view*proj);    
+    float farPlan = -camera->getFarDistance();
+    float nearPlan = -camera->getNearDistance();
     float fov = camera->getFov();
     float aspect = (double)camera->getResWidth() / camera->getResHeight();
     float halfHeight = tanf(fov * .5f);
@@ -476,49 +523,62 @@ void Scene::renderFrustum(){
     float xf = halfWidth * farPlan;
     float yn = halfHeight * nearPlan;
     float yf = halfHeight * farPlan;
-    glm::vec4 initialFrustumEdge[8] = {
+    glm::vec3 initialFrustumEdge[8] = {
     // near face
-    {-xn, -yn,nearPlan , 1.f},
-    {xn, -yn, nearPlan, 1.f},
-    {xn, yn, nearPlan, 1.f},
-    {-xn, yn, nearPlan, 1.f},
+    {-xn, -yn,nearPlan},
+    {xn, -yn, nearPlan},
+    {xn, yn, nearPlan},
+    {-xn, yn, nearPlan},
 
     // far face
-    {-xf, -yf,farPlan, 1.f},
-    {xf, -yf,farPlan , 1.f},
-    {xf, yf, farPlan, 1.f},
-    {-xf, yf,farPlan , 1.f},
+    {-xf, -yf,farPlan},
+    {xf, -yf,farPlan },
+    {xf, yf, farPlan},
+    {-xf, yf,farPlan },
 };
     glm::vec3 frustumEdge[8];
-    for (int i = 0; i < 8; i++)
-    {
-        glm::vec4 invInit = inv * initialFrustumEdge[i];
-        frustumEdge[i].x = invInit.x / invInit.w;
-        frustumEdge[i].y = invInit.y / invInit.w;
-        frustumEdge[i].z = -invInit.z / invInit.w;
-        std::cout <<"x" << i << " : " << frustumEdge[i].x<< std::endl;
-        std::cout <<"y" << i << " : " << frustumEdge[i].y<< std::endl;
-        std::cout <<"z" << i << " : " << frustumEdge[i].z<< std::endl;
-    }
     glm::mat4 rotationMatrix{
         1.0f,0.0f,0.0f,0.0f,
         0.0f,1.0f,0.0f,0.0f,
         0.0f,0.0f,1.0f,0.0f,
         0.0f,0.0f,0.0f,1.0f
-    };
+    };   
     auto pos = camera->getPosition();
-    auto scale = glm::vec3(1.0f,1.0f,1.0f);
-    FrustumObject FObject("debugFrustum", frustumEdge,pos,rotationMatrix,scale);
+    glm::vec3 scale(1.0f,1.0f,1.0f);
+    for (int i = 0; i < 8; i++)
+    {
+        initialFrustumEdge[i] -=camera->getPosition();
 
-    FrustumObject::bind();    
-    
-    frustumShader.start();
+        glm::vec4 invInit = inv * glm::vec4(initialFrustumEdge[i],1.0f);
+        frustumEdge[i].x = invInit.x / invInit.w;
+        frustumEdge[i].y = invInit.y / invInit.w;
+        frustumEdge[i].z = invInit.z / invInit.w;
+        //std::cout <<"x" << i << " : " << frustumEdge[i].x<< std::endl;
+        //std::cout <<"y" << i << " : " << frustumEdge[i].y<< std::endl;
+        //std::cout <<"z" << i << " : " << frustumEdge[i].z<< std::endl;
+    }
+    if(firesi){
 
-    frustumShader.loadMat4("view", view);
-    frustumShader.loadMat4("projection", proj);
-    FObject.draw(frustumShader);
-    FrustumObject::unbind();
-    frustumShader.stop();
+        FObject = FrustumObject("debugFrustum", initialFrustumEdge, pos, rotationMatrix, scale);
+        firesi = false;
+
+        
+
+    }
+    else{
+        FrustumObject::bind();   
+        frustumShader.start();
+        frustumShader.loadMat4("view", view);
+        frustumShader.loadMat4("projection", proj);
+        frustumShader.loadMat4("model", FObject.getTransformationMatrix());
+        FObject.AdjustVertexData(frustumEdge);
+        std::cout <<  glm::to_string(frustumEdge[0]) << std::endl;
+        FrustumObject::unbind();
+        frustumShader.stop();
+    }
+    */
+
+
 }
 
 //! Add an object to scene
@@ -628,3 +688,5 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     // glDisable(GL_DEPTH_TEST);
     delete _visibility;
 }
+
+

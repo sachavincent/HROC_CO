@@ -116,7 +116,16 @@ public:
 	inline const float &getNearDistance() const
 	{
 		return this->nearDistance;
+	}	
+	inline const float &getYaw() const
+	{
+		return this->yaw;
+	}	
+	inline const float &getPitch() const
+	{
+		return this->pitch;
 	}
+	
 
 	//! Get camera viewport width (in px)
 	int getResWidth() const { return width; };

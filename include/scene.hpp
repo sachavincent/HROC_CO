@@ -46,7 +46,7 @@ private:
 
     BvhTree *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
-    DrawElementsCommand *earlyZcmds;
+    
     DrawElementsCommand *cmds;
     int *visibility;
     // std::set<OBJECT_DATA>
@@ -115,9 +115,7 @@ private:
         Camera *staticCam = getCamera();
         std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
                   { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
-
-        int cmdCount = 0;
-        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects, &cmdCount);
+        
         visibility = new int[_objects.size()];
 
         for (int i = 0; i < _objects.size(); ++i)

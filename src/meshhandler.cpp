@@ -3,181 +3,178 @@
 #include "scene.hpp"
 #include "utils/utils.hpp"
 
-
-
 void MeshLoader::generateBaseModels()
 {
     OBJECT_DATA cubeData;
 
-	cubeData.bounds.min = {-0.5f, -0.5f, -0.5f};
-	cubeData.bounds.max = {0.5f, 0.5f, 0.5f};
+    cubeData.bounds.min = {-0.5f, -0.5f, -0.5f};
+    cubeData.bounds.max = {0.5f, 0.5f, 0.5f};
 
-	std::vector<GLfloat> vertices = {
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-		-0.5f, 0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
+    std::vector<GLfloat> vertices = {
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, 0.5f, -0.5f,
+        0.5f, 0.5f, -0.5f,
+        -0.5f, 0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-		-0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
+        0.5f, -0.5f, 0.5f,
+        0.5f, 0.5f, 0.5f,
+        0.5f, 0.5f, 0.5f,
+        -0.5f, 0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
 
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
+        -0.5f, 0.5f, 0.5f,
+        -0.5f, 0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, 0.5f,
+        -0.5f, 0.5f, 0.5f,
 
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
+        0.5f, 0.5f, 0.5f,
+        0.5f, 0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, 0.5f,
+        0.5f, 0.5f, 0.5f,
 
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		-0.5f, -0.5f, 0.5f,
-		-0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, 0.5f,
+        0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-		-0.5f, 0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, -0.5f};
+        -0.5f, 0.5f, -0.5f,
+        0.5f, 0.5f, -0.5f,
+        0.5f, 0.5f, 0.5f,
+        0.5f, 0.5f, 0.5f,
+        -0.5f, 0.5f, 0.5f,
+        -0.5f, 0.5f, -0.5f};
 
-	std::vector<GLfloat> normals = {
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
+    std::vector<GLfloat> normals = {
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
 
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
 
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
 
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
 
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
 
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f};
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f};
 
-	std::vector<GLfloat> textureCoord = {
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f,
+    std::vector<GLfloat> textureCoord = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
 
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
 
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f,
-		1.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
 
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f,
-		1.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
 
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 0.0f,
-		1.0f, 0.0f,
-		0.0f, 0.0f,
-		0.0f, 1.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
 
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 0.0f,
-		1.0f, 0.0f,
-		0.0f, 0.0f,
-		0.0f, 1.0f};
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f};
 
-	std::vector<GLuint> indices = {
-		0, 2, 1,
-		3, 5, 4,
+    std::vector<GLuint> indices = {
+        0, 2, 1,
+        3, 5, 4,
 
-		6, 7, 8,
-		9, 10, 11,
+        6, 7, 8,
+        9, 10, 11,
 
-		12, 13, 14,
-		15, 16, 17,
+        12, 13, 14,
+        15, 16, 17,
 
-		18, 20, 19,
-		21, 23, 22,
+        18, 20, 19,
+        21, 23, 22,
 
-		24, 25, 26,
-		27, 28, 29,
+        24, 25, 26,
+        27, 28, 29,
 
-		30, 32, 31,
-		33, 35, 34};
+        30, 32, 31,
+        33, 35, 34};
 
-	cubeData.numVertices = vertices.size() / 3;
-	cubeData.vertices = new Vertex[cubeData.numVertices];
-	for (size_t i = 0; i < cubeData.numVertices; i++)
-	{
-		Vertex vertex;
-		vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
-		vertex.Normal = {normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]};
-		vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
-		cubeData.vertices[i] = vertex;
-	}
+    cubeData.numVertices = vertices.size() / 3;
+    cubeData.vertices = new Vertex[cubeData.numVertices];
+    for (size_t i = 0; i < cubeData.numVertices; i++)
+    {
+        Vertex vertex;
+        vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
+        vertex.Normal = {normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]};
+        vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
+        cubeData.vertices[i] = vertex;
+    }
 
-	cubeData.numIndices = indices.size();
-	cubeData.indices = new GLuint[cubeData.numIndices];
-	for (size_t i = 0; i < cubeData.numIndices; i++)
-		cubeData.indices[i] = indices[i];
+    cubeData.numIndices = indices.size();
+    cubeData.indices = new GLuint[cubeData.numIndices];
+    for (size_t i = 0; i < cubeData.numIndices; i++)
+        cubeData.indices[i] = indices[i];
 
-
-    handlerSingleton->addData("cube",cubeData);
+    handlerSingleton->addData("cube", cubeData);
 
     OBJECT_DATA planeData;
     planeData.bounds.min = {-0.5f, -0.5f, 0.0f};
@@ -221,9 +218,8 @@ void MeshLoader::generateBaseModels()
     for (size_t i = 0; i < planeData.numIndices; i++)
         planeData.indices[i] = indices[i];
 
+    handlerSingleton->addData("plane", planeData);
 
-    handlerSingleton->addData("plane",planeData);
-	
     OBJECT_DATA sphereData;
 
     int _nCols = 25;
@@ -233,7 +229,7 @@ void MeshLoader::generateBaseModels()
 
     sphereData.bounds.min = {-_radius, -_radius, -_radius};
     sphereData.bounds.max = {_radius, _radius, _radius};
-    
+
     vertices.clear();
     normals.clear();
     indices.clear();
@@ -307,17 +303,16 @@ void MeshLoader::generateBaseModels()
     for (size_t i = 0; i < sphereData.numIndices; i++)
         sphereData.indices[i] = indices[i];
 
-
-    handlerSingleton->addData("sphere",sphereData);
+    handlerSingleton->addData("sphere", sphereData);
 }
 
-void MeshLoader::loadModel(const std::string &_path,const string& keyModel)
+void MeshLoader::loadModel(const std::string &_path, const std::string &keyModel)
 {
-	bool _smoothNormals = true;
+    bool _smoothNormals = true;
 
     std::string abs_path = Utils::workingDirectory() + _path;
 
-    //skip loading if same object already exists
+    // skip loading if same object already exists
     if (!handlerSingleton->contain(keyModel))
     {
         Assimp::Importer importer;
@@ -341,11 +336,11 @@ void MeshLoader::loadModel(const std::string &_path,const string& keyModel)
 
         aiMesh *mesh = scene->mMeshes[0];
         OBJECT_DATA data = processMesh(mesh, scene);
-		handlerSingleton->addData(keyModel,data);
-	}
+        handlerSingleton->addData(keyModel, data);
+    }
 }
 
-OBJECT_DATA MeshLoader:: processMesh(aiMesh *_mesh, const aiScene *_scene)
+OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene)
 {
     OBJECT_DATA data;
 
@@ -439,136 +434,128 @@ OBJECT_DATA MeshLoader:: processMesh(aiMesh *_mesh, const aiScene *_scene)
     return data;
 }
 
-
-
-void MeshHandler::getBuffers(std::vector<shared_ptr<Object>>& _objects,vector<Vertex>& vert,vector<GLuint>& ind)
-{       
-    map<string,OBJECT_DATA*> temp;
-    map<string,int> countMap;
-    for(auto it : _objects) {
-        if(it->getObjectData() != nullptr)
+void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects, std::vector<Vertex> &vert, std::vector<GLuint> &ind)
+{
+    std::vector<std::string> objOrder;
+    std::map<std::string, OBJECT_DATA *> temp;
+    for (auto it : _objects)
+    {
+        if (it->getObjectData() != nullptr)
         {
-            OBJECT_DATA* data = it->getObjectData();
-            std::string keyModel = it->getModelKey(); 
-            if(temp.count(keyModel) == 0)
+            OBJECT_DATA *data = it->getObjectData();
+            std::string keyModel = it->getModelKey();
+            if (temp.count(keyModel) == 0)
             {
+                objOrder.push_back(keyModel);
                 temp[keyModel] = data;
-                countMap[keyModel] = 1;
-            }
-            else 
-            {
-                countMap[keyModel] += 1;
             }
         }
     }
 
-    for(auto it : temp)
+    for (auto obj : objOrder)
     {
-        std::vector<Vertex> vec(it.second->vertices, it.second->vertices + it.second->numVertices);
+        OBJECT_DATA *data = temp[obj];
+        std::vector<Vertex> vec(data->vertices, data->vertices + data->numVertices);
         vert.insert(vert.end(), vec.begin(), vec.end());
 
-        std::vector<GLuint> tempind(it.second->indices, it.second->indices + it.second->numIndices);
+        std::vector<GLuint> tempind(data->indices, data->indices + data->numIndices);
         ind.insert(ind.end(), tempind.begin(), tempind.end());
     }
 }
 
-
-
-DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _objects,int *cmdCount)
+DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
 {
-	GLuint baseVert = 0;
-	GLuint baseIdx = 0;
-	GLuint baseInstance = 0;
+    GLuint baseVert = 0;
+    GLuint baseIdx = 0;
+    GLuint baseInstance = 0;
 
-	
-	map<string,OBJECT_DATA*> temp;
-    map<string,int> countMap;
-	for(auto it : _objects) {
-        if(it->getObjectData() != nullptr)
+    std::vector<std::string> objOrder;
+    std::map<std::string, OBJECT_DATA *> temp;
+    std::map<std::string, std::vector<std::shared_ptr<Object>>> countMap;
+    for (auto obj : _objects)
+    {
+        if (obj->getObjectData() != nullptr)
         {
-            OBJECT_DATA* data = it->getObjectData();
-            std::string keyModel = it->getModelKey(); 
-            if(temp.count(keyModel) == 0)
+            std::string keyModel = obj->getModelKey();
+            if (temp.count(keyModel) == 0)
             {
-                temp[keyModel] = data;
-                countMap[keyModel] = 1;
+                objOrder.push_back(keyModel);
+                temp[keyModel] = obj->getObjectData();
+                countMap[keyModel].push_back(obj);
             }
-            else 
+            else
             {
-                countMap[keyModel] += 1;
+                countMap[keyModel].push_back(obj);
             }
         }
-	}
+    }
 
+    DrawElementsCommand *cmds = new DrawElementsCommand[temp.size()];
 
-	DrawElementsCommand* cmds = new DrawElementsCommand[temp.size()]{};
-
-	int cmdId = 0;
-    for(auto it : temp)
+    size_t cmdId = 0;
+    // for (auto it : temp)
+    for (size_t cmdId = 0; cmdId < objOrder.size(); cmdId++)
     {
-        cmds[cmdId].vertexCount = it.second->numVertices;
-		cmds[cmdId].instanceCount = countMap[it.first];
-		cmds[cmdId].firstIndex = baseIdx;
-		cmds[cmdId].baseVertex = baseVert;
-		cmds[cmdId].baseInstance = baseInstance;
-		baseIdx += it.second->numIndices;
-		baseVert += it.second->numVertices;
-		baseInstance += countMap[it.first];
-        cmdId++;
+        std::string keyModel = objOrder[cmdId];
+        OBJECT_DATA *data = temp[keyModel];
+        std::vector<std::shared_ptr<Object>> objList = countMap[keyModel];
+        int nbObj = int(objList.size());
+
+        cmds[cmdId].vertexCount = data->numIndices;
+        cmds[cmdId].instanceCount = nbObj;
+        cmds[cmdId].firstIndex = baseIdx;
+        cmds[cmdId].baseVertex = baseVert;
+        cmds[cmdId].baseInstance = baseInstance;
+
+        baseIdx += data->numIndices;
+        baseVert += data->numVertices;
+        baseInstance += nbObj;
+
+        for (int i = 0; i < nbObj; i++)
+        {
+            DrawElementsCommand cmd = cmds[cmdId];
+            cmd.instanceCount = 1;
+            cmd.baseInstance += i;
+            objList[i]->setCommand(cmd);
+        }
     }
     *cmdCount = temp.size();
-
-
-
-    // earlyZcmds = new DrawElementsCommand[5];
-
-    //     std::vector<OBJECT_DATA> objD = FileObject::getData();
-    //     OBJECT_DATA teapotData = objD[0];
-    //     OBJECT_DATA cubeData = Cube::getData();
-    //     OBJECT_DATA planeData = Plane::getData();
-    //     OBJECT_DATA sphereData = UVSphere::getData();
-
-    //     GLuint baseVert = 0;
-    //     GLuint baseIdx = 0;
-    //     GLuint baseInstance = 0;
-    //     earlyZcmds[0].vertexCount = teapotData.numIndices;
-    //     earlyZcmds[0].instanceCount = 1;
-    //     earlyZcmds[0].firstIndex = 42;
-    //     earlyZcmds[0].baseVertex = 40;
-    //     earlyZcmds[0].baseInstance = 11;
-    //     baseIdx += teapotData.numIndices;
-    //     baseInstance += 1;
-
-    //     earlyZcmds[1].vertexCount = planeData.numIndices;
-    //     earlyZcmds[1].instanceCount = 1;
-    //     earlyZcmds[1].firstIndex = 36;
-    //     earlyZcmds[1].baseVertex = 36;
-    //     earlyZcmds[1].baseInstance = 10;
-    //     baseInstance += 1;
-
-    //     earlyZcmds[2].vertexCount = teapotData.numIndices;
-    //     earlyZcmds[2].instanceCount = 1;
-    //     earlyZcmds[2].firstIndex = 42;
-    //     earlyZcmds[2].baseVertex = 40;
-    //     earlyZcmds[2].baseInstance = 12;
-    //     baseInstance += 1;
-
-    //     earlyZcmds[3].vertexCount = sphereData.numIndices;
-    //     earlyZcmds[3].instanceCount = 2;
-    //     earlyZcmds[3].firstIndex = 19002;
-    //     earlyZcmds[3].baseVertex = 19000;
-    //     earlyZcmds[3].baseInstance = 13;
-    //     baseInstance += 2;
-
-    //     earlyZcmds[4].vertexCount = cubeData.numIndices;
-    //     earlyZcmds[4].instanceCount = 10;
-    //     earlyZcmds[4].firstIndex = 0;
-    //     earlyZcmds[4].baseVertex = 0;
-    //     earlyZcmds[4].baseInstance = 0;
-
-
-
-	return cmds;
+    return cmds;
 }
 
+DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
+{
+    std::vector<DrawElementsCommand> commands;
+    size_t i = 0;
+    do
+    {
+        std::shared_ptr<Object> obj = _objects[i];
+        std::string currentKeyModel = obj->getModelKey();
+        GLuint currentBaseInstance = obj->getCommand().baseInstance;
+        std::string keyModel = obj->getModelKey();
+        int nbConsecutiveObj = 0;
 
+        while (currentKeyModel == keyModel && i < _objects.size())
+        {
+            nbConsecutiveObj++;
+            if (i == _objects.size() - 1)
+                break;
+            std::shared_ptr<Object> nextObj = _objects[++i];
+            keyModel = nextObj->getModelKey();
+            GLuint baseInstance = nextObj->getCommand().baseInstance;
+            if (keyModel == currentKeyModel && baseInstance != currentBaseInstance + 1)
+                break;
+            currentBaseInstance++;
+        }
+        DrawElementsCommand command = obj->getCommand();
+        command.instanceCount = nbConsecutiveObj;
+        commands.push_back(command);
+    } while (i < _objects.size() - 1);
+
+    DrawElementsCommand *cmds = new DrawElementsCommand[commands.size()];
+    for (size_t i = 0; i < commands.size(); i++)
+        cmds[i] = commands[i];
+
+    *cmdCount = commands.size();
+    return cmds;
+}

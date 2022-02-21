@@ -5,76 +5,119 @@ bool BoundingBoxObject::loaded = false;
 GLuint BoundingBoxObject::vao;
 int BoundingBoxObject::numIndices;
 OBJECT_BOUNDS BoundingBoxObject::bounds;
-BoundingBoxObject::BoundingBoxObject(std::string _parentName, 
-				const glm::vec3 &_pos, 
-				const glm::mat4 &_rotationMatrix, 
-				const glm::vec3 &_scale,
-				std::string keyModel)
-	: Object("BoundingBox_" + _parentName,keyModel)
+BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale, std::string keyModel) : Object("BoundingBox_" + _parentName, keyModel)
 {
 	setPosition(_pos);
 	setRotationMatrix(_rotationMatrix);
 	setScale(_scale);
 
-	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
+	// std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 	if (!loaded)
 	{
-		#ifndef HROC_TESTS
+#ifndef HROC_TESTS
 		bounds.min = {-0.5f, -0.5f, -0.5f};
 		bounds.max = {0.5f, 0.5f, 0.5f};
 		std::vector<GLfloat> vertices = {
-            -0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f,
-            
-            0.5f, -0.5f, 0.5f,
-            0.5f, -0.5f, -0.5f,
-            
-            0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, -0.5f,
-            
-            -0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
-            
-            -0.5f, -0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
-            
-            -0.5f, -0.5f, 0.5f,
-            -0.5f, 0.5f, 0.5f,
-            
-            0.5f, 0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
-            
-            -0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f,
-            
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, 0.5f, -0.5f,
-            
-            0.5f, 0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            
-            -0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f,
-        };
+			-0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+			-0.5f,
+			-0.5f,
+
+			0.5f,
+			-0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+			-0.5f,
+
+			0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+
+			-0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+
+			-0.5f,
+			-0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+
+			-0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+			0.5f,
+
+			0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+
+			-0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+			0.5f,
+
+			-0.5f,
+			-0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+			-0.5f,
+
+			-0.5f,
+			-0.5f,
+			-0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+
+			0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+			-0.5f,
+			-0.5f,
+
+			-0.5f,
+			0.5f,
+			-0.5f,
+			0.5f,
+			0.5f,
+			-0.5f,
+		};
 
 		std::vector<GLuint> indices = {
-			0,1,
-			2,3,
-			4,5,
-			6,7,
-			8,9,
-			10,11,
-			12,13,
-			14,15,
-			16,17,
-			18,19,
-			20,21,
-			22,23
+			0, 1,
+			2, 3,
+			4, 5,
+			6, 7,
+			8, 9,
+			10, 11,
+			12, 13,
+			14, 15,
+			16, 17,
+			18, 19,
+			20, 21,
+			22, 23
 
-			};
+		};
 
 		numIndices = indices.size();
 

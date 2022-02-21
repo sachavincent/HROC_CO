@@ -3,7 +3,7 @@
 
 #include "bvh/boundingBoxObject.hpp"
 #include "scene.hpp"
-bool isStatic = true;
+
 Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width(_width), height(_height), position(_position), fov(_fov), movingFactor({0, 0, 0})
 {
 	yaw = 90.0;
@@ -13,12 +13,8 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	nearDistance = 1.0f;
 	moveSpeed = 4.0;
 
-	farDistance = 5000.0f;
-	if (isStatic)
-	{
-		farDistance = 10.0f;
-		isStatic = false;
-	}
+	farDistance = 500.0f;
+
 	setResolution(_width, _height);
 	frustum = new Frustum(this);
 }

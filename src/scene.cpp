@@ -246,6 +246,7 @@ void Scene::load()
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
     frustumShader = {"shaders/frustum.vert", "shaders/frustum.frag"};
 
+    createFrustum();
     setupEarlyZCommand();
 }
 
@@ -424,9 +425,10 @@ void Scene::renderBoundingBoxes()
     engine->getUi().setBboxMaxLevel(maxBboxLevel);
     bbShader.stop();
 }
-void Scene::createFrustum(){
+void Scene::createFrustum()
+{
     glm::mat4 view, proj;
-    Camera * staticCamera = engine->getStaticCamera();
+    Camera *staticCamera = engine->getStaticCamera();
     proj = staticCamera->getProjectionMatrix();
     view = staticCamera->getViewMatrix();
     std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
@@ -453,23 +455,28 @@ void Scene::createFrustum(){
             auto v = inv * glm::vec4(p, 1.0f);
             v.z = v.z;
             return glm::vec3(v) / v.w;
-        }
-    );
-    glm::vec3 * vertices = _frustumVertices.data();
-    staticFrustumObject = new FrustumObject("debugFrustum",vertices,"Frustum");
+        });
+    glm::vec3 *vertices = _frustumVertices.data();
+    staticFrustumObject = new FrustumObject("debugFrustum", vertices, "Frustum");
 }
-void Scene::updateFrustum(){
+
+void Scene::updateFrustum()
+{
     glm::mat4 view, proj;
-    Camera * staticCamera = engine->getStaticCamera();
+    Camera *staticCamera = engine->getStaticCamera();
     proj = staticCamera->getProjectionMatrix();
     view = staticCamera->getViewMatrix();
     std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
-    {
-        { -1.0f, -1.0f, 1.0f }, { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { -1.0f, 1.0f, 1.0f },
-        { -1.0f, -1.0f, -1.0f }, { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, -1.0f }, { -1.0f, 1.0f, -1.0f },
-    }
-    };
-
+        {
+            {-1.0f, -1.0f, 1.0f},
+            {1.0f, -1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f},
+            {-1.0f, 1.0f, 1.0f},
+            {-1.0f, -1.0f, -1.0f},
+            {1.0f, -1.0f, -1.0f},
+            {1.0f, 1.0f, -1.0f},
+            {-1.0f, 1.0f, -1.0f},
+        }};
 
     const auto inv = glm::inverse(proj * view);
     std::array<glm::vec3, 8> _frustumVertices;
@@ -478,20 +485,19 @@ void Scene::updateFrustum(){
         _cameraFrustumCornerVertices.begin(),
         _cameraFrustumCornerVertices.end(),
         _frustumVertices.begin(),
-        [&](glm::vec3 p) {
-            auto v =  inv * glm::vec4(p, 1.0f) ;
+        [&](glm::vec3 p)
+        {
+            auto v = inv * glm::vec4(p, 1.0f);
             return glm::vec3(v) / v.w;
-        }
-    );
-    glm::vec3 * vertices = _frustumVertices.data();
+        });
+    glm::vec3 *vertices = _frustumVertices.data();
     staticFrustumObject->adjustVertexData(vertices);
-
 }
 void Scene::renderFrustum(bool outline){    
     bool frustumVisMode = engine->getUi().getFrustumVisMode();
-    if (!frustumVisMode)
+    if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
-    FrustumObject::bind();    
+    FrustumObject::bind();
     frustumShader.start();
     outline ? frustumShader.loadBool("outline",true) :frustumShader.loadBool("outline",false);
     frustumShader.loadMat4("view", getCamera()->getViewMatrix());

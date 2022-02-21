@@ -140,7 +140,7 @@ void Scene::updateBvh()
 
     timers[4] = end - start;
     start = glfwGetTime();
-
+    // TODO: Get objects in nodes
     std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
     end = glfwGetTime();
 
@@ -160,7 +160,6 @@ void Scene::updateBvh()
     // doEarlyZ();
     std::vector<Object *> drawnObjects;
 
-    renderObjects(drawnObjects);
     end = glfwGetTime();
 
     timers[7] = end - start;
@@ -535,7 +534,7 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
 
 Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
 
-std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups)
+std::vector<std::shared_ptr<Object>> Scene::batchOcclusionTest(std::vector<std::shared_ptr<Object>> &occludeeGroups)
 {
     Camera *staticCam = engine->getStaticCamera();
     simpleShader.start();
@@ -544,19 +543,19 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
 
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(/*std::execution::par_unseq, */ occludeeGroups.begin(), occludeeGroups.end(),
-              [staticCam](std::shared_ptr<BvhNode> a, std::shared_ptr<BvhNode> b)
+    std::sort(occludeeGroups.begin(), occludeeGroups.end(),
+              [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
               {
                   return glm::distance(staticCam->getPosition(), a->getBoundingBox()->getCenter()) < glm::distance(staticCam->getPosition(), b->getBoundingBox()->getCenter());
               });
 
-    std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees;
+    std::vector<std::shared_ptr<Object>> potentiallyVisibleOccludees;
     const size_t nbQueries = occludeeGroups.size();
     GLuint *queries = new GLuint[nbQueries];
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    for (std::shared_ptr<BvhNode> bb : occludeeGroups)
+    for (std::shared_ptr<Object> bb : occludeeGroups)
     {
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
         bb->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
@@ -616,7 +615,7 @@ std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
     std::vector<std::shared_ptr<Object>> obj;
     for (auto idxObj : _objects)
         obj.push_back(objects[idxObj]);
-    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(obj, &nbCmds);
+    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(obj, &nbCmds); // TODO: Remove sorted objects
 
     glNamedBufferData(cmd, nbCmds * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);

@@ -412,7 +412,7 @@ void Scene::renderBoundingBoxes()
     for (auto entry : boundingBoxes)
     {
         int numBB = 0;
-        bboxLevel = entry.first + 1;
+        bboxLevel = entry.first;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
         auto bboxs = entry.second;
         if (visMode == 0 || bboxLevel == visMode)
@@ -493,18 +493,20 @@ void Scene::updateFrustum()
     glm::vec3 *vertices = _frustumVertices.data();
     staticFrustumObject->adjustVertexData(vertices);
 }
-void Scene::renderFrustum(bool outline){    
+
+void Scene::renderFrustum(bool outline)
+{
     bool frustumVisMode = engine->getUi().getFrustumVisMode();
     if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
     FrustumObject::bind();
     frustumShader.start();
-    outline ? frustumShader.loadBool("outline",true) :frustumShader.loadBool("outline",false);
+    frustumShader.loadBool("outline", outline);
     frustumShader.loadMat4("view", getCamera()->getViewMatrix());
     frustumShader.loadMat4("projection", getCamera()->getProjectionMatrix());
-    
+
     outline ? staticFrustumObject->drawOutline() : staticFrustumObject->draw();
-    
+
     FrustumObject::unbind();
     frustumShader.stop();
 }

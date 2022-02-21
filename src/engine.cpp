@@ -122,8 +122,8 @@ void Engine::startLoop()
         scene->renderFrustum(false);
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
-        glEnable(GL_DEPTH_TEST);
 
+        glEnable(GL_DEPTH_TEST);
         // imgui part
         ui.render();
 

@@ -80,7 +80,7 @@ void Texture::loadTexture(const std::string &_file, unsigned int _id)
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
                     0,             // Mipmap number
                     0, 0, _id,     // xoffset, yoffset, zoffset
-                    1024, 1024, 1, // width, height, depth
+                    width, height, 1, // width, height, depth
                     GL_RGBA,       // format
                     GL_FLOAT,      // type
                     &data[0]);     // pointer to data

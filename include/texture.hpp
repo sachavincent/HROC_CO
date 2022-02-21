@@ -19,12 +19,15 @@ private:
     static bool arrayInit;
     static unsigned int currObj;
     static unsigned int maxObjects;
-
+    static unsigned int width;
+    static unsigned int height;
 public:
-    static void createTextureArray(unsigned int nbObjects)
+    static void createTextureArray(unsigned int nbObjects, unsigned int _width, unsigned int _height)
     {
         maxObjects = nbObjects;
 
+        width = _width;
+        height = _height;
         glGenTextures(1, &id);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, id);
@@ -33,7 +36,7 @@ public:
         glTexStorage3D(GL_TEXTURE_2D_ARRAY,
                        1,
                        GL_RGBA16F, // Internal format
-                       1024, 1024, // width,height
+                       width, height, // width,height
                        maxObjects  // Number of layers
         );
         arrayInit = true;

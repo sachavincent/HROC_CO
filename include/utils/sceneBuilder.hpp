@@ -137,14 +137,15 @@ public:
 
         MeshLoader::getSingleton()->loadModel("models/asteroid/Asteroid1.obj",modelKey);
 
+        Texture::createTextureArray(_aCount, 1500, 1500);
         for (size_t i = 0; i < _aCount; i++)
         {
             auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj",modelKey);
             asteroid->setPosition({distPosX(gen), distPosY(gen), distPosZ(gen)})
                 .setScale(glm::vec3{distScale(gen), distScale(gen), distScale(gen)})
                 .setRotation(distRot(gen) * 90, {distAxisRot(gen) == 0 ? 1 : 0, distAxisRot(gen) == 1 ? 1 : 0, distAxisRot(gen) == 2 ? 1 : 0})
-                .setTexDiffuse("models/asteroid/asteroidDiffuse.jpg")
-                .setTexSpecular("models/asteroid/asteroidSpecular.png");
+                .setTexDiffuse("models/asteroid/asteroidDiffuse.jpg");
+                //.setTexSpecular("models/asteroid/asteroidSpecular.png");
             scene->addObject(asteroid);
         }
         return scene;

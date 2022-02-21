@@ -487,15 +487,18 @@ void Scene::updateFrustum(){
     staticFrustumObject->adjustVertexData(vertices);
 
 }
-void Scene::renderFrustum(){    
+void Scene::renderFrustum(bool outline){    
     bool frustumVisMode = engine->getUi().getFrustumVisMode();
     if (!frustumVisMode)
         return;
     FrustumObject::bind();    
     frustumShader.start();
+    outline ? frustumShader.loadBool("outline",true) :frustumShader.loadBool("outline",false);
     frustumShader.loadMat4("view", getCamera()->getViewMatrix());
     frustumShader.loadMat4("projection", getCamera()->getProjectionMatrix());
-    staticFrustumObject->draw();
+    
+    outline ? staticFrustumObject->drawOutline() : staticFrustumObject->draw();
+    
     FrustumObject::unbind();
     frustumShader.stop();
 }

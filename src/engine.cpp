@@ -120,7 +120,10 @@ void Engine::startLoop()
             isFirstLoop = false;
             scene->createFrustum();
         }
-        scene->renderFrustum();
+        scene->renderFrustum(true);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        scene->renderFrustum(false);
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 

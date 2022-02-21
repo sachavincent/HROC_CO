@@ -70,7 +70,7 @@ public:
     void renderBoundingBoxes();
 
     void createFrustum();
-    void renderFrustum();
+    void renderFrustum(bool outline);
     void updateFrustum();
 
     Scene &addObject(std::shared_ptr<Object> _object);

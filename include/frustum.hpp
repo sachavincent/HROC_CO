@@ -85,6 +85,7 @@ class FrustumObject : public Object
 {
 private:
     std::vector<GLfloat> vertices;
+    std::vector<GLfloat> outlineVertices;
     static GLuint vao;
     GLuint vbo;
 public:
@@ -92,6 +93,7 @@ public:
                   const glm::vec3 _edge[8],
                   const std::string _keyModel);
     void draw();
+    void drawOutline();
     void adjustVertexData(const glm::vec3 _edge[8]);
 
     static inline void bind() { glBindVertexArray(vao); }

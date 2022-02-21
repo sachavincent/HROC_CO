@@ -114,15 +114,12 @@ void Engine::startLoop()
 
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_DEPTH_TEST);
         scene->renderBoundingBoxes();
-        if (isFirstLoop)
-        {
-            isFirstLoop = false;
-            scene->createFrustum();
-        }
         scene->renderFrustum();
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+        glEnable(GL_DEPTH_TEST);
 
         // imgui part
         ui.render();

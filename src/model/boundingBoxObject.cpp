@@ -122,7 +122,7 @@ void BoundingBoxObject::draw(Shader &_shader, int _numBB)
 	_shader.loadInt("numBB", _numBB);
 	_shader.loadMat4("model", getTransformationMatrix());
 
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_LINES, numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 void BoundingBoxObject::drawQuery(Shader &_shader)

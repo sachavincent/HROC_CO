@@ -3,7 +3,7 @@
 
 #include "object.hpp"
 #include "scene.hpp"
-
+#include "meshhandler.hpp"
 #include <memory>
 #include <random>
 #include <utility>
@@ -30,6 +30,13 @@ public:
 
         //####################### creating models ###########################
 
+
+        MeshLoader::getSingleton()->generateBaseModels();
+        MeshLoader::getSingleton()->loadModel("models/teapot.obj","teapot");
+
+        
+        //####################### creating objects ###########################
+
         std::random_device device;
         std::mt19937 gen(3);
         std::uniform_real_distribution<float> dist(5, 20);
@@ -37,7 +44,8 @@ public:
         std::uniform_real_distribution<float> distRot(-1, 1);
 
         Texture::createTextureArray(15);
-        Cube::create(10);
+
+        //Cube::create(10);
         for (size_t i = 0; i < 10; i++)
         {
             auto cube = std::make_shared<Cube>(1.0f);
@@ -49,27 +57,28 @@ public:
             sc->addObject(cube);
         }
 
-        Plane::create(1);
+        //Plane::create(1);
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
         plane1->setRotation(-90, {1, 0, 0})
             .setTexDiffuse("textures/stoneWall/diffuse.png")
             .setTexSpecular("textures/stoneWall/roughness.png");
         sc->addObject(plane1);
 
-        FileObject::create("models/teapot.obj", 2);
-        auto teapot = std::make_shared<FileObject>("models/teapot.obj");
+        //FileObject::create("models/teapot.obj", 2);
+        std::string keyModel("teapot");
+        auto teapot = std::make_shared<FileObject>("models/teapot.obj",keyModel);
         teapot->setScale(glm::vec3{0.6f})
             .setPosition({0.0f, 1.5f, 0.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot);
 
-        auto teapot2 = std::make_shared<FileObject>("models/teapot.obj");
+        auto teapot2 = std::make_shared<FileObject>("models/teapot.obj",keyModel);
         teapot2->setScale(glm::vec3{0.7f})
             .setPosition({-3.0f, 1.5f, 2.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot2);
 
-        UVSphere::create(2);
+        //UVSphere::create(2);
         auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
         sphere1->setPosition({3.5, 0.7, 3.5})
             .setRotation(90, {1, 0, 0})
@@ -124,10 +133,13 @@ public:
 
         std::uniform_int_distribution<int> distRot(-1, 1);
         std::uniform_int_distribution<int> distAxisRot(0, 2);
-        FileObject::create("models/asteroid/Asteroid1.obj", _aCount);
+        std::string modelKey = std::string("asteroid1");
+
+        MeshLoader::getSingleton()->loadModel("models/asteroid/Asteroid1.obj",modelKey);
+
         for (size_t i = 0; i < _aCount; i++)
         {
-            auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj");
+            auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj",modelKey);
             asteroid->setPosition({distPosX(gen), distPosY(gen), distPosZ(gen)})
                 .setScale(glm::vec3{distScale(gen), distScale(gen), distScale(gen)})
                 .setRotation(distRot(gen) * 90, {distAxisRot(gen) == 0 ? 1 : 0, distAxisRot(gen) == 1 ? 1 : 0, distAxisRot(gen) == 2 ? 1 : 0})

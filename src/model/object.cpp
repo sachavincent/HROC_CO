@@ -68,7 +68,7 @@ Object &Object::setSpecular(glm::vec3 _color)
 
 std::pair<glm::vec3, glm::vec3> Object::getBounds() const
 {
-    OBJECT_BOUNDS bounds = getObjectBounds();
+    OBJECT_BOUNDS bounds = meshfilter.getObjectBounds();
     glm::mat4 tmat = rotation * scale;
     // get 8 transformed corners
     std::vector<glm::vec4> boundsCorners = {
@@ -103,7 +103,7 @@ void Object::flushCaches()
 {
     Cube::instance_counter = 0;
     FileObject::instance_counter = 0;
-    FileObject::path_cache.clear();
+    //FileObject::path_cache.clear();
     UVSphere::instance_counter = 0;
     Plane::instance_counter = 0;
     //AssimpMeshObject::instance_counter = 0;

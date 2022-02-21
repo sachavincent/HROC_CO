@@ -6,8 +6,12 @@ GLuint BoundingBoxObject::vao;
 int BoundingBoxObject::numIndices;
 OBJECT_BOUNDS BoundingBoxObject::bounds;
 
-BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale)
-	: Object("BoundingBox_" + _parentName)
+BoundingBoxObject::BoundingBoxObject(std::string _parentName, 
+				const glm::vec3 &_pos, 
+				const glm::mat4 &_rotationMatrix, 
+				const glm::vec3 &_scale,
+				std::string keyModel)
+	: Object("BoundingBox_" + _parentName,keyModel)
 {
 	setPosition(_pos);
 	setRotationMatrix(_rotationMatrix);
@@ -16,7 +20,7 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_
 	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 	if (!loaded)
 	{
-#ifndef HROC_TESTS
+		#ifndef HROC_TESTS
 		bounds.min = {-0.5f, -0.5f, -0.5f};
 		bounds.max = {0.5f, 0.5f, 0.5f};
 		std::vector<GLfloat> vertices = {

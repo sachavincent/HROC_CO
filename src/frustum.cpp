@@ -4,7 +4,7 @@ bool FrustumObject::loaded = false;
 GLuint FrustumObject::vao;
 int FrustumObject::numIndices;
 
-FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale) : Object("Frustum_" + _parentName)
+FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale,const std::string _keyModel ) : Object("Frustum_" + _parentName,_keyModel)
 {
     
 	setPosition(_pos);
@@ -97,7 +97,7 @@ FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 &_pos, con
 		unbind();
 		loaded = true;
 }
-FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale, const glm::vec3 _edge[8]) : Object("Frustum_" + _parentName)
+FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale, const glm::vec3 _edge[8],const std::string _keyModel ) : Object("Frustum_" + _parentName,_keyModel)
 {
     
 	setPosition(_pos);

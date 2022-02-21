@@ -20,6 +20,7 @@
 #include "light.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
+#include "meshhandler.hpp"
 
 class Scene;
 class BoundingBox;
@@ -38,15 +39,17 @@ protected:
 
     glm::vec3 diffuse = glm::vec3(-1.0f);
 
+    mutable MeshRenderer meshRenderer;
+    mutable MeshFilter meshfilter;
+
     // HROC
     std::shared_ptr<BoundingBox> boundingBox;
 public:
-    Object(std::string _name = "Object")
-        : name(_name), boundingBox(nullptr)
+    Object(std::string _name = "Object",std::string _modelkey ="")
+        : name(_name), boundingBox(nullptr),meshfilter(_modelkey),meshRenderer(&meshfilter)
     {
         id = id_counter++;
     }
-
     ~Object();
     inline size_t getId() const { return id; }
 
@@ -62,10 +65,8 @@ public:
     Object &setDiffuse(glm::vec3 _color);
     Object &setSpecular(glm::vec3 _color);
 
-    virtual bool isVisible() { return false; };
-    virtual void setVisible(bool _visible){};
-    virtual OBJECT_BOUNDS getObjectBounds() const { return {glm::vec3(), glm::vec3()}; }
-
+    virtual bool isVisible() { return meshRenderer.is_Visible(); };
+    virtual void setVisible(bool _visible){meshRenderer.setVisibility(_visible);};
     inline void setBoundingBox(std::shared_ptr<BoundingBox> _boundingBox) { boundingBox = _boundingBox; }
     inline std::shared_ptr<BoundingBox> getBoundingBox() { return boundingBox; }
     inline std::string getName() const { return name; }
@@ -79,6 +80,8 @@ public:
     //! Returns the maximum and minimum bounds after transformation
     virtual std::pair<glm::vec3, glm::vec3> getBounds() const;
 
+    inline OBJECT_DATA* getObjectData(){return meshfilter.getMeshData();}
+    inline string getModelKey() const {return meshfilter.getMeshKey();}
     //! before creating a new scene, flush the static caches of objects.
     static void flushCaches();
 };
@@ -89,24 +92,17 @@ class Cube : public Object
     friend class Object;
 
 private:
-    static bool *visible;
-
-    static OBJECT_DATA data;
-
     unsigned int instance;
 
 protected:
     static unsigned int instance_counter; // TODO: reset this field in scene destructor
 public:
-    static void create(int nbInstances);
 
-    static OBJECT_DATA getData();
     //! Create a cube of size _edgeSize.
-    Cube(float _edgeSize = 1.0f, const std::string &_name = "Cube_" + std::to_string(instance_counter));
+    Cube(float _edgeSize = 1.0f, 
+    const std::string &_name = "Cube_" + std::to_string(instance_counter),
+    std::string _keyModel ="cube");
 
-    inline void setVisible(bool _visible) { visible[instance] = _visible; }
-    inline bool isVisible() { return visible[instance]; }
-    inline OBJECT_BOUNDS getObjectBounds() const { return data.bounds; }
 };
 
 //! A object loaded from a file, only one object per .obj.
@@ -115,29 +111,28 @@ class FileObject : public Object
     friend class Object;
 
 private:
-    static std::map<const std::string, bool *> visible;
+    //static std::map<const std::string, bool *> visible;
 
     unsigned int instance;
     std::string path;
 
-private:
-    static std::map<const std::string, OBJECT_DATA> path_cache; // TODO: reset this field in scene destructor
+    //static std::map<const std::string, OBJECT_DATA> path_cache; // TODO: reset this field in scene destructor
 
-    static OBJECT_DATA processMesh(aiMesh *_mesh, const aiScene *_scene);
+    //static OBJECT_DATA processMesh(aiMesh *_mesh, const aiScene *_scene);
 
 protected:
     static unsigned int instance_counter; // TODO: reset this field in scene destructor
 public:
-    static void create(const std::string &_path, int nbInstances);
+    //static void create(const std::string &_path, int nbInstances);
 
-    static std::vector<OBJECT_DATA> getData();
+    //static std::vector<OBJECT_DATA> getData();
 
-    FileObject(const std::string &_path);
+    FileObject(const std::string &_path,std::string _modelkey ="");
+    //OBJECT_DATA* getMeshData()  override {return nullptr;}
 
     // bool hasTextures() { return diffuseMapPath != ""; }
-    inline void setVisible(bool _visible) { visible[path][instance] = _visible; }
-    inline bool isVisible() { return visible[path][instance]; }
-    inline OBJECT_BOUNDS getObjectBounds() const { return path_cache[path].bounds; }
+    //inline void setVisible(bool _visible) { visible[path][instance] = _visible; }
+    //inline bool isVisible() { return visible[path][instance]; }
 };
 /*
 //! Load an assimp mesh as an object
@@ -164,24 +159,22 @@ class UVSphere : public Object
     friend class Object;
 
 private:
-    static bool *visible;
-
-    static OBJECT_DATA data;
 
     unsigned int instance; // TODO: reset this field in scene destructor
 
 protected:
     static unsigned int instance_counter; // TODO: reset this field in scene destructor
 public:
-    static void create(int nbInstances);
+    //static void create(int nbInstances);
 
-    static OBJECT_DATA getData();
+    //OBJECT_DATA& getMeshData()  {return OBJECT_DATA();} override;
 
-    UVSphere(float _radius, int _nCols, int _nRows, const std::string &_name = "UVSphere_" + std::to_string(instance_counter));
+    UVSphere(float _radius, int _nCols, int _nRows, 
+    const std::string &_name = "UVSphere_" + std::to_string(instance_counter),
+    std::string _modelkey ="sphere");
 
-    inline void setVisible(bool _visible) { visible[instance] = _visible; }
-    inline bool isVisible() { return visible[instance]; }
-    inline OBJECT_BOUNDS getObjectBounds() const { return data.bounds; }
+    //inline void setVisible(bool _visible) { /*visible[instance] = _visible;*/ }
+    //inline bool isVisible() { return true;/*visible[instance];*/ }
 };
 
 class Plane : public Object
@@ -189,9 +182,9 @@ class Plane : public Object
     friend class Object;
 
 private:
-    static bool *visible;
+    //static bool *visible;
 
-    static OBJECT_DATA data;
+    //static OBJECT_DATA data;
 
     unsigned int instance; // TODO: reset this field in scene destructor
 
@@ -201,15 +194,19 @@ private:
 protected:
     static unsigned int instance_counter; // TODO: reset this field in scene destructor
 public:
-    static void create(int nbInstances);
+    //OBJECT_DATA& getMeshData()  {return OBJECT_DATA();} override;
 
-    static OBJECT_DATA getData();
+    //static void create(int nbInstances);
 
-    Plane(glm::vec2 _size, int _nCols, int _nRows, const std::string &_name = "Plane_" + std::to_string(instance_counter));
+    //static OBJECT_DATA getData();
 
-    inline void setVisible(bool _visible) { visible[instance] = _visible; }
-    inline bool isVisible() { return visible[instance]; }
-    inline OBJECT_BOUNDS getObjectBounds() const { return data.bounds; }
+    Plane(glm::vec2 _size, int _nCols, int _nRows,
+        const std::string &_name = "Plane_" + std::to_string(instance_counter),
+        std::string _keyModel = "plane");
+
+    //inline void setVisible(bool _visible) {  /*visible[instance] = _visible;*/ }
+    //inline bool isVisible() { return true;/*return visible[instance];*/ }
+    //inline OBJECT_BOUNDS getObjectBounds() const { /*return getMeshData().bounds;*/return OBJECT_BOUNDS(); }
 };
 
 #endif

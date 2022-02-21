@@ -94,8 +94,17 @@ private:
     glm::mat4 transformationMatrix;
 public:
     FrustumObject() = default;
-    FrustumObject(std::string _parentName,const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale);
-    FrustumObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale, const glm::vec3 _edge[8]);
+    FrustumObject(std::string _parentName,
+                const glm::vec3 &_pos, 
+                const glm::mat4 &_rotationMatrix, 
+                const glm::vec3 &_scale,
+                const std::string _keyModel);
+    FrustumObject(std::string _parentName, 
+                const glm::vec3 &_pos, 
+                const glm::mat4 &_rotationMatrix, 
+                const glm::vec3 &_scale, 
+                const glm::vec3 _edge[8],
+                const std::string _keyModel);
     void draw();
     void draw(Shader &_shader);
     void AdjustVertexData(const glm::vec3 _edge[8]);

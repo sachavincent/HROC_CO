@@ -151,6 +151,7 @@ void Scene::updateBvh()
     end = glfwGetTime();
     timers[6] = end - start;
     start = glfwGetTime();
+    //doEarlyZ();
     std::vector<Object *> drawnObjects;
 
     renderObjects(drawnObjects);
@@ -167,16 +168,29 @@ void Scene::updateBvh()
 //! Load the scene models on GPU before rendering
 void Scene::load()
 {
-    OBJECT_DATA cubeData = Cube::getData();
-    OBJECT_DATA planeData = Plane::getData();
-    std::vector<OBJECT_DATA> objD = FileObject::getData();
-    std::vector<OBJECT_DATA> objDatas;
-    objDatas.push_back(cubeData);
-    objDatas.push_back(planeData);
-    for (auto &d : objD)
-        objDatas.push_back(d);
-    OBJECT_DATA sphereData = UVSphere::getData();
-    objDatas.push_back(sphereData);
+    // OBJECT_DATA cubeData = Cube::getData();
+    // OBJECT_DATA planeData = Plane::getData();
+    // std::vector<OBJECT_DATA> objD = FileObject::getData();
+    // std::vector<OBJECT_DATA> objDatas;
+    // objDatas.push_back(cubeData);
+    // objDatas.push_back(planeData);
+    // for (auto &d : objD)
+    //     objDatas.push_back(d);
+    // OBJECT_DATA sphereData = UVSphere::getData();
+    // objDatas.push_back(sphereData);
+
+    
+    // meshHandlerEarlyZ.addData("cube",Cube::getData());
+    // meshHandlerEarlyZ.addData("plane",Plane::getData());
+    // int id = 0;
+    // std::vector<OBJECT_DATA> objD = FileObject::getData();
+    // for (auto &d : objD)
+    // {
+    //     meshHandlerEarlyZ.addData(to_string(id),d);
+    //     ++id;
+    // }
+
+    // meshHandlerEarlyZ.addData("sphere",UVSphere::getData());
 
     std::vector<GLuint> ids;
     for (GLuint i = 0; i < objects.size(); i++)
@@ -185,9 +199,10 @@ void Scene::load()
     for (auto &o : objects)
         colors.push_back(o->getDiffuse());
 
-    nbObjects = objDatas.size();
-    cmds = new DrawElementsCommand[nbObjects];
 
+    //nbObjects = objects.size();
+    //cmds = new DrawElementsCommand[nbObjects];
+    nbObjects = objects.size();
     GLuint baseVert = 0;
     GLuint baseIdx = 0;
     GLuint baseInstance = 0;
@@ -195,25 +210,14 @@ void Scene::load()
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    for (int i = 0; i < objDatas.size(); i++)
-    {
-        OBJECT_DATA objData = objDatas[i];
-        std::vector<Vertex> vec(objData.vertices, objData.vertices + objData.numVertices);
-        vertices.insert(vertices.end(), vec.begin(), vec.end());
+    cmds = MeshHandler::getSingleton()->getCmds(objects);
 
-        std::vector<GLuint> ind(objData.indices, objData.indices + objData.numIndices);
-        indices.insert(indices.end(), ind.begin(), ind.end());
+    MeshHandler::getSingleton()->getBuffers(vertices,indices);
 
-        cmds[i].vertexCount = objData.numIndices;
-        cmds[i].instanceCount = objData.numInstances;
-        cmds[i].firstIndex = baseIdx;
-        cmds[i].baseVertex = baseVert;
-        cmds[i].baseInstance = baseInstance;
+    // std::vector<Vertex> vertices = std::vector<Vertex>();
+    // std::vector<GLuint> indices = std::vector<GLuint>();
+    // meshHandlerEarlyZ.getBuffers(vertices,indices);
 
-        baseIdx += objData.numIndices;
-        baseVert += objData.numVertices;
-        baseInstance += objData.numInstances;
-    }
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vbo);
     glCreateBuffers(1, &idVBO);
@@ -234,8 +238,11 @@ void Scene::load()
     glNamedBufferStorage(vbo, std::size(vertices) * sizeof(Vertex), vertices.data(), 0);
     glNamedBufferStorage(ebo, std::size(indices) * sizeof(GLuint), indices.data(), 0);
     glNamedBufferStorage(inst, std::size(models) * sizeof(glm::mat4), models.data(), 0);
+    
     glNamedBufferStorage(idVBO, std::size(ids) * sizeof(GLuint), ids.data(), 0);
     glNamedBufferStorage(colorVBO, std::size(colors) * sizeof(glm::vec3), colors.data(), 0);
+    
+    
     // glNamedBufferStorage(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, 0);
     glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
     glVertexArrayElementBuffer(vao, ebo);                      // link vao to ebo
@@ -496,7 +503,7 @@ void Scene::renderFrustum(){
     glm::vec3 * vertices = _frustumVertices.data();
     std::cout << glm::to_string(vertices[0]) << std::endl;
     std::cout << glm::to_string(vertices[4]) << std::endl;
-    FObject = FrustumObject("debugFrustum", camera->getPosition(),rotationMatrix,glm::vec3(1.f,1.f,1.f),vertices);
+    FObject = FrustumObject("debugFrustum", camera->getPosition(),rotationMatrix,glm::vec3(1.f,1.f,1.f),vertices,"frustrum");
     FrustumObject::bind();    
     
     frustumShader.start();

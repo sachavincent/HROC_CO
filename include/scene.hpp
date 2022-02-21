@@ -9,6 +9,7 @@
 #include <list>
 
 #include "object.hpp"
+#include "meshhandler.hpp"
 #include "camera.hpp"
 #include "light.hpp"
 #include "bvh/boundingbox.hpp"
@@ -100,6 +101,8 @@ private:
 
     std::vector<std::shared_ptr<BvhNode>> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups);
 
+    //MeshHandler meshHandlerEarlyZ;
+
     void setupEarlyZCommand()
     {
         std::vector<std::shared_ptr<Object>> _objects = objects;
@@ -108,11 +111,25 @@ private:
         std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
                   { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
+        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects);
+        visibility = new int[_objects.size()];
+
+        for(int i = 0; i < _objects.size();++i)
+        {
+            visibility[i] = _objects[i]->isVisible();
+        }
+
+        glGenBuffers(1, &ssbo);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * _objects.size(), visibility, GL_DYNAMIC_COPY);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
         // TEAPOT x1
         // Plane x1
         // TEAPOT x1
         // SPHERE x2
         // CUBE x10
+
+        /*
         earlyZcmds = new DrawElementsCommand[5];
 
         std::vector<OBJECT_DATA> objD = FileObject::getData();
@@ -167,6 +184,7 @@ private:
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+        */
     }
 };
 

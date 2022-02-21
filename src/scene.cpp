@@ -494,7 +494,8 @@ void Scene::updateFrustum()
     staticFrustumObject->adjustVertexData(vertices);
 }
 void Scene::renderFrustum(bool outline){    
-    bool frustumVisMode = engine->getUi().getFrustumVisMode();
+    bool frustumVisMode;
+    outline ? frustumVisMode = engine->getUi().getFrustumVisMode() : frustumVisMode = engine->getUi().getFrustumOutlineVisMode();
     if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
     FrustumObject::bind();

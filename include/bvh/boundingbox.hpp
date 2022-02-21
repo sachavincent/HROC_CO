@@ -11,6 +11,7 @@
 
 #include "boundingBoxObject.hpp"
 
+class BvhNode;
 struct Plan;
 
 class BoundingBox
@@ -19,6 +20,7 @@ protected:
     glm::vec3 size;
     glm::vec3 center;
     std::shared_ptr<BoundingBoxObject> wireframe;
+    std::shared_ptr<BvhNode> node;
 
 public:
 #ifdef HROC_TESTS
@@ -38,9 +40,10 @@ public:
     inline const glm::vec3 &getCenter() const { return center; }
 
     virtual BoundingBox *merge(BoundingBox *_A) = 0;
-    virtual bool isOnOrForwardPlan(const Plan& plan) const;
+    virtual bool isOnOrForwardPlan(const Plan &plan) const;
 
-
+    inline void setNode(std::shared_ptr<BvhNode> _node) { node = _node; }
+    inline const std::shared_ptr<BvhNode>& getNode() const { return node; }
     static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
     //! Get a model of the BoundingBox object for debug mode rendering

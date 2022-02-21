@@ -13,13 +13,6 @@ FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 _edge[8],c
 			_edge[7].x,_edge[7].y,_edge[7].z,
 			_edge[4].x,_edge[4].y,_edge[4].z,
 
-			_edge[0].x,_edge[0].y,_edge[0].z,
-			_edge[1].x,_edge[1].y,_edge[1].z,
-			_edge[2].x,_edge[2].y,_edge[2].z,
-			_edge[2].x,_edge[2].y,_edge[2].z,
-			_edge[3].x,_edge[3].y,_edge[3].z,
-			_edge[0].x,_edge[0].y,_edge[0].z,
-
 			_edge[3].x,_edge[3].y,_edge[3].z,
 			_edge[7].x,_edge[7].y,_edge[7].z,
 			_edge[4].x,_edge[4].y,_edge[4].z,
@@ -161,13 +154,6 @@ void FrustumObject::adjustVertexData(const glm::vec3 _edge[8])
 			_edge[7].x,_edge[7].y,_edge[7].z,
 			_edge[4].x,_edge[4].y,_edge[4].z,
 
-			_edge[0].x,_edge[0].y,_edge[0].z,
-			_edge[1].x,_edge[1].y,_edge[1].z,
-			_edge[2].x,_edge[2].y,_edge[2].z,
-			_edge[2].x,_edge[2].y,_edge[2].z,
-			_edge[3].x,_edge[3].y,_edge[3].z,
-			_edge[0].x,_edge[0].y,_edge[0].z,
-
 			_edge[3].x,_edge[3].y,_edge[3].z,
 			_edge[7].x,_edge[7].y,_edge[7].z,
 			_edge[4].x,_edge[4].y,_edge[4].z,
@@ -287,7 +273,7 @@ void FrustumObject::draw()
 {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER,0, vertices.size() * sizeof(GLfloat), vertices.data());
-    glDrawArrays(GL_TRIANGLES, 0, 108);
+    glDrawArrays(GL_TRIANGLES, 0, 90);
 }
 void FrustumObject::drawOutline()
 {

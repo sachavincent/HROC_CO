@@ -49,6 +49,7 @@ private:
     int *visibility;
 
     FrustumObject *staticFrustumObject;
+
 public:
     // Timers for pipeline
     double timers[9];
@@ -71,6 +72,7 @@ public:
     void renderBoundingBoxes();
 
     void renderFrustum(bool outline);
+
     void updateFrustum();
 
     Scene &addObject(std::shared_ptr<Object> _object);
@@ -95,7 +97,7 @@ public:
 
     void createBVH();
 
-    void doEarlyZ(std::vector<std::shared_ptr<Object>> _objects);
+    std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 
 private:
     void createFrustum();

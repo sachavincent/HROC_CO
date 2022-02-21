@@ -108,9 +108,6 @@ void Engine::startLoop()
         updateFpsCounter(500);
 
         getCurrentCamera()->move(2.0f * deltaTime);
-        // final rendering of scene
-
-        scene->doEarlyZ(scene->getObjects());
 
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

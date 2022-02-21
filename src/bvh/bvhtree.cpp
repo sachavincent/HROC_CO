@@ -10,7 +10,10 @@ BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_
     nodes.reserve(objs.size());
     for (auto &bb : objs)
     {
-        nodes.emplace_back(new BvhNode(bb, idGenerator->GetUniqueId()));
+        BvhNode *node = new BvhNode(bb, idGenerator->GetUniqueId());
+        nodes.emplace_back(node);
+        std::shared_ptr<BvhNode> ptrNode(node);
+        bb->setNode(ptrNode);
     }
 
     if (nodes.size() == 1) // Only one node (=root)

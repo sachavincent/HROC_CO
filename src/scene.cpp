@@ -76,10 +76,11 @@ void Scene::updateBvh()
      * return list of indices of effectives occluders O
      */
 
+    std::vector<unsigned int> V;
     start = glfwGetTime();
-    std::vector<BvhNode *> effectiveOccluders;
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map
+    std::vector<unsigned int> O = doEarlyZ(V);
     end = glfwGetTime();
 
     timers[0] = end - start;
@@ -95,14 +96,20 @@ void Scene::updateBvh()
      * return indices of culled potentential occludees G
      */
 
-    std::vector<BvhNode *> potentialOccluders = hierarchy->extractOccludees(effectiveOccluders); // = G
+    std::vector<BvhNode *> occluders;
+    for (unsigned int o : O)
+    {
+        occluders.push_back(objects[o]->getBoundingBox()->getNode().get());
+    }
+
+    std::vector<BvhNode *> G = hierarchy->extractOccludees(occluders);
     end = glfwGetTime();
 
     timers[1] = end - start;
     start = glfwGetTime();
 
     const Frustum *f = getCamera()->getFrustum();
-    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
+    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(G);
     end = glfwGetTime();
 
     timers[2] = end - start;
@@ -493,10 +500,10 @@ void Scene::updateFrustum()
     glm::vec3 *vertices = _frustumVertices.data();
     staticFrustumObject->adjustVertexData(vertices);
 }
-
 void Scene::renderFrustum(bool outline)
 {
-    bool frustumVisMode = engine->getUi().getFrustumVisMode();
+    bool frustumVisMode;
+    outline ? frustumVisMode = engine->getUi().getFrustumVisMode() : frustumVisMode = engine->getUi().getFrustumOutlineVisMode();
     if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
     FrustumObject::bind();
@@ -577,12 +584,13 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
     return potentiallyVisibleOccludees;
 }
 
-void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
+std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
 {
     Camera *staticCam = getCamera();
 
-    std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
-              { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
+    std::sort(_objects.begin(), _objects.end(), [&](unsigned int a, unsigned int b)
+              { return glm::distance(staticCam->getPosition(), objects[a].get()->getPosition()) <
+                       glm::distance(staticCam->getPosition(), objects[b].get()->getPosition()); });
 
     // Camera *staticCam = engine->getStaticCamera();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
@@ -605,7 +613,10 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glBindVertexArray(vao);
 
     int nbCmds = 0;
-    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(_objects, &nbCmds);
+    std::vector<std::shared_ptr<Object>> obj;
+    for (auto idxObj : _objects)
+        obj.push_back(objects[idxObj]);
+    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(obj, &nbCmds);
 
     glNamedBufferData(cmd, nbCmds * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
@@ -623,6 +634,17 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glDepthMask(GL_FALSE);
 
     // glDisable(GL_DEPTH_TEST);
-    delete _visibility;
     delete earlyZcmds;
+
+    std::vector<unsigned int> visibleObjects;
+
+    for (size_t i = 0; i < objects.size(); i++)
+    {
+        if (_visibility[i] == 1)
+            visibleObjects.push_back(i);
+    }
+
+    delete _visibility;
+
+    return visibleObjects;
 }

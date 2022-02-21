@@ -66,6 +66,8 @@ void Ui::displayParams()
     ImGui::Checkbox("Display Objects", &objectMode);
 
     ImGui::Separator();
+    ImGui::Checkbox("Display Frustum Outline", &frustumOutlineMode);
+    ImGui::Separator();
     ImGui::Checkbox("Display Frustum", &frustumMode);
     ImGui::Separator();
 

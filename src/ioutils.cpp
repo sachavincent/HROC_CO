@@ -20,6 +20,7 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
         {
             engine->getCurrentCamera()->offsetYaw((float)xoffset, MOUSE_SENSITIVTY);
             engine->getCurrentCamera()->offsetPitch((float)yoffset, MOUSE_SENSITIVTY);
+            engine->getScene()->updateFrustum();
         }
     }
     else
@@ -77,31 +78,49 @@ void IOUtils::onKeyPressed(GLFWwindow *window, int key)
     case GLFW_KEY_W:
     case GLFW_KEY_UP:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveZ(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveZ(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveX(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveX(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
 
     case GLFW_KEY_SPACE:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveY(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_LEFT_CONTROL:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveY(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
 
     case GLFW_KEY_U:
@@ -137,31 +156,49 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
     case GLFW_KEY_W:
     case GLFW_KEY_UP:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveZ(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveZ(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveX(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveX(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
 
     case GLFW_KEY_SPACE:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveY(-1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     case GLFW_KEY_LEFT_CONTROL:
         if (engine->getCurrentCameraType() == CameraType::FREE)
+        {
             engine->getCurrentCamera()->moveY(1.0);
+            engine->getScene()->updateFrustum();
+        }
         break;
     default:
         // Key not assigned

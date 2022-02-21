@@ -110,11 +110,16 @@ void Engine::startLoop()
         getCurrentCamera()->move(2.0f * deltaTime);
         // final rendering of scene
 
-        //scene->doEarlyZ(scene->getObjects());
+        // scene->doEarlyZ(scene->getObjects());
 
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         scene->renderBoundingBoxes();
+        if (isFirstLoop)
+        {
+            isFirstLoop = false;
+            scene->createFrustum();
+        }
         scene->renderFrustum();
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);

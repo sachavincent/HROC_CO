@@ -30,7 +30,7 @@ public:
 
     void loadScene(const std::string &_file);
 
-    void loadScene(Scene* _scene);
+    void loadScene(Scene *_scene);
 
     void loadScene();
 
@@ -62,6 +62,7 @@ public:
     {
         polygonMode = polygonMode == GL_FILL ? GL_LINE : GL_FILL;
     }
+
 private:
     Ui ui;
     float width;
@@ -77,5 +78,7 @@ private:
     int polygonMode = GL_FILL;
     double deltaTime;
     double lastFrame;
+
+    bool isFirstLoop = true;
 };
 #endif

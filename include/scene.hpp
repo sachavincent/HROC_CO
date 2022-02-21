@@ -14,10 +14,12 @@
 #include "light.hpp"
 #include "bvh/boundingbox.hpp"
 #include "bvh/bvhtree.hpp"
+#include "frustum.hpp"
 #include <string>
 #include <time.h>
 #include <chrono>
 #include <ctime>
+
 class Engine;
 
 class Scene
@@ -47,7 +49,10 @@ private:
     DrawElementsCommand *earlyZcmds;
     DrawElementsCommand *cmds;
     int *visibility;
-    //std::set<OBJECT_DATA>
+    // std::set<OBJECT_DATA>
+
+    FrustumObject *staticFrustumObject;
+
 public:
     Scene(Engine *_engine);
 
@@ -64,9 +69,9 @@ public:
     //! render a wireframe view of all bounding boxes in the scene.
     void renderBoundingBoxes();
 
-    
+    void createFrustum();
     void renderFrustum();
-
+    void updateFrustum();
 
     Scene &addObject(std::shared_ptr<Object> _object);
     Scene &addLight(std::shared_ptr<Light> _light);
@@ -101,7 +106,7 @@ private:
 
     std::vector<std::shared_ptr<BvhNode>> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups);
 
-    //MeshHandler meshHandlerEarlyZ;
+    // MeshHandler meshHandlerEarlyZ;
 
     void setupEarlyZCommand()
     {
@@ -112,10 +117,10 @@ private:
                   { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
         int cmdCount = 0;
-        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects,&cmdCount);
+        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects, &cmdCount);
         visibility = new int[_objects.size()];
 
-        for(int i = 0; i < _objects.size();++i)
+        for (int i = 0; i < _objects.size(); ++i)
         {
             visibility[i] = 0;
         }

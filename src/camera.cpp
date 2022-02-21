@@ -3,8 +3,7 @@
 
 #include "bvh/boundingBoxObject.hpp"
 #include "scene.hpp"
-
-int debugCamIndice = 0;
+bool isStatic = true;
 Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width(_width), height(_height), position(_position), fov(_fov), movingFactor({0, 0, 0})
 {
 	yaw = 90.0;
@@ -12,18 +11,15 @@ Camera::Camera(int _width, int _height, glm::vec3 _position, float _fov) : width
 	front = glm::vec3(0.0f, 0.0f, 1.0f);
 	up = glm::vec3(0.0f, 1.0f, 0.0f);
 	nearDistance = 1.0f;
-	// for debug purpose
-	if (debugCamIndice == 0){
-
-		farDistance = 10.0f;
-		debugCamIndice++;
-	}
-	else
-		farDistance = 5000.0f;
 	moveSpeed = 4.0;
 
+	farDistance = 5000.0f;
+	if (isStatic)
+	{
+		farDistance = 10.0f;
+		isStatic = false;
+	}
 	setResolution(_width, _height);
-
 	frustum = new Frustum(this);
 }
 
@@ -39,11 +35,9 @@ void Camera::updateDirection()
 
 	right = glm::normalize(glm::cross(front, {0, 1, 0}));
 	up = glm::normalize(glm::cross(right, front));
-	
+
 	frustum->update(this);
 }
-
-
 
 float Camera::offsetPitch(float _offset, float _sensitivity)
 {
@@ -115,10 +109,10 @@ void Camera::setResolution(int w, int h)
 
 void Camera::move(const float delta)
 {
-	position += movingFactor.x * moveSpeed* delta * glm::normalize(glm::cross(front, up));
-	position += movingFactor.y * moveSpeed* delta * glm::normalize(up);
-	position += movingFactor.z * moveSpeed* delta * front;
-	
+	position += movingFactor.x * moveSpeed * delta * glm::normalize(glm::cross(front, up));
+	position += movingFactor.y * moveSpeed * delta * glm::normalize(up);
+	position += movingFactor.z * moveSpeed * delta * front;
+
 	frustum->update(this);
 }
 

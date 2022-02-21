@@ -13,7 +13,7 @@ public:
     glm::vec3 normal = {0.f, 1.f, 0.f}; // unit vector
     float distance = 0.f;               // Distance with origin
     glm::vec3 pos;
-    
+
     Plan() = default;
 
     Plan(const glm::vec3 &p1, const glm::vec3 &norm) : normal(glm::normalize(norm)), distance(glm::dot(normal, p1))
@@ -85,30 +85,14 @@ class FrustumObject : public Object
 {
 private:
     std::vector<GLfloat> vertices;
-    static bool loaded;
-    static Shader shader;
     static GLuint vao;
-    static int numIndices;
-    GLuint frustumVbo;
-
-    glm::mat4 transformationMatrix;
+    GLuint vbo;
 public:
-    FrustumObject() = default;
     FrustumObject(std::string _parentName,
-                const glm::vec3 &_pos, 
-                const glm::mat4 &_rotationMatrix, 
-                const glm::vec3 &_scale,
-                const std::string _keyModel);
-    FrustumObject(std::string _parentName, 
-                const glm::vec3 &_pos, 
-                const glm::mat4 &_rotationMatrix, 
-                const glm::vec3 &_scale, 
-                const glm::vec3 _edge[8],
-                const std::string _keyModel);
+                  const glm::vec3 _edge[8],
+                  const std::string _keyModel);
     void draw();
-    void draw(Shader &_shader);
-    void AdjustVertexData(const glm::vec3 _edge[8]);
-    void drawQuery(Shader &_shader);
+    void adjustVertexData(const glm::vec3 _edge[8]);
 
     static inline void bind() { glBindVertexArray(vao); }
     static inline void unbind() { glBindVertexArray(0); }

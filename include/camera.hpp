@@ -41,7 +41,6 @@ private:
 	glm::mat4 projectionMatrix;
 	float lastX;
 	float lastY;
-
 	Frustum *frustum;
 
 	void updateDirection();

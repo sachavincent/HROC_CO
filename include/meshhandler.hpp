@@ -69,8 +69,8 @@ public:
     inline OBJECT_DATA* getData(int i){return datas[i];}
 
 
-    DrawElementsCommand* getCmds(std::vector<shared_ptr<Object>>& _objects);
-    void getBuffers(vector<Vertex>& vert,vector<GLuint>& ind)
+    DrawElementsCommand* getCmds(std::vector<shared_ptr<Object>>& _objects,int* cmdCount);
+    /*void getBuffers(vector<Vertex>& vert,vector<GLuint>& ind)
     {
         for (int i = 0; i < datas.size(); i++)
         {
@@ -81,7 +81,9 @@ public:
             std::vector<GLuint> tempind(objData->indices, objData->indices + objData->numIndices);
             ind.insert(ind.end(), tempind.begin(), tempind.end());
         }
-    }
+    }*/
+    void getBuffers(std::vector<shared_ptr<Object>>& _objects,vector<Vertex>& vert,vector<GLuint>& ind);
+
 
    static MeshHandler* getSingleton() {
         static MeshHandler* singleton = nullptr;

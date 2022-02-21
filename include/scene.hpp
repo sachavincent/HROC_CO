@@ -111,7 +111,8 @@ private:
         std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
                   { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
 
-        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects);
+        int cmdCount = 0;
+        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects,&cmdCount);
         visibility = new int[_objects.size()];
 
         for(int i = 0; i < _objects.size();++i)

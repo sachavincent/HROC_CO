@@ -210,9 +210,10 @@ void Scene::load()
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    cmds = MeshHandler::getSingleton()->getCmds(objects);
+    int cmdCount = 0;
+    cmds = MeshHandler::getSingleton()->getCmds(objects,&cmdCount);
 
-    MeshHandler::getSingleton()->getBuffers(vertices,indices);
+    MeshHandler::getSingleton()->getBuffers(objects,vertices,indices);
 
     // std::vector<Vertex> vertices = std::vector<Vertex>();
     // std::vector<GLuint> indices = std::vector<GLuint>();
@@ -244,7 +245,7 @@ void Scene::load()
     
     
     // glNamedBufferStorage(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, 0);
-    glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
+    glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
     glVertexArrayElementBuffer(vao, ebo);                      // link vao to ebo
     glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex)); // vbo bound to location 0 of vao
 

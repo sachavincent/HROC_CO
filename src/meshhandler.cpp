@@ -441,7 +441,40 @@ OBJECT_DATA MeshLoader:: processMesh(aiMesh *_mesh, const aiScene *_scene)
 
 
 
-DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _objects)
+void MeshHandler::getBuffers(std::vector<shared_ptr<Object>>& _objects,vector<Vertex>& vert,vector<GLuint>& ind)
+{       
+    map<string,OBJECT_DATA*> temp;
+    map<string,int> countMap;
+    for(auto it : _objects) {
+        if(it->getObjectData() != nullptr)
+        {
+            OBJECT_DATA* data = it->getObjectData();
+            std::string keyModel = it->getModelKey(); 
+            if(temp.count(keyModel) == 0)
+            {
+                temp[keyModel] = data;
+                countMap[keyModel] = 1;
+            }
+            else 
+            {
+                countMap[keyModel] += 1;
+            }
+        }
+    }
+
+    for(auto it : temp)
+    {
+        std::vector<Vertex> vec(it.second->vertices, it.second->vertices + it.second->numVertices);
+        vert.insert(vert.end(), vec.begin(), vec.end());
+
+        std::vector<GLuint> tempind(it.second->indices, it.second->indices + it.second->numIndices);
+        ind.insert(ind.end(), tempind.begin(), tempind.end());
+    }
+}
+
+
+
+DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _objects,int *cmdCount)
 {
 	GLuint baseVert = 0;
 	GLuint baseIdx = 0;
@@ -483,7 +516,7 @@ DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _obje
 		baseInstance += countMap[it.first];
         cmdId++;
     }
-
+    *cmdCount = temp.size();
 
 
 

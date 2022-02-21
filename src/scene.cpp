@@ -212,7 +212,7 @@ void Scene::load()
 
     int cmdCount = 0;
     cmds = MeshHandler::getSingleton()->getCmds(objects,&cmdCount);
-
+    nbObjects = cmdCount;
     MeshHandler::getSingleton()->getBuffers(objects,vertices,indices);
 
     // std::vector<Vertex> vertices = std::vector<Vertex>();

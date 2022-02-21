@@ -134,7 +134,6 @@ void Scene::updateBvh()
     timers[4] = end - start;
     start = glfwGetTime();
 
-
     std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
     end = glfwGetTime();
 
@@ -151,7 +150,7 @@ void Scene::updateBvh()
     end = glfwGetTime();
     timers[6] = end - start;
     start = glfwGetTime();
-    //doEarlyZ();
+    // doEarlyZ();
     std::vector<Object *> drawnObjects;
 
     renderObjects(drawnObjects);
@@ -168,30 +167,6 @@ void Scene::updateBvh()
 //! Load the scene models on GPU before rendering
 void Scene::load()
 {
-    // OBJECT_DATA cubeData = Cube::getData();
-    // OBJECT_DATA planeData = Plane::getData();
-    // std::vector<OBJECT_DATA> objD = FileObject::getData();
-    // std::vector<OBJECT_DATA> objDatas;
-    // objDatas.push_back(cubeData);
-    // objDatas.push_back(planeData);
-    // for (auto &d : objD)
-    //     objDatas.push_back(d);
-    // OBJECT_DATA sphereData = UVSphere::getData();
-    // objDatas.push_back(sphereData);
-
-    
-    // meshHandlerEarlyZ.addData("cube",Cube::getData());
-    // meshHandlerEarlyZ.addData("plane",Plane::getData());
-    // int id = 0;
-    // std::vector<OBJECT_DATA> objD = FileObject::getData();
-    // for (auto &d : objD)
-    // {
-    //     meshHandlerEarlyZ.addData(to_string(id),d);
-    //     ++id;
-    // }
-
-    // meshHandlerEarlyZ.addData("sphere",UVSphere::getData());
-
     std::vector<GLuint> ids;
     for (GLuint i = 0; i < objects.size(); i++)
         ids.push_back(i);
@@ -199,25 +174,13 @@ void Scene::load()
     for (auto &o : objects)
         colors.push_back(o->getDiffuse());
 
-
-    //nbObjects = objects.size();
-    //cmds = new DrawElementsCommand[nbObjects];
-    nbObjects = objects.size();
-    GLuint baseVert = 0;
-    GLuint baseIdx = 0;
-    GLuint baseInstance = 0;
-
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
     int cmdCount = 0;
-    cmds = MeshHandler::getSingleton()->getCmds(objects,&cmdCount);
+    cmds = MeshHandler::getSingleton()->getCmds(objects, &cmdCount);
     nbObjects = cmdCount;
-    MeshHandler::getSingleton()->getBuffers(objects,vertices,indices);
-
-    // std::vector<Vertex> vertices = std::vector<Vertex>();
-    // std::vector<GLuint> indices = std::vector<GLuint>();
-    // meshHandlerEarlyZ.getBuffers(vertices,indices);
+    MeshHandler::getSingleton()->getBuffers(objects, vertices, indices);
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vbo);
@@ -239,11 +202,10 @@ void Scene::load()
     glNamedBufferStorage(vbo, std::size(vertices) * sizeof(Vertex), vertices.data(), 0);
     glNamedBufferStorage(ebo, std::size(indices) * sizeof(GLuint), indices.data(), 0);
     glNamedBufferStorage(inst, std::size(models) * sizeof(glm::mat4), models.data(), 0);
-    
+
     glNamedBufferStorage(idVBO, std::size(ids) * sizeof(GLuint), ids.data(), 0);
     glNamedBufferStorage(colorVBO, std::size(colors) * sizeof(glm::vec3), colors.data(), 0);
-    
-    
+
     // glNamedBufferStorage(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, 0);
     glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
     glVertexArrayElementBuffer(vao, ebo);                      // link vao to ebo
@@ -424,8 +386,8 @@ void Scene::renderObject(Object &obj)
         }
     }
 
-    //obj.draw(sh);
-    // unload shader
+    // obj.draw(sh);
+    //  unload shader
     sh.stop();
 }
 
@@ -464,26 +426,31 @@ void Scene::renderBoundingBoxes()
 }
 bool firesi = true;
 FrustumObject FObject;
-void Scene::renderFrustum(){
-    
+void Scene::renderFrustum()
+{
+
     bool frustumVisMode = engine->getUi().getFrustumVisMode();
     if (!frustumVisMode)
         return;
     glm::mat4 view, proj;
-    Camera * camera = engine->getStaticCamera();
+    Camera *camera = engine->getStaticCamera();
     glm::mat4 rotationMatrix(1.0f);
-    rotationMatrix = glm::rotate(rotationMatrix,glm::radians(camera->getYaw()),glm::vec3(1,0,0));
-    rotationMatrix = glm::rotate(rotationMatrix,glm::radians(camera->getPitch()),glm::vec3(0,1,0));
-    //Camera * camera = getCamera();
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(camera->getYaw()), glm::vec3(1, 0, 0));
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(camera->getPitch()), glm::vec3(0, 1, 0));
+    // Camera * camera = getCamera();
     proj = camera->getProjectionMatrix();
     view = camera->getViewMatrix();
     std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
-    {
-        { -1.0f, -1.0f, 1.0f }, { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { -1.0f, 1.0f, 1.0f },
-        { -1.0f, -1.0f, -1.0f }, { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, -1.0f }, { -1.0f, 1.0f, -1.0f },
-    }
-    };
-
+        {
+            {-1.0f, -1.0f, 1.0f},
+            {1.0f, -1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f},
+            {-1.0f, 1.0f, 1.0f},
+            {-1.0f, -1.0f, -1.0f},
+            {1.0f, -1.0f, -1.0f},
+            {1.0f, 1.0f, -1.0f},
+            {-1.0f, 1.0f, -1.0f},
+        }};
 
     const auto inv = glm::inverse(proj * view);
     std::array<glm::vec3, 8> _frustumVertices;
@@ -492,21 +459,21 @@ void Scene::renderFrustum(){
         _cameraFrustumCornerVertices.begin(),
         _cameraFrustumCornerVertices.end(),
         _frustumVertices.begin(),
-        [&](glm::vec3 p) {
-            auto v =  inv * glm::vec4(p, 1.0f) ;
+        [&](glm::vec3 p)
+        {
+            auto v = inv * glm::vec4(p, 1.0f);
             v.z = v.z;
             // version cpu
-            //auto u = glm::vec4(glm::vec3(v) / v.w,1.0f);
-            //return glm::vec3(engine->getFreeCam()->getProjectionMatrix() * engine->getFreeCam()->getViewMatrix() * u);
+            // auto u = glm::vec4(glm::vec3(v) / v.w,1.0f);
+            // return glm::vec3(engine->getFreeCam()->getProjectionMatrix() * engine->getFreeCam()->getViewMatrix() * u);
             return glm::vec3(v) / v.w;
-        }
-    );
-    glm::vec3 * vertices = _frustumVertices.data();
+        });
+    glm::vec3 *vertices = _frustumVertices.data();
     std::cout << glm::to_string(vertices[0]) << std::endl;
     std::cout << glm::to_string(vertices[4]) << std::endl;
-    FObject = FrustumObject("debugFrustum", camera->getPosition(),rotationMatrix,glm::vec3(1.f,1.f,1.f),vertices,"frustrum");
-    FrustumObject::bind();    
-    
+    FObject = FrustumObject("debugFrustum", camera->getPosition(), rotationMatrix, glm::vec3(1.f, 1.f, 1.f), vertices, "frustrum");
+    FrustumObject::bind();
+
     frustumShader.start();
     frustumShader.loadMat4("view", getCamera()->getViewMatrix());
     frustumShader.loadMat4("projection", getCamera()->getProjectionMatrix());
@@ -520,7 +487,7 @@ void Scene::renderFrustum(){
     //Camera * camera = getCamera();
     proj = camera->getProjectionMatrix();
     view = camera->getViewMatrix();
-    inv = glm::inverse(view*proj);    
+    inv = glm::inverse(view*proj);
     float farPlan = -camera->getFarDistance();
     float nearPlan = -camera->getNearDistance();
     float fov = camera->getFov();
@@ -550,7 +517,7 @@ void Scene::renderFrustum(){
         0.0f,1.0f,0.0f,0.0f,
         0.0f,0.0f,1.0f,0.0f,
         0.0f,0.0f,0.0f,1.0f
-    };   
+    };
     auto pos = camera->getPosition();
     glm::vec3 scale(1.0f,1.0f,1.0f);
     for (int i = 0; i < 8; i++)
@@ -570,11 +537,11 @@ void Scene::renderFrustum(){
         FObject = FrustumObject("debugFrustum", initialFrustumEdge, pos, rotationMatrix, scale);
         firesi = false;
 
-        
+
 
     }
     else{
-        FrustumObject::bind();   
+        FrustumObject::bind();
         frustumShader.start();
         frustumShader.loadMat4("view", view);
         frustumShader.loadMat4("projection", proj);
@@ -585,8 +552,6 @@ void Scene::renderFrustum(){
         frustumShader.stop();
     }
     */
-
-
 }
 
 //! Add an object to scene
@@ -615,11 +580,11 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
 
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(/*std::execution::par_unseq, */occludeeGroups.begin(),occludeeGroups.end(), 
-                [staticCam](std::shared_ptr<BvhNode> a, std::shared_ptr<BvhNode> b)
-            { return glm::distance(staticCam->getPosition(), a->getBoundingBox()->getCenter()) 
-                < glm::distance(staticCam->getPosition(), b->getBoundingBox()->getCenter()); 
-            });
+    std::sort(/*std::execution::par_unseq, */ occludeeGroups.begin(), occludeeGroups.end(),
+              [staticCam](std::shared_ptr<BvhNode> a, std::shared_ptr<BvhNode> b)
+              {
+                  return glm::distance(staticCam->getPosition(), a->getBoundingBox()->getCenter()) < glm::distance(staticCam->getPosition(), b->getBoundingBox()->getCenter());
+              });
 
     std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees;
     const size_t nbQueries = occludeeGroups.size();
@@ -627,7 +592,7 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    for (std::shared_ptr<BvhNode>bb : occludeeGroups)
+    for (std::shared_ptr<BvhNode> bb : occludeeGroups)
     {
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
         bb->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
@@ -657,17 +622,21 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
 
 void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
 {
-    // Camera *staticCam = engine->getStaticCamera();
     Camera *staticCam = getCamera();
+
+    std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
+              { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
+
+    // Camera *staticCam = engine->getStaticCamera();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     int *_visibility = new int[objects.size()];
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
-    std::vector<int> valuesQ(_visibility, _visibility + objects.size());
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    /*    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
+        std::vector<int> valuesQ(_visibility, _visibility + objects.size());
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);*/
     // glEnable(GL_DEPTH_TEST);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
@@ -678,10 +647,12 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     earlyZShader.loadMat4("projection", staticCam->getProjectionMatrix());
     glBindVertexArray(vao);
 
-    // glNamedBufferData(cmd, 1 * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_STORAGE_BIT);
-    glNamedBufferData(cmd, 5 * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
+    int nbCmds = 0;
+    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(_objects, &nbCmds);
+
+    glNamedBufferData(cmd, nbCmds * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, size_t(5), 0);
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, size_t(nbCmds), 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
@@ -693,8 +664,8 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glDepthFunc(GL_EQUAL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
+
     // glDisable(GL_DEPTH_TEST);
     delete _visibility;
+    delete earlyZcmds;
 }
-
-

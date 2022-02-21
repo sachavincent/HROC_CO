@@ -492,8 +492,6 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
 
     DrawElementsCommand *cmds = new DrawElementsCommand[temp.size()];
 
-    size_t cmdId = 0;
-    // for (auto it : temp)
     for (size_t cmdId = 0; cmdId < objOrder.size(); cmdId++)
     {
         std::string keyModel = objOrder[cmdId];
@@ -525,6 +523,7 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
 
 DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
 {
+    bool stop = false;
     std::vector<DrawElementsCommand> commands;
     size_t i = 0;
     do
@@ -534,12 +533,14 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
         GLuint currentBaseInstance = obj->getCommand().baseInstance;
         std::string keyModel = obj->getModelKey();
         int nbConsecutiveObj = 0;
-
         while (currentKeyModel == keyModel && i < _objects.size())
         {
             nbConsecutiveObj++;
             if (i == _objects.size() - 1)
+            {
+                stop = true;
                 break;
+            }
             std::shared_ptr<Object> nextObj = _objects[++i];
             keyModel = nextObj->getModelKey();
             GLuint baseInstance = nextObj->getCommand().baseInstance;
@@ -550,7 +551,7 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
         DrawElementsCommand command = obj->getCommand();
         command.instanceCount = nbConsecutiveObj;
         commands.push_back(command);
-    } while (i < _objects.size() - 1);
+    } while (i < _objects.size() && !stop);
 
     DrawElementsCommand *cmds = new DrawElementsCommand[commands.size()];
     for (size_t i = 0; i < commands.size(); i++)

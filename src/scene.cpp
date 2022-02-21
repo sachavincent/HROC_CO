@@ -488,7 +488,6 @@ void Scene::updateFrustum()
         [&](glm::vec3 p)
         {
             auto v = inv * glm::vec4(p, 1.0f);
-            v.z = v.z;
             return glm::vec3(v) / v.w;
         });
     glm::vec3 *vertices = _frustumVertices.data();

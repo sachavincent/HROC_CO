@@ -45,9 +45,10 @@ private:
     BvhTree *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
 
-    DrawElementsCommand *cmds, *earlyZcmds;
+    DrawElementsCommand *cmds;
     int *visibility;
 
+    FrustumObject *staticFrustumObject;
 public:
     // Timers for pipeline
     double timers[9];
@@ -70,6 +71,8 @@ public:
     void renderBoundingBoxes();
 
     void renderFrustum();
+
+    void updateFrustum();
 
     Scene &addObject(std::shared_ptr<Object> _object);
 
@@ -105,24 +108,16 @@ private:
 
     void setupEarlyZCommand()
     {
-        std::vector<std::shared_ptr<Object>> _objects = objects;
+        visibility = new int[objects.size()];
 
-        Camera *staticCam = getCamera();
-        std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
-                  { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
-
-        int cmdCount = 0;
-        earlyZcmds = MeshHandler::getSingleton()->getCmds(_objects, &cmdCount);
-        visibility = new int[_objects.size()];
-
-        for (int i = 0; i < _objects.size(); ++i)
+        for (int i = 0; i < objects.size(); ++i)
         {
             visibility[i] = 0;
         }
 
         glGenBuffers(1, &ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * _objects.size(), visibility, GL_DYNAMIC_COPY);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     }
 };

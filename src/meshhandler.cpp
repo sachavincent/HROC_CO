@@ -458,7 +458,7 @@ DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _obje
             if(temp.count(keyModel) == 0)
             {
                 temp[keyModel] = data;
-                countMap[keyModel] = 0;
+                countMap[keyModel] = 1;
             }
             else 
             {

@@ -28,11 +28,14 @@ struct OBJECT_DATA;
 class Object;
 
 
-//Contains all data for each objects
+//Singleton 
+//Contains all data for each Models by key 
+//and distribute the data when needed
+//Can build gl draw commands array from object list 
 class MeshHandler
 {
 private:
-    vector<OBJECT_DATA> datas;
+    vector<OBJECT_DATA*> datas;
     map<string,OBJECT_DATA*> mapData;
 public:
     bool addData(string key,OBJECT_DATA value)
@@ -41,8 +44,9 @@ public:
         {
             return false;
         }
-        datas.push_back(OBJECT_DATA(value));
-        mapData[key] = &(datas[datas.size() - 1]);
+        OBJECT_DATA* d = new OBJECT_DATA(value);
+        datas.push_back(d);
+        mapData[key] = d;
         return true;
     }
 
@@ -62,7 +66,7 @@ public:
         return datas.size();
     }
 
-    inline OBJECT_DATA* getData(int i){return &datas[i];}
+    inline OBJECT_DATA* getData(int i){return datas[i];}
 
 
     DrawElementsCommand* getCmds(std::vector<shared_ptr<Object>>& _objects);
@@ -90,6 +94,7 @@ public:
 };
 
 //Interface on each object to attribute a model by key 
+//Can ask the Handler to get ObjectData
 class MeshFilter
 {
 private:
@@ -113,10 +118,9 @@ public:
         key = _key;
         return true;
     }
-
-    
-
 };
+
+//Component on each object to control draw behavior
 class MeshRenderer
 {
 private:
@@ -130,6 +134,9 @@ public:
     bool is_Visible(){return isVisible;}
 };
 
+
+//On project startup load base models(Sphere,Cube,..) and store them in the Handler
+//Can also load a model and store it in the MeshHandler 
 class MeshLoader
 {
 private:

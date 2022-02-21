@@ -116,7 +116,7 @@ private:
 
         for(int i = 0; i < _objects.size();++i)
         {
-            visibility[i] = _objects[i]->isVisible();
+            visibility[i] = 0;
         }
 
         glGenBuffers(1, &ssbo);

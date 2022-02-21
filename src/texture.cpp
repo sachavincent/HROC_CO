@@ -5,13 +5,12 @@ std::map<std::string, GLuint> Texture::cache;
 GLuint Texture::id;
 bool Texture::arrayInit = false;
 unsigned int Texture::maxObjects = 0;
-unsigned int Texture::width = 0;
-unsigned int Texture::height = 0;
+int Texture::width = 0;
+int Texture::height = 0;
 unsigned int Texture::currObj = 0;
 
 GLuint Texture::loadTexture(const std::string &_file, unsigned int _id)
 {
-#ifndef HROC_TESTS
     if (currObj > maxObjects)
     {
         std::cerr << "Texture array size too small! (" << _id << " < " << maxObjects << ")" << std::endl;
@@ -26,6 +25,7 @@ GLuint Texture::loadTexture(const std::string &_file, unsigned int _id)
 
     std::string path = Utils::workingDirectory() + _file;
 
+#ifndef HROC_TESTS
     // load a texture only if it has not been loaded previously (avoids loading duplicates)
     if (Texture::cache.find(path) == Texture::cache.end())
     {
@@ -74,7 +74,7 @@ GLuint Texture::loadTexture(const std::string &_file, unsigned int _id)
         }
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
                         0,                // Mipmap number
-                        0, 0, currObj,        // xoffset, yoffset, zoffset
+                        0, 0, currObj,    // xoffset, yoffset, zoffset
                         width, height, 1, // width, height, depth
                         GL_RGBA,          // format
                         GL_FLOAT,         // type

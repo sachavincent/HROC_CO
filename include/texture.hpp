@@ -18,9 +18,10 @@ private:
     static GLuint id;
     static bool arrayInit;
     static unsigned int maxObjects;
-    static unsigned int width;
-    static unsigned int height;
+    static int width;
+    static int height;
     static unsigned int currObj;
+
 public:
     static void createTextureArray(unsigned int nbObjects, unsigned int _width, unsigned int _height)
     {
@@ -35,9 +36,9 @@ public:
         // Create storage for the texture. (100 layers of 1x1 texels)
         glTexStorage3D(GL_TEXTURE_2D_ARRAY,
                        1,
-                       GL_RGBA16F, // Internal format
+                       GL_RGBA16F,    // Internal format
                        width, height, // width,height
-                       maxObjects  // Number of layers
+                       maxObjects     // Number of layers
         );
         arrayInit = true;
     }

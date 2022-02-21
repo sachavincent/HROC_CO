@@ -468,7 +468,7 @@ DrawElementsCommand* MeshHandler::getCmds(std::vector<shared_ptr<Object>>& _obje
 	}
 
 
-	DrawElementsCommand* cmds = new DrawElementsCommand[_objects.size()]{};
+	DrawElementsCommand* cmds = new DrawElementsCommand[temp.size()]{};
 
 	int cmdId = 0;
     for(auto it : temp)

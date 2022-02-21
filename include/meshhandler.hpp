@@ -151,7 +151,9 @@ private:
 
 public:
     void generateBaseModels();
+
     void loadModel(const std::string &_path, const std::string &key);
+
     OBJECT_DATA processMesh(aiMesh *_mesh, const aiScene *_scene);
 
     static MeshLoader *getSingleton()

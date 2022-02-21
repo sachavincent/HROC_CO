@@ -11,7 +11,7 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_
 	setRotationMatrix(_rotationMatrix);
 	setScale(_scale);
 
-	std::cout << "Created bounding box object: '" << name << "'" << std::endl;
+	// std::cout << "Created bounding box object: '" << name << "'" << std::endl;
 	if (!loaded)
 	{
 #ifndef HROC_TESTS

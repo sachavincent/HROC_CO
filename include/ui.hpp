@@ -21,10 +21,10 @@ class Engine;
 class Ui
 {
 private:
-    void lightsParams();
-    void objectsParams();
-    void sceneParams();
+
     void displayParams();
+    void lightsParams();
+    void sceneLoading();
 
     void newSceneWindow();
     void newLightWindow();
@@ -44,8 +44,8 @@ private:
 
     int bboxMaxLevel;
     /** Mode of bbox visualisation
-    // -1 = none visvible
-    // 0 = all visvible
+    // -1 = none visible
+    // 0 = all visible
     // 1 = first level visible
     // 1 = second level visible
     // etc..

@@ -14,7 +14,6 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
 
 Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr), nbObjects(0)
 {
-    // TODO:
     const std::string path = Utils::workingDirectory() + "scenes/" + _file;
     std::ifstream file(path);
     if (!file.good())
@@ -65,7 +64,7 @@ Scene::~Scene()
 
 void Scene::updateBvh()
 {
-    double start, end;
+    double timerStart;
     /*
      * 1 - Occlusion Map Rendering
      * in V indices of previously drawn objects
@@ -76,14 +75,16 @@ void Scene::updateBvh()
      * return list of indices of effectives occluders O
      */
 
-    start = glfwGetTime();
+    timerStart = glfwGetTime();
     std::vector<BvhNode *> effectiveOccluders;
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map
-    end = glfwGetTime();
 
-    timers[0] = end - start;
-    start = glfwGetTime();
+    timers[0] = glfwGetTime() - timerStart;
+
+    //############################
+    
+    timerStart = glfwGetTime();
 
     /*
      * 2 - Extraction of Occludee Groups
@@ -96,17 +97,22 @@ void Scene::updateBvh()
      */
 
     std::vector<BvhNode *> potentialOccluders = hierarchy->extractOccludees(effectiveOccluders); // = G
-    end = glfwGetTime();
 
-    timers[1] = end - start;
-    start = glfwGetTime();
+    timers[1] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
 
     const Frustum *f = getCamera()->getFrustum();
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
-    end = glfwGetTime();
+    
 
-    timers[2] = end - start;
-    start = glfwGetTime();
+    timers[2] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
 
     /*
      * 3 - Batch Occlusion Test (Paper Original)
@@ -119,26 +125,35 @@ void Scene::updateBvh()
      */
 
     // TODO Raycast with aabb on GPU to extract U
-    end = glfwGetTime();
+    
 
-    timers[3] = end - start;
-    start = glfwGetTime();
+    timers[3] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
 
     /*
      * 3 - Batch Occlusion Test (Our Implementation)
      *
      * return indices of potential visible occludees U
      */
-    end = glfwGetTime();
+    
 
-    timers[4] = end - start;
-    start = glfwGetTime();
+    timers[4] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
 
     std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
-    end = glfwGetTime();
+    
 
-    timers[5] = end - start;
-    start = glfwGetTime();
+    timers[5] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
 
     /*
      * 4 - Occludee Rendering
@@ -147,21 +162,28 @@ void Scene::updateBvh()
      */
     // TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
 
-    end = glfwGetTime();
-    timers[6] = end - start;
-    start = glfwGetTime();
+    
+    timers[6] = glfwGetTime() - timerStart;
+
+    //############################
+
+    timerStart = glfwGetTime();
+
     // doEarlyZ();
     std::vector<Object *> drawnObjects;
 
     renderObjects(drawnObjects);
-    end = glfwGetTime();
+    
+    timers[7] = glfwGetTime() - timerStart;
 
-    timers[7] = end - start;
-    start = glfwGetTime();
+    //############################
+
+    timerStart = glfwGetTime();
+
     // TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V
-    end = glfwGetTime();
+    
 
-    timers[8] = end - start;
+    timers[8] = glfwGetTime() - timerStart;
 }
 
 //! Load the scene models on GPU before rendering
@@ -554,6 +576,7 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
             glGetQueryObjectiv(queries[j], GL_QUERY_RESULT_AVAILABLE, &available);
 
         glGetQueryObjectuiv(queries[j], GL_QUERY_RESULT, &nbSamples);
+        
         if (nbSamples > THRESHOLD)
             potentiallyVisibleOccludees.push_back(occludeeGroups[j]);
     }

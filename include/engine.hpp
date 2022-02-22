@@ -21,7 +21,6 @@ enum CameraType
 class Engine
 {
 public:
-    std::vector<double> fpsVector;
     Engine(float _width, float _height);
 
     ~Engine();
@@ -63,6 +62,9 @@ public:
         polygonMode = polygonMode == GL_FILL ? GL_LINE : GL_FILL;
     }
 
+    
+    double deltaTime;
+
 private:
     Ui ui;
     float width;
@@ -76,7 +78,6 @@ private:
     std::string windowName = WINDOW_NAME;
 
     int polygonMode = GL_FILL;
-    double deltaTime;
     double lastFrame;
 
     bool isFirstLoop = true;

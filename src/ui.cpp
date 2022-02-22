@@ -1,11 +1,14 @@
 #include "ui.hpp"
 #include "engine.hpp"
 #include "scene.hpp"
+#include "utils/benchmark.hpp"
 
 #include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
+
+#include <numeric>
 
 Ui::Ui() {}
 
@@ -27,33 +30,35 @@ void Ui::render()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    plotTimer();
-    plotFpsRate();
 
-    ImGui::Begin("Parameters");
-
+    ImGui::Begin("Scene Parameters");
     displayParams();
     ImGui::Separator();
-    sceneParams();
+    sceneLoading();
     ImGui::Separator();
     lightsParams();
-    ImGui::Separator();
-    objectsParams();
-
-    if (newLightWindowActive)
-        newLightWindow();
-
     ImGui::End();
+
+    ImGui::Begin("Performance & Benchmark");
+    plotTimer();
+    ImGui::Separator();
+    plotFpsRate();
+    ImGui::End();
+
+    if (newLightWindowActive) newLightWindow();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+//! Parameters for general display/rendering options
 void Ui::displayParams()
 {
     Scene *scene = engine->getScene();
     static float camspeed = scene->getCamera()->getMoveSpeed();
     std::string cameraType;
-    engine->getCurrentCameraType() == CameraType::FREE ? cameraType = "Free Cam" : cameraType = "Static Cam";
+    engine->getCurrentCameraType() == CameraType::FREE ? cameraType = "Free Cam"
+                                                       : cameraType = "Static Cam";
     ImGui::Text(cameraType.c_str());
     ImGui::Separator();
     ImGui::DragFloat("camera movement speed", &camspeed, 0.1, 0.1, 40.0);
@@ -67,6 +72,7 @@ void Ui::displayParams()
 
     ImGui::Separator();
     ImGui::Checkbox("Display Frustum", &frustumMode);
+
     ImGui::Separator();
 
     static bool dispBbox = false;
@@ -93,6 +99,7 @@ void Ui::displayParams()
     }
 }
 
+//! Parameters for lights in the scene
 void Ui::lightsParams()
 {
     if (ImGui::TreeNode("Lights Parameters"))
@@ -167,60 +174,9 @@ void Ui::lightsParams()
     lastlightListIndex = lightListIndex;
 }
 
-void Ui::objectsParams()
+//! Scene loading interface
+void Ui::sceneLoading()
 {
-    if (ImGui::TreeNode("Objects Parameters"))
-    {
-        const char *items[200];
-        auto &objects = engine->getScene()->getObjects();
-        std::vector<std::string> objectsNames;
-        for (int i = 0; i < 200; i++)
-            objectsNames.push_back(objects[i]->getName());
-
-        for (int i = 0; i < 200; i++)
-        {
-            items[i] = objectsNames[i].c_str();
-        }
-
-        ImGui::ListBox("Select a object", &objectsListIndex, items, objectsNames.size(), 5);
-        auto object = objects[objectsListIndex];
-
-        std::string objectText = "\n" + object->getName() + " parameters:\n";
-        ImGui::Text(objectText.c_str());
-        // position
-        glm::vec3 pos = object->getPosition();
-        ImGui::DragFloat3("Position", &pos[0], 0.01, -10.0, 10.0);
-        object->setPosition(pos);
-        // position
-        glm::vec3 scale = object->getScale();
-        ImGui::DragFloat3("Scale", &scale[0], 0.01, 0.01, 10.0);
-        object->setScale(scale);
-        /*
-                glm::vec3 diffuse = object->getDiffuse();
-                ImGui::ColorEdit3("Diffuse", &diffuse[0]);
-                object->setDiffuse(diffuse);
-                glm::vec3 specular = object->getSpecular();
-                ImGui::ColorEdit3("Specular", &specular[0]);
-                object->setSpecular(specular);
-                float shininess = object->getShininess();
-                ImGui::DragFloat("Shininess", &shininess, 1.0, 5.0, 256.0);
-                object->setShininess(shininess);
-
-                ImGui::Text("Texture Parameters:");
-                if (object->hasTextures())
-                {
-                    glm::vec2 texScale = object->getTexScaling();
-                    ImGui::DragFloat2("Texture Scaling", &texScale[0], 0.1, 0.1, 20.0);
-                    object->setTexScaling(texScale);
-                }
-        */
-        ImGui::TreePop();
-    }
-}
-
-void Ui::sceneParams()
-{
-
     if (ImGui::TreeNode("Scene Loading"))
     {
         static const char *items[3] = {"Base Scene", "Asteroid Scene", "Scene from .obj"};
@@ -251,8 +207,8 @@ void Ui::sceneParams()
         break;
         case 2:
             if (ImGui::Button("Choose File"))
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File",
-                                                        ".obj", ".");
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj",
+                                                        ".");
 
             // display
             if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
@@ -295,13 +251,6 @@ void Ui::sceneParams()
                 scene->createBVH();
             }
         }
-        // TODO: following procedure should be automated in gui
-        // delete previous -> build a scene -> load it to engine -> generate BVH -> repeat
-        // delete testScene;
-        // testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{40,40,150},
-        // glm::vec3{0.0f,0.0f,70.0f}, 2000, 0.8, 0.5); engine.loadScene(testScene);
-        // testScene->createBVH();
-
         ImGui::TreePop();
     }
 }
@@ -340,11 +289,15 @@ void Ui::plotTimer()
         timers[i] = round(scene->timers[i] * 1000);
         if (timers[i] < 0)
         {
-            timers[i] = 0;
+            timers[i] = 1.0;
         }
     }
-    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(250, 250)))
+    
+    static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
+    static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
+    if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(350, 350)))
     {
+        ImPlot::SetupAxes("", "", xflags, yflags);
         ImPlot::PlotPieChart(scene->timerLabels, timers, 9, 0.5f, 0.5f, 0.4f);
         ImPlot::EndPlot();
     }
@@ -352,17 +305,49 @@ void Ui::plotTimer()
 
 void Ui::plotFpsRate()
 {
-    std::vector<double> &fpsVector = engine->fpsVector;
-    int length = fpsVector.size();
-    double *fps = fpsVector.data();
+    static std::vector<double> fpsVec(80, 0.0);
+    static std::vector<double> fpsVecAvg30(80, 0.0);
 
-    static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit;
-    static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit;
+    static double refreshCounter = 0.0;
+    static float updateSpeedMs = 100.0f;
 
-    if (ImPlot::BeginPlot("Fps rate", NULL, NULL, ImVec2(250, 250)))
+    if (refreshCounter>updateSpeedMs/1000)
     {
-        ImPlot::SetupAxes("X", "Y", xflags, yflags);
-        ImPlot::PlotLine("Courbe des fps", fps, length);
+        for (size_t i = 0; i < 79; i++)
+        {
+            fpsVec[i] = fpsVec[i + 1];
+        }
+
+        for (size_t i = 30; i < 80;i++){
+            fpsVecAvg30[i] = std::reduce(&fpsVec[i-30], &fpsVec[i]) / 30;
+        }
+
+        fpsVec[79] = 1 / engine->deltaTime;
+        refreshCounter = 0.0;
+    }
+    refreshCounter += engine->deltaTime;
+
+    
+
+    static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
+
+    static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_LockMin;
+
+    static ImPlotLegendFlags legendFlags = ImPlotLegendFlags_None;
+    
+    ImGui::SliderFloat("update speed (ms)",&updateSpeedMs,5.0f,200.0f);
+    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200),0))
+    {
+        
+        
+        ImPlot::SetupAxes("time", "FPS", xflags, yflags);
+        ImPlot::SetupLegend(ImPlotLocation_SouthWest,legendFlags);
+        std::vector<double> instantCrop(fpsVec.begin()+30,fpsVec.end());
+        ImPlot::PlotLine("instant fps", instantCrop.data(), 50);
+
+        std::vector<double> avgCrop(fpsVecAvg30.begin()+30,fpsVecAvg30.end());
+        ImPlot::PlotLine("moving average 30", avgCrop.data(), 50);
+
         ImPlot::EndPlot();
     }
 }

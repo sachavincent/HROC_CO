@@ -18,6 +18,7 @@
 #include <time.h>
 #include <chrono>
 #include <ctime>
+#include <set>
 class Engine;
 
 class Scene
@@ -112,7 +113,7 @@ private:
 
     void createFrustum();
 
-    std::vector<unsigned int> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> occludeeGroups);
+    std::vector<unsigned int> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> occludeeGroups, std::set<int> &cache);
 
     void setupEarlyZCommand()
     {

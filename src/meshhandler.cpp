@@ -521,6 +521,7 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
 {
     if (_objects.empty())
         return nullptr;
+        
     bool stop = false;
     std::vector<DrawElementsCommand> commands;
     size_t i = 0;
@@ -533,8 +534,8 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
         int nbConsecutiveObj = 0;
         while (currentKeyModel == keyModel && i < _objects.size())
         {
-           // if (obj->isVisible())
-                nbConsecutiveObj++;
+            // if (obj->isVisible())
+            nbConsecutiveObj++;
             if (i == _objects.size() - 1)
             {
                 stop = true;

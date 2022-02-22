@@ -75,8 +75,8 @@ void Scene::stopBvhUpdate()
 
 void Scene::updateBvh()
 {
-    if (updateRequired == 0)
-        return;
+   // if (updateRequired == 0)
+     //   return;
 
     updateRequired--;
     std::cout << "Updating bvh." << std::endl;
@@ -127,7 +127,7 @@ void Scene::updateBvh()
     }
 
     std::vector<std::shared_ptr<BvhNode>> G = hierarchy->extractOccludees(occluders);
-
+    
     timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
 
@@ -161,14 +161,13 @@ void Scene::updateBvh()
     timers[4] = timerStart - glfwGetTime(); // Bb extract
     timerStart = glfwGetTime();
 
-    std::vector<unsigned int> potentialOccludeesIndices;
-    for (auto node : culledPotentialOccludees)
-    {
-        std::vector<std::shared_ptr<Object>> objectsInLeaf = node->getObjectsInLeafs();
-        for (auto obj : objectsInLeaf)
-            potentialOccludeesIndices.push_back(obj->getId());
-    }
-    std::vector<unsigned int> potentiallyVisibleOccludees = batchOcclusionTest(potentialOccludeesIndices);
+    glDisable(GL_DEPTH_TEST);
+    simpleShader.start();
+    simpleShader.loadMat4("view", engine->getStaticCamera()->getViewMatrix());
+    simpleShader.loadMat4("projection", engine->getStaticCamera()->getProjectionMatrix());
+    std::vector<unsigned int> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
+    simpleShader.stop();
+    glEnable(GL_DEPTH_TEST);
 
     timers[5] = glfwGetTime() - timerStart; // Batch occlusion Test
     timerStart = glfwGetTime();
@@ -180,6 +179,9 @@ void Scene::updateBvh()
      */
     // TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
 
+    glDepthMask(GL_TRUE);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glDepthMask(GL_FALSE);
     std::vector<unsigned int> drawObjects = doEarlyZ(potentiallyVisibleOccludees);
     timers[6] = glfwGetTime() - timerStart; // Early Z on Rendering
     timerStart = glfwGetTime();
@@ -194,7 +196,7 @@ void Scene::updateBvh()
 
     timers[8] = glfwGetTime() - timerStart; // Merge
 
-    std::cout << "Bvh updated:\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << potentialOccludeesIndices.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
+    std::cout << "Bvh updated:\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << culledPotentialOccludees.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
               << "\n\t2nd Early-Z: " << drawObjects.size() << std::endl;
 }
 
@@ -275,7 +277,7 @@ void Scene::load()
     glVertexArrayBindingDivisor(vao, 3, 1);
 
     sh = {"shaders/default.vert", "shaders/simple.frag"};
-    simpleShader = {"shaders/default.vert", "shaders/simple.frag"};
+    simpleShader = {"shaders/boundingBox.vert", "shaders/query.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
     frustumShader = {"shaders/frustum.vert", "shaders/frustum.frag"};
@@ -339,10 +341,36 @@ void Scene::renderObjects()
     // draw objects if gui enables it
     if (engine->getUi().getObjectsVisMode())
     {
+
         glBindVertexArray(vao);
-        glNamedBufferData(cmd, nbObjects * sizeof(DrawElementsCommand), cmds, GL_DYNAMIC_DRAW);
+        if (debugVisibility)
+            sh.loadBool("visible", true);
+        std::vector<std::shared_ptr<Object>> listObjVisible;
+        std::vector<std::shared_ptr<Object>> listObjInvisible;
+        for (size_t i = 0; i < objectVisibility.size(); i++)
+        {
+            if (objectVisibility[i] == 1)
+                listObjVisible.push_back(objects[i]);
+            else if (debugVisibility)
+                listObjInvisible.push_back(objects[i]);
+        }
+
+        int cmdCount;
+        auto newCmds = MeshHandler::getSingleton()->getCmdsForSubset(listObjVisible, &cmdCount);
+
+        glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), newCmds, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);
+
+        if (debugVisibility)
+        {
+            sh.loadBool("visible", false);
+
+            auto newCmdsInvis = MeshHandler::getSingleton()->getCmdsForSubset(listObjInvisible, &cmdCount);
+            glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), newCmdsInvis, GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
+            glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, nbObjects, 0);
+        }
 
         glBindVertexArray(0);
     }
@@ -567,54 +595,63 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
 
 Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
 
-std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<unsigned int> occludeeGroups)
+std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> occludeeGroups)
 {
-    Camera *staticCam = engine->getStaticCamera();
-    simpleShader.start();
-    simpleShader.loadMat4("view", staticCam->getViewMatrix());
-    simpleShader.loadMat4("projection", staticCam->getProjectionMatrix());
-
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(occludeeGroups.begin(), occludeeGroups.end(),
+    /*std::sort(occludeeGroups.begin(), occludeeGroups.end(),
               [&](unsigned int a, unsigned int b)
               {
                   return glm::distance(staticCam->getPosition(), objects[a]->getBoundingBox()->getCenter()) <
                          glm::distance(staticCam->getPosition(), objects[b]->getBoundingBox()->getCenter());
-              });
+              });*/
 
     std::vector<unsigned int> potentiallyVisibleOccludees;
+    std::vector<std::shared_ptr<BvhNode>> nextOccludeeGroups;
     const size_t nbQueries = occludeeGroups.size();
     GLuint *queries = new GLuint[nbQueries];
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    for (unsigned int idxObj : occludeeGroups)
+    for (std::shared_ptr<BvhNode> node : occludeeGroups)
     {
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
-        objects[idxObj]->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
+        node->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
         glEndQuery(GL_SAMPLES_PASSED);
     }
 
     for (unsigned int j = 0; j < i; j++)
     {
-        unsigned int nbSamples;
+        GLuint nbSamples;
         GLint available = GL_FALSE;
         while (available == GL_FALSE)
             glGetQueryObjectiv(queries[j], GL_QUERY_RESULT_AVAILABLE, &available);
 
         glGetQueryObjectuiv(queries[j], GL_QUERY_RESULT, &nbSamples);
-
+        
         if (nbSamples > THRESHOLD)
-            potentiallyVisibleOccludees.push_back(occludeeGroups[j]);
+        {
+            if (occludeeGroups[j]->isLeaf())
+                potentiallyVisibleOccludees.push_back(occludeeGroups[j]->getBoundingBox()->getObject()->getId());
+            else
+            {
+                if (occludeeGroups[j]->hasLeftChild())
+                    nextOccludeeGroups.push_back(occludeeGroups[j]->getLeftChild());
+                if (occludeeGroups[j]->hasRightChild())
+                    nextOccludeeGroups.push_back(occludeeGroups[j]->getRightChild());
+            }
+        }
     }
 
     glDeleteQueries(nbQueries, queries);
 
     delete queries;
 
-    simpleShader.stop();
-
+    if (!nextOccludeeGroups.empty())
+    {
+        std::vector<unsigned int> visibleOccludees = batchOcclusionTest(nextOccludeeGroups);
+        potentiallyVisibleOccludees.insert(potentiallyVisibleOccludees.end(), visibleOccludees.begin(), visibleOccludees.end());
+    }
     return potentiallyVisibleOccludees;
 }
 
@@ -624,10 +661,6 @@ std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _idObjects)
         return std::vector<unsigned int>();
 
     Camera *staticCam = engine->getStaticCamera();
-
-    // std::sort(_objects.begin(), _objects.end(), [&](unsigned int a, unsigned int b)
-    //         { return glm::distance(staticCam->getPosition(), objects[a].get()->getPosition()) <
-    //                glm::distance(staticCam->getPosition(), objects[b].get()->getPosition()); }); // TODO: Remove sorted objects
 
     defaultVisibility = new int[_idObjects.size()];
 

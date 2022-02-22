@@ -106,12 +106,13 @@ public:
 
     void requestBvhUpdate(int nbRequests = INT_MAX);
     void stopBvhUpdate();
+
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 
     void createFrustum();
 
-    std::vector<unsigned int> batchOcclusionTest(std::vector<unsigned int> occludeeGroups);
+    std::vector<unsigned int> batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> occludeeGroups);
 
     void setupEarlyZCommand()
     {

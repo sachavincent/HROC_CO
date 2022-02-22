@@ -22,14 +22,14 @@ enum Visibility
     POTENTIAL_OCCLUDERS,
     UNKNOWN
 };
-class BvhNode
+class BvhNode : public std::enable_shared_from_this<BvhNode>
 {
 private:
     int id;
     NodeType type;
     Visibility tag;
-    std::shared_ptr<BvhNode>leftChild;
-    std::shared_ptr<BvhNode>rightChild;
+    std::shared_ptr<BvhNode> leftChild;
+    std::shared_ptr<BvhNode> rightChild;
     std::shared_ptr<BvhNode> parent;
     std::shared_ptr<BoundingBox> boundingBox;
 
@@ -85,13 +85,13 @@ public:
     {
         tag = _tag;
     }
-    
+
     inline void setVisibilityRecursive(const Visibility &_tag)
     {
         tag = _tag;
-        if(hasLeftChild())
+        if (hasLeftChild())
             leftChild->setVisibilityRecursive(_tag);
-        if(hasRightChild())
+        if (hasRightChild())
             rightChild->setVisibilityRecursive(_tag);
     }
 
@@ -102,28 +102,26 @@ public:
         return boundingBox;
     }
 
-    inline bool isLeaf() {return !hasLeftChild() && ! hasRightChild();}
+    inline bool isLeaf() { return !hasLeftChild() && !hasRightChild(); }
 
     std::vector<std::shared_ptr<Object>> getObjectsInLeafs();
-    
 
-    void RecursiveAdd(std::vector<std::shared_ptr<BvhNode>>& vec)
+    void RecursiveAdd(std::vector<std::shared_ptr<BvhNode>> &vec)
     {
-        if(tag == Visibility::UNKNOWN)
+        if (tag == Visibility::UNKNOWN)
         {
-            vec.push_back(std::shared_ptr<BvhNode>(this));
+            vec.push_back(shared_from_this());
         }
-        if(hasLeftChild())
+        if (hasLeftChild())
         {
             leftChild->RecursiveAdd(vec);
         }
-        if(hasRightChild())
+        if (hasRightChild())
         {
             rightChild->RecursiveAdd(vec);
         }
     }
 
-
-    static std::shared_ptr<BvhNode>merge(std::shared_ptr<BvhNode>_left, std::shared_ptr<BvhNode>_right, int _newId);
+    static std::shared_ptr<BvhNode> merge(std::shared_ptr<BvhNode> _left, std::shared_ptr<BvhNode> _right, int _newId);
 };
 #endif

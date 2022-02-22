@@ -8,8 +8,8 @@ class BoundingBoxObject : public Object
 private:
     static bool loaded;
     static Shader shader;
-    static GLuint vao;
-    static int numIndices;
+    static GLuint vao, vaoFull;
+    static int numIndices, numIndicesFull;
     static OBJECT_BOUNDS bounds;
 
     glm::mat4 transformationMatrix;

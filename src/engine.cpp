@@ -15,15 +15,12 @@ Engine::Engine(float _width, float _height) : width(_width), height(_height), sc
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE); // TODO: Enlever (performances)
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 #ifdef HROC_TESTS
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-//#elif WIN32 && _DEBUG
-//  glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 #endif
-    glfwSetErrorCallback(IOUtils::errorCallback); // TODO: Enlever (performances)
 
     window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -113,6 +110,7 @@ void Engine::startLoop()
             glDepthMask(GL_TRUE);
             glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             glDepthMask(GL_FALSE);
+            glDepthFunc(GL_LESS);
         }
         else
         {

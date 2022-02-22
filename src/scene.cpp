@@ -88,7 +88,6 @@ void Scene::updateBvh()
     glDepthMask(GL_FALSE);
 
     double timerStart;
-    timerStart = glfwGetTime();
 
     /*
      * 1 - Occlusion Map Rendering
@@ -101,16 +100,24 @@ void Scene::updateBvh()
      */
 
     std::vector<unsigned int> V;
+    V.reserve(objects.size());
     for (auto obj : objects)
         V.push_back(obj->getId());
 
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map
-    std::vector<unsigned int> O = doEarlyZ(V);
+    timerStart = glfwGetTime();
+    std::vector<unsigned int> O;
+    if (engine->getUi().getFirstEarlyZMode())
+    {
+        O = doEarlyZ(V);
+    }
+    else
+    {
+        O = V;
+    }
 
     timers[0] = glfwGetTime() - timerStart; // Early-Z
-    timerStart = glfwGetTime();
-
     /*
      * 2 - Extraction of Occludee Groups
      * in O indices of effectives occluders
@@ -121,18 +128,38 @@ void Scene::updateBvh()
      * return indices of culled potentential occludees G
      */
     std::vector<std::shared_ptr<BvhNode>> occluders;
+    occluders.reserve(O.size());
     for (unsigned int o : O)
     {
         occluders.push_back(objects[o]->getBoundingBox()->getNode()); // Object idx => BvhNode
     }
 
-    std::vector<std::shared_ptr<BvhNode>> G = hierarchy->extractOccludees(occluders);
+    timerStart = glfwGetTime();
+
+    std::vector<std::shared_ptr<BvhNode>> G;
+    if (engine->getUi().getExtractOccludeesMode())
+    {
+        G = hierarchy->extractOccludees(occluders);
+    }
+    else
+    {
+        G = occluders;
+    }
 
     timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
 
     const Frustum *f = engine->getStaticCamera()->getFrustum();
-    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(G);
+    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees;
+
+    if (engine->getUi().getVFCMode())
+    {
+        culledPotentialOccludees = f->ViewFrustumCulling(G);
+    }
+    else
+    {
+        culledPotentialOccludees = G;
+    }
 
     timers[2] = glfwGetTime() - timerStart; // VFC
     timerStart = glfwGetTime();
@@ -189,7 +216,17 @@ void Scene::updateBvh()
                   return glm::distance(engine->getStaticCamera()->getPosition(), objects[a]->getBoundingBox()->getCenter()) <
                          glm::distance(engine->getStaticCamera()->getPosition(), objects[b]->getBoundingBox()->getCenter());
               });
-    std::vector<unsigned int> drawObjects = doEarlyZ(potentiallyVisibleOccludees);
+
+    std::vector<unsigned int> drawObjects;
+
+    if (engine->getUi().getSecondEarlyZMode())
+    {
+        drawObjects = doEarlyZ(potentiallyVisibleOccludees);
+    }
+    else
+    {
+        drawObjects = potentiallyVisibleOccludees;
+    }
     timers[6] = glfwGetTime() - timerStart; // Early Z on Rendering
     timerStart = glfwGetTime();
 
@@ -578,7 +615,7 @@ void Scene::updateFrustum()
 void Scene::renderFrustum(bool outline)
 {
     bool frustumVisMode;
-    outline ? frustumVisMode = engine->getUi().getFrustumVisMode() : frustumVisMode = engine->getUi().getFrustumOutlineVisMode();
+    outline ? frustumVisMode = engine->getUi().getFrustumOutlineVisMode() : frustumVisMode = engine->getUi().getFrustumVisMode();
     if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
     FrustumObject::bind();

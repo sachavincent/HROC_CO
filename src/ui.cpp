@@ -45,7 +45,12 @@ void Ui::render()
     plotFpsRate();
     ImGui::End();
 
-    if (newLightWindowActive) newLightWindow();
+    ImGui::Begin("Pipeline options ");
+    displayPipelineOptions();
+    ImGui::End();
+
+    if (newLightWindowActive)
+        newLightWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -76,7 +81,6 @@ void Ui::displayParams()
     ImGui::Checkbox("Display Frustum", &frustumMode);
 
     ImGui::Separator();
-
     static bool dispBbox = false;
     static bool dispSpecificBbox = false;
     static int dispBboxLevel = 1;
@@ -294,7 +298,7 @@ void Ui::plotTimer()
             timers[i] = 1.0;
         }
     }
-    
+
     static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
     static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
     if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(350, 350)))
@@ -313,15 +317,16 @@ void Ui::plotFpsRate()
     static double refreshCounter = 0.0;
     static float updateSpeedMs = 100.0f;
 
-    if (refreshCounter>updateSpeedMs/1000)
+    if (refreshCounter > updateSpeedMs / 1000)
     {
         for (size_t i = 0; i < 79; i++)
         {
             fpsVec[i] = fpsVec[i + 1];
         }
 
-        for (size_t i = 30; i < 80;i++){
-            fpsVecAvg30[i] = std::reduce(&fpsVec[i-30], &fpsVec[i]) / 30;
+        for (size_t i = 30; i < 80; i++)
+        {
+            fpsVecAvg30[i] = std::reduce(&fpsVec[i - 30], &fpsVec[i]) / 30;
         }
 
         fpsVec[79] = 1 / engine->deltaTime;
@@ -329,27 +334,40 @@ void Ui::plotFpsRate()
     }
     refreshCounter += engine->deltaTime;
 
-    
-
     static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
 
     static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_LockMin;
 
     static ImPlotLegendFlags legendFlags = ImPlotLegendFlags_None;
-    
-    ImGui::SliderFloat("update speed (ms)",&updateSpeedMs,5.0f,200.0f);
-    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200),0))
+
+    ImGui::SliderFloat("update speed (ms)", &updateSpeedMs, 5.0f, 200.0f);
+    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200), 0))
     {
-        
-        
+
         ImPlot::SetupAxes("time", "FPS", xflags, yflags);
-        ImPlot::SetupLegend(ImPlotLocation_SouthWest,legendFlags);
-        std::vector<double> instantCrop(fpsVec.begin()+30,fpsVec.end());
+        ImPlot::SetupLegend(ImPlotLocation_SouthWest, legendFlags);
+        std::vector<double> instantCrop(fpsVec.begin() + 30, fpsVec.end());
         ImPlot::PlotLine("instant fps", instantCrop.data(), 50);
 
-        std::vector<double> avgCrop(fpsVecAvg30.begin()+30,fpsVecAvg30.end());
+        std::vector<double> avgCrop(fpsVecAvg30.begin() + 30, fpsVecAvg30.end());
         ImPlot::PlotLine("moving average 30", avgCrop.data(), 50);
 
         ImPlot::EndPlot();
     }
+}
+
+void Ui::displayPipelineOptions()
+{
+
+    ImGui::Checkbox("First Early Z", &firstEarlyZMode);
+    ImGui::Separator();
+
+    ImGui::Checkbox("Extract Occludees", &extractOccludeesMode);
+    ImGui::Separator();
+
+    ImGui::Checkbox("View Frustum Culling", &viewFrustumCullingMode);
+    ImGui::Separator();
+
+    ImGui::Checkbox("Second Early Z", &secondEarlyZMode);
+    ImGui::Separator();
 }

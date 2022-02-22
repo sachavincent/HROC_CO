@@ -21,7 +21,7 @@ protected:
     glm::vec3 center;
     std::shared_ptr<BoundingBoxObject> wireframe;
     std::shared_ptr<BvhNode> node;
-    std::shared_ptr<const Object> object;
+    std::shared_ptr<Object> object;
 
 public:
 #ifdef HROC_TESTS
@@ -29,7 +29,7 @@ public:
     {
     }
 #endif
-    BoundingBox(const Object &_o);
+    BoundingBox(std::shared_ptr<Object>);
 
     BoundingBox(glm::vec3 _center, glm::vec3 _size);
 
@@ -46,7 +46,7 @@ public:
     inline void setNode(std::shared_ptr<BvhNode> _node) { node = _node; }
     inline const std::shared_ptr<BvhNode> &getNode() const { return node; }
 
-    inline const std::shared_ptr<const Object> &getObject() const { return object; }
+    inline const std::shared_ptr<Object> &getObject() const { return object; }
 
     static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
@@ -60,7 +60,7 @@ private:
     glm::mat3 transform;
 
 public:
-    OrientedBoundingBox(const Object &_o, glm::mat3 &_transform);
+    OrientedBoundingBox(std::shared_ptr<Object>, glm::mat3 &_transform);
 
     OrientedBoundingBox(glm::vec3 _center, glm::vec3 _size);
 
@@ -79,7 +79,7 @@ private:
     static glm::mat3 DEFAULT_TRANSFORM;
 
 public:
-    AxisBoundingBox(const Object &_o);
+    AxisBoundingBox(std::shared_ptr<Object> _o);
 
     AxisBoundingBox(glm::vec3 _center, glm::vec3 _size);
 

@@ -47,7 +47,7 @@ BvhTree::~BvhTree()
 
 void BvhTree::destroyRecursive(BvhNode *node)
 {
-    if (node)
+    if (node != nullptr)
     {
         destroyRecursive(node->getLeftChild());
         destroyRecursive(node->getRightChild());

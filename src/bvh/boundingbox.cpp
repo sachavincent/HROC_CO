@@ -20,7 +20,7 @@ bool BoundingBox::isOnOrForwardPlan(const Plan &plan) const
     return -r <= plan.getSignedDistanceToPlan(center);
 }
 
-OrientedBoundingBox::OrientedBoundingBox(const Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
+OrientedBoundingBox::OrientedBoundingBox(std::shared_ptr<Object>_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
 {
 }
 
@@ -32,24 +32,24 @@ AxisBoundingBox::AxisBoundingBox(glm::vec3 _center, glm::vec3 _size) : OrientedB
 {
 }
 
-AxisBoundingBox::AxisBoundingBox(const Object &_o) : OrientedBoundingBox(_o, AxisBoundingBox::DEFAULT_TRANSFORM)
+AxisBoundingBox::AxisBoundingBox(std::shared_ptr<Object> _o) : OrientedBoundingBox(_o, AxisBoundingBox::DEFAULT_TRANSFORM)
 {
 }
 
-BoundingBox::BoundingBox(const Object &_o)
+BoundingBox::BoundingBox(std::shared_ptr<Object> _o)
 {
-    glm::vec3 minPos = _o.getBounds().first;
-    glm::vec3 maxPos = _o.getBounds().second;
+    glm::vec3 minPos = _o->getBounds().first;
+    glm::vec3 maxPos = _o->getBounds().second;
 
-    center = _o.getPosition();
+    center = _o->getPosition();
     size = ((maxPos - minPos));
-    object = std::shared_ptr<const Object>(&_o);
+    object = _o;
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)
     {
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
     }
 
-    wireframe = std::make_shared<BoundingBoxObject>(_o.getName(), center, glm::mat4(1.0), size);
+    wireframe = std::make_shared<BoundingBoxObject>(_o->getName(), center, glm::mat4(1.0), size);
 }
 
 BoundingBox::BoundingBox(glm::vec3 _center, glm::vec3 _size)

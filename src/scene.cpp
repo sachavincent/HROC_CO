@@ -166,7 +166,7 @@ void Scene::updateBvh()
     std::vector<unsigned int> potentialOccludeesIndices;
     for (auto node : culledPotentialOccludees)
     {
-        std::vector<std::shared_ptr<const Object>> objectsInLeaf = node->getObjectsInLeafs();
+        std::vector<std::shared_ptr<Object>> objectsInLeaf = node->getObjectsInLeafs();
         for (auto obj : objectsInLeaf)
             potentialOccludeesIndices.push_back(obj->getId());
     }
@@ -290,11 +290,10 @@ void Scene::createBVH()
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
     for (auto obj : _objects)
     {
-        Object *bbo = obj.get();
-        auto newBoundingBox = std::make_shared<AxisBoundingBox>(*bbo);
-        bbo->setBoundingBox(newBoundingBox);
-        if (bbo)
-            bbs.push_back(bbo->getBoundingBox());
+        auto newBoundingBox = std::make_shared<AxisBoundingBox>(obj);
+        obj->setBoundingBox(newBoundingBox);
+        if (obj)
+            bbs.push_back(obj->getBoundingBox());
     }
 
     hierarchy = new BvhTree(bbs);

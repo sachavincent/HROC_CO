@@ -93,7 +93,7 @@ public:
         return boundingBox;
     }
 
-    std::vector<std::shared_ptr<const Object>> getObjectsInLeafs();
+    std::vector<std::shared_ptr<Object>> getObjectsInLeafs();
     
     static BvhNode *merge(BvhNode *_left, BvhNode *_right, int _newId);
 };

@@ -41,7 +41,7 @@ BvhTree::~BvhTree()
         delete idGenerator;
 
     destroyRecursive(root);
-
+    //delete root;
     nodes.clear();
 }
 
@@ -49,8 +49,15 @@ void BvhTree::destroyRecursive(BvhNode *node)
 {
     if (node != nullptr)
     {
+        std::string str;
+        //printBT(str,root, true);
         destroyRecursive(node->getLeftChild());
+        //node->
+        //str.clear();
+        //printBT(str, root, true);
         destroyRecursive(node->getRightChild());
+        //str.clear();
+        //printBT(str, root, true);
         delete node;
     }
 }

@@ -10,7 +10,18 @@ BvhNode::BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id)
 
 BvhNode::~BvhNode()
 {
-    boundingBox.~shared_ptr();
+    if(parent != nullptr)
+    {
+        if(parent->leftChild == this)
+        {
+            parent->leftChild = nullptr;
+        }
+        else
+        {
+            parent->rightChild = nullptr;
+        }
+    }
+    
 }
 
 BvhNode *BvhNode::getChild(const NodeType &_t) const

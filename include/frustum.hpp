@@ -58,7 +58,7 @@ public:
         return bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(rightFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace);
     };
 
-    std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<BvhNode *> occludeeGroups) const
+    std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(const std::vector<std::shared_ptr<BvhNode>> &occludeeGroups) const
     {
         std::vector<std::shared_ptr<BvhNode>> occ;
         for (auto it = occludeeGroups.begin(); it != occludeeGroups.end(); it++)
@@ -80,6 +80,5 @@ public:
     Plan farFace;
     Plan nearFace;
 };
-
 
 #endif

@@ -44,7 +44,7 @@ public:
 
     ~BvhTree();
 
-    std::vector<BvhNode *> extractOccludees(const std::vector<BvhNode *> &occluders);
+    std::vector<std::shared_ptr<BvhNode>> extractOccludees(const std::vector<std::shared_ptr<BvhNode>> &occluders);
 
     void createMap(std::vector<BvhNode *> &nodes);
 

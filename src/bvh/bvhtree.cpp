@@ -141,13 +141,13 @@ BvhTree::PairNode BvhTree::requestMap()
     return it->second;
 }
 
-std::vector<BvhNode *> BvhTree::extractOccludees(const std::vector<BvhNode *> &occluders)
+std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vector<std::shared_ptr<BvhNode>> &occluders)
 {
-    std::vector<BvhNode *> occludeeGroups;
+    std::vector<std::shared_ptr<BvhNode>> occludeeGroups;
     occludeeGroups.reserve(occluders.size());
     if (occluders.empty())
     {
-        occludeeGroups.push_back(root);
+        occludeeGroups.push_back(std::shared_ptr<BvhNode>(root));
         return occludeeGroups;
     }
     for (auto it = occluders.begin(); it != occluders.end(); it++)
@@ -157,7 +157,7 @@ std::vector<BvhNode *> BvhTree::extractOccludees(const std::vector<BvhNode *> &o
 
     for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
-        BvhNode *n = (*it);
+        BvhNode *n = (*it).get();
         while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
         {
             n->setVisibility(Visibility::VISIBLE);
@@ -170,7 +170,7 @@ std::vector<BvhNode *> BvhTree::extractOccludees(const std::vector<BvhNode *> &o
     {
         if ((*it)->getVisibility() == Visibility::UNKNOWN)
         {
-            occludeeGroups.push_back(*it);
+            occludeeGroups.push_back(std::shared_ptr<BvhNode>(*it));
         }
     }
 

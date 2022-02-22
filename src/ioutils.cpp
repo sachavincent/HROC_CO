@@ -36,6 +36,10 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void IOUtils::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
     engine->getCurrentCamera()->offsetFov(yoffset);
+    if (engine->getCurrentCameraType() == CameraType::STATIC)
+    {
+        engine->getScene()->requestBvhUpdate(1);
+    }
 }
 
 void IOUtils::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)

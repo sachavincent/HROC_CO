@@ -83,7 +83,6 @@ void Scene::updateBvh()
 
     updateFrustum();
 
-    // updateRequired = false;
     glDepthMask(GL_TRUE);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDepthMask(GL_FALSE);
@@ -108,7 +107,7 @@ void Scene::updateBvh()
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map
     std::vector<unsigned int> O = doEarlyZ(V);
-    return;
+
     timers[0] = glfwGetTime() - timerStart; // Early-Z
     timerStart = glfwGetTime();
 
@@ -122,13 +121,13 @@ void Scene::updateBvh()
      * return indices of culled potentential occludees G
      */
 
-    std::vector<BvhNode *> occluders;
+    std::vector<std::shared_ptr<BvhNode>> occluders;
     for (unsigned int o : O)
     {
-        occluders.push_back(objects[o]->getBoundingBox()->getNode().get()); // Object idx => BvhNode
+        occluders.push_back(objects[o]->getBoundingBox()->getNode()); // Object idx => BvhNode
     }
 
-    std::vector<BvhNode *> G = hierarchy->extractOccludees(occluders);
+    std::vector<std::shared_ptr<BvhNode>> G = hierarchy->extractOccludees(occluders);
 
     timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
@@ -617,20 +616,29 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<unsigned int> oc
     return potentiallyVisibleOccludees;
 }
 
-std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
+std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _idObjects)
 {
-    // Camera *staticCam = getCamera();
+    if (_idObjects.empty())
+        return std::vector<unsigned int>();
+
     Camera *staticCam = engine->getStaticCamera();
 
-    std::sort(_objects.begin(), _objects.end(), [&](unsigned int a, unsigned int b)
-              { return glm::distance(staticCam->getPosition(), objects[a].get()->getPosition()) <
-                       glm::distance(staticCam->getPosition(), objects[b].get()->getPosition()); }); // TODO: Remove sorted objects
+    // std::sort(_objects.begin(), _objects.end(), [&](unsigned int a, unsigned int b)
+    //         { return glm::distance(staticCam->getPosition(), objects[a].get()->getPosition()) <
+    //                glm::distance(staticCam->getPosition(), objects[b].get()->getPosition()); }); // TODO: Remove sorted objects
+
+    defaultVisibility = new int[_idObjects.size()];
+
+    for (int i = 0; i < _idObjects.size(); ++i)
+    {
+        defaultVisibility[i] = 0;
+    }
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), defaultVisibility, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * _idObjects.size(), defaultVisibility, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    int *_visibility = new int[objects.size()];
+    int *_visibility = new int[_idObjects.size()];
 
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_TRUE);
@@ -643,7 +651,7 @@ std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
 
     int nbCmds = 0;
     std::vector<std::shared_ptr<Object>> obj;
-    for (auto idxObj : _objects)
+    for (auto idxObj : _idObjects)
         obj.push_back(objects[idxObj]);
     DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(obj, &nbCmds);
     if (!earlyZcmds)
@@ -654,19 +662,25 @@ std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
     glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, size_t(nbCmds), 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * objects.size(), _visibility);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(int) * _idObjects.size(), _visibility);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glBindVertexArray(0);
 
     earlyZShader.stop();
-    std::vector<unsigned int> visibleObjects(_visibility, _visibility + objects.size());
 
     glDepthFunc(GL_EQUAL);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
 
+    std::vector<unsigned int> test(_visibility, _visibility + _idObjects.size());
+    std::vector<unsigned int> visibleObjects;
     delete earlyZcmds;
-    delete _visibility;
 
+    for (size_t i = 0; i < _idObjects.size(); i++)
+    {
+        if (_visibility[i] == 1)
+            visibleObjects.push_back(_idObjects[i]);
+    }
+    delete _visibility;
     return visibleObjects;
 }

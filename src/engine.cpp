@@ -108,22 +108,19 @@ void Engine::startLoop()
         updateFpsCounter(500);
 
         getCurrentCamera()->move(2.0f * deltaTime);
-        // final rendering of scene
-
-        scene->doEarlyZ(scene->getObjects());
 
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_DEPTH_TEST);
         scene->renderBoundingBoxes();
-        if (isFirstLoop)
-        {
-            isFirstLoop = false;
-            scene->createFrustum();
-        }
-        scene->renderFrustum();
+        scene->renderFrustum(true);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        scene->renderFrustum(false);
 
         glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 
+        glEnable(GL_DEPTH_TEST);
         // imgui part
         ui.render();
 

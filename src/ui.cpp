@@ -1,7 +1,7 @@
 #include "ui.hpp"
 #include "engine.hpp"
 #include "scene.hpp"
-#include "utils/benchmark.hpp"
+//#include "utils/benchmark.hpp"
 
 #include <memory>
 #include <mutex>
@@ -70,6 +70,8 @@ void Ui::displayParams()
 
     ImGui::Checkbox("Display Objects", &objectMode);
 
+    ImGui::Separator();
+    ImGui::Checkbox("Display Frustum Outline", &frustumOutlineMode);
     ImGui::Separator();
     ImGui::Checkbox("Display Frustum", &frustumMode);
 

@@ -53,6 +53,7 @@ private:
 
     int bboxMode = 0;
     bool frustumMode = true;
+    bool frustumOutlineMode = true;
     bool objectMode = true;
 
 public:
@@ -62,6 +63,7 @@ public:
     void setBboxMaxLevel(int _level) { bboxMaxLevel = _level; }
     int getBboxVisMode() { return bboxMode; }
     int getFrustumVisMode(){return frustumMode;}
+    int getFrustumOutlineVisMode(){return frustumOutlineMode;}
     int getObjectsVisMode() { return objectMode; }
 };
 

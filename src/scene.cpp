@@ -65,6 +65,8 @@ Scene::~Scene()
 void Scene::updateBvh()
 {
     double timerStart;
+    timerStart = glfwGetTime();
+
     /*
      * 1 - Occlusion Map Rendering
      * in V indices of previously drawn objects
@@ -75,15 +77,16 @@ void Scene::updateBvh()
      * return list of indices of effectives occluders O
      */
 
-    timerStart = glfwGetTime();
-    std::vector<BvhNode *> effectiveOccluders;
+    std::vector<unsigned int> V;
+
+    
+    
     // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
     // TODO store depth map
+    std::vector<unsigned int> O = doEarlyZ(V);
 
-    timers[0] = glfwGetTime() - timerStart;
 
-    //############################
-    
+    timers[0] = glfwGetTime() - timerStart;//Early-Z
     timerStart = glfwGetTime();
 
     /*
@@ -96,23 +99,26 @@ void Scene::updateBvh()
      * return indices of culled potentential occludees G
      */
 
-    std::vector<BvhNode *> potentialOccluders = hierarchy->extractOccludees(effectiveOccluders); // = G
+    std::vector<BvhNode *> occluders;
+    for (unsigned int o : O)
+    {
+        occluders.push_back(objects[o]->getBoundingBox()->getNode().get());
+    }
 
-    timers[1] = glfwGetTime() - timerStart;
-
-    //############################
-
-    timerStart = glfwGetTime();
-
-    const Frustum *f = getCamera()->getFrustum();
-    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(potentialOccluders);
+    std::vector<BvhNode *> G = hierarchy->extractOccludees(occluders);
     
 
-    timers[2] = glfwGetTime() - timerStart;
-
-    //############################
-
+    timers[1] = glfwGetTime() - timerStart;//Extract
     timerStart = glfwGetTime();
+
+
+    const Frustum *f = getCamera()->getFrustum();
+    std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(G);
+
+
+    timers[2] = glfwGetTime() - timerStart;//VFC
+    timerStart = glfwGetTime();
+
 
     /*
      * 3 - Batch Occlusion Test (Paper Original)
@@ -127,10 +133,7 @@ void Scene::updateBvh()
     // TODO Raycast with aabb on GPU to extract U
     
 
-    timers[3] = glfwGetTime() - timerStart;
-
-    //############################
-
+    timers[3] = glfwGetTime() - timerStart;//Raycast
     timerStart = glfwGetTime();
 
     /*
@@ -140,20 +143,17 @@ void Scene::updateBvh()
      */
     
 
-    timers[4] = glfwGetTime() - timerStart;
-
-    //############################
-
+    timers[4] = timerStart - glfwGetTime();//Bb extract
     timerStart = glfwGetTime();
 
-    std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
+
+    // TODO: Get objects in nodes
+    //std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees);
     
 
-    timers[5] = glfwGetTime() - timerStart;
-
-    //############################
-
+    timers[5] = glfwGetTime() - timerStart;//Batch occlusion Test
     timerStart = glfwGetTime();
+
 
     /*
      * 4 - Occludee Rendering
@@ -162,28 +162,22 @@ void Scene::updateBvh()
      */
     // TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
 
+
+    timers[6] = glfwGetTime() - timerStart;//Early Z on Rendering
+    timerStart = glfwGetTime();
     
-    timers[6] = glfwGetTime() - timerStart;
 
-    //############################
 
+    timers[7] = glfwGetTime() - timerStart;//Draw objects
     timerStart = glfwGetTime();
 
     // doEarlyZ();
     std::vector<Object *> drawnObjects;
 
-    renderObjects(drawnObjects);
-    
-    timers[7] = glfwGetTime() - timerStart;
-
-    //############################
-
-    timerStart = glfwGetTime();
-
     // TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V
     
 
-    timers[8] = glfwGetTime() - timerStart;
+    timers[8] = glfwGetTime() - timerStart;//Merge
 }
 
 //! Load the scene models on GPU before rendering
@@ -268,6 +262,7 @@ void Scene::load()
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
     frustumShader = {"shaders/frustum.vert", "shaders/frustum.frag"};
 
+    createFrustum();
     setupEarlyZCommand();
 }
 
@@ -433,7 +428,7 @@ void Scene::renderBoundingBoxes()
     for (auto entry : boundingBoxes)
     {
         int numBB = 0;
-        bboxLevel = entry.first + 1;
+        bboxLevel = entry.first;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
         auto bboxs = entry.second;
         if (visMode == 0 || bboxLevel == visMode)
@@ -446,9 +441,10 @@ void Scene::renderBoundingBoxes()
     engine->getUi().setBboxMaxLevel(maxBboxLevel);
     bbShader.stop();
 }
-void Scene::createFrustum(){
+void Scene::createFrustum()
+{
     glm::mat4 view, proj;
-    Camera * staticCamera = engine->getStaticCamera();
+    Camera *staticCamera = engine->getStaticCamera();
     proj = staticCamera->getProjectionMatrix();
     view = staticCamera->getViewMatrix();
     std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
@@ -475,23 +471,28 @@ void Scene::createFrustum(){
             auto v = inv * glm::vec4(p, 1.0f);
             v.z = v.z;
             return glm::vec3(v) / v.w;
-        }
-    );
-    glm::vec3 * vertices = _frustumVertices.data();
-    staticFrustumObject = new FrustumObject("debugFrustum",vertices,"Frustum");
+        });
+    glm::vec3 *vertices = _frustumVertices.data();
+    staticFrustumObject = new FrustumObject("debugFrustum", vertices, "Frustum");
 }
-void Scene::updateFrustum(){
+
+void Scene::updateFrustum()
+{
     glm::mat4 view, proj;
-    Camera * staticCamera = engine->getStaticCamera();
+    Camera *staticCamera = engine->getStaticCamera();
     proj = staticCamera->getProjectionMatrix();
     view = staticCamera->getViewMatrix();
     std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
-    {
-        { -1.0f, -1.0f, 1.0f }, { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { -1.0f, 1.0f, 1.0f },
-        { -1.0f, -1.0f, -1.0f }, { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, -1.0f }, { -1.0f, 1.0f, -1.0f },
-    }
-    };
-
+        {
+            {-1.0f, -1.0f, 1.0f},
+            {1.0f, -1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f},
+            {-1.0f, 1.0f, 1.0f},
+            {-1.0f, -1.0f, -1.0f},
+            {1.0f, -1.0f, -1.0f},
+            {1.0f, 1.0f, -1.0f},
+            {-1.0f, 1.0f, -1.0f},
+        }};
 
     const auto inv = glm::inverse(proj * view);
     std::array<glm::vec3, 8> _frustumVertices;
@@ -500,25 +501,28 @@ void Scene::updateFrustum(){
         _cameraFrustumCornerVertices.begin(),
         _cameraFrustumCornerVertices.end(),
         _frustumVertices.begin(),
-        [&](glm::vec3 p) {
-            auto v =  inv * glm::vec4(p, 1.0f) ;
-            v.z = v.z;
+        [&](glm::vec3 p)
+        {
+            auto v = inv * glm::vec4(p, 1.0f);
             return glm::vec3(v) / v.w;
-        }
-    );
-    glm::vec3 * vertices = _frustumVertices.data();
+        });
+    glm::vec3 *vertices = _frustumVertices.data();
     staticFrustumObject->adjustVertexData(vertices);
-
 }
-void Scene::renderFrustum(){    
-    bool frustumVisMode = engine->getUi().getFrustumVisMode();
-    if (!frustumVisMode)
+void Scene::renderFrustum(bool outline)
+{
+    bool frustumVisMode;
+    outline ? frustumVisMode = engine->getUi().getFrustumVisMode() : frustumVisMode = engine->getUi().getFrustumOutlineVisMode();
+    if (!frustumVisMode || engine->getCurrentCameraType() == CameraType::STATIC)
         return;
-    FrustumObject::bind();    
+    FrustumObject::bind();
     frustumShader.start();
+    frustumShader.loadBool("outline", outline);
     frustumShader.loadMat4("view", getCamera()->getViewMatrix());
     frustumShader.loadMat4("projection", getCamera()->getProjectionMatrix());
-    staticFrustumObject->draw();
+
+    outline ? staticFrustumObject->drawOutline() : staticFrustumObject->draw();
+
     FrustumObject::unbind();
     frustumShader.stop();
 }
@@ -540,7 +544,7 @@ Scene &Scene::addLight(std::shared_ptr<Light> _light)
 
 Camera *Scene::getCamera() { return engine->getCurrentCamera(); }
 
-std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std::shared_ptr<BvhNode>> &occludeeGroups)
+std::vector<std::shared_ptr<Object>> Scene::batchOcclusionTest(std::vector<std::shared_ptr<Object>> &occludeeGroups)
 {
     Camera *staticCam = engine->getStaticCamera();
     simpleShader.start();
@@ -549,19 +553,19 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
 
     unsigned int THRESHOLD = 10; // Min samples
 
-    std::sort(/*std::execution::par_unseq, */ occludeeGroups.begin(), occludeeGroups.end(),
-              [staticCam](std::shared_ptr<BvhNode> a, std::shared_ptr<BvhNode> b)
+    std::sort(occludeeGroups.begin(), occludeeGroups.end(),
+              [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
               {
                   return glm::distance(staticCam->getPosition(), a->getBoundingBox()->getCenter()) < glm::distance(staticCam->getPosition(), b->getBoundingBox()->getCenter());
               });
 
-    std::vector<std::shared_ptr<BvhNode>> potentiallyVisibleOccludees;
+    std::vector<std::shared_ptr<Object>> potentiallyVisibleOccludees;
     const size_t nbQueries = occludeeGroups.size();
     GLuint *queries = new GLuint[nbQueries];
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    for (std::shared_ptr<BvhNode> bb : occludeeGroups)
+    for (std::shared_ptr<Object> bb : occludeeGroups)
     {
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
         bb->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
@@ -590,12 +594,13 @@ std::vector<std::shared_ptr<BvhNode>> Scene::batchOcclusionTest(std::vector<std:
     return potentiallyVisibleOccludees;
 }
 
-void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
+std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _objects)
 {
     Camera *staticCam = getCamera();
 
-    std::sort(/*std::execution::par_unseq, */ _objects.begin(), _objects.end(), [staticCam](std::shared_ptr<Object> a, std::shared_ptr<Object> b)
-              { return glm::distance(staticCam->getPosition(), a.get()->getPosition()) < glm::distance(staticCam->getPosition(), b.get()->getPosition()); });
+    std::sort(_objects.begin(), _objects.end(), [&](unsigned int a, unsigned int b)
+              { return glm::distance(staticCam->getPosition(), objects[a].get()->getPosition()) <
+                       glm::distance(staticCam->getPosition(), objects[b].get()->getPosition()); });
 
     // Camera *staticCam = engine->getStaticCamera();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
@@ -618,7 +623,10 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glBindVertexArray(vao);
 
     int nbCmds = 0;
-    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(_objects, &nbCmds);
+    std::vector<std::shared_ptr<Object>> obj;
+    for (auto idxObj : _objects)
+        obj.push_back(objects[idxObj]);
+    DrawElementsCommand *earlyZcmds = MeshHandler::getSingleton()->getCmdsForSubset(obj, &nbCmds); // TODO: Remove sorted objects
 
     glNamedBufferData(cmd, nbCmds * sizeof(DrawElementsCommand), earlyZcmds, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, cmd);
@@ -636,6 +644,17 @@ void Scene::doEarlyZ(std::vector<std::shared_ptr<Object>> _objects)
     glDepthMask(GL_FALSE);
 
     // glDisable(GL_DEPTH_TEST);
-    delete _visibility;
     delete earlyZcmds;
+
+    std::vector<unsigned int> visibleObjects;
+
+    for (size_t i = 0; i < objects.size(); i++)
+    {
+        if (_visibility[i] == 1)
+            visibleObjects.push_back(i);
+    }
+
+    delete _visibility;
+
+    return visibleObjects;
 }

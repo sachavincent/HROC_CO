@@ -43,7 +43,7 @@ Object &Object::setPosition(const glm::vec3 &_pos)
 
 Object &Object::setTexDiffuse(std::string _path)
 {
-    Texture::loadTexture(_path, id);
+    diffuse.z = Texture::loadTexture(_path, id); // Are you confused yet?
     return *this;
 }
 
@@ -103,8 +103,8 @@ void Object::flushCaches()
 {
     Cube::instance_counter = 0;
     FileObject::instance_counter = 0;
-    //FileObject::path_cache.clear();
+    // FileObject::path_cache.clear();
     UVSphere::instance_counter = 0;
     Plane::instance_counter = 0;
-    //AssimpMeshObject::instance_counter = 0;
+    // AssimpMeshObject::instance_counter = 0;
 }

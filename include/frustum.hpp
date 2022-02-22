@@ -81,21 +81,5 @@ public:
     Plan nearFace;
 };
 
-class FrustumObject : public Object
-{
-private:
-    std::vector<GLfloat> vertices;
-    static GLuint vao;
-    GLuint vbo;
-public:
-    FrustumObject(std::string _parentName,
-                  const glm::vec3 _edge[8],
-                  const std::string _keyModel);
-    void draw();
-    void adjustVertexData(const glm::vec3 _edge[8]);
-
-    static inline void bind() { glBindVertexArray(vao); }
-    static inline void unbind() { glBindVertexArray(0); }
-};
 
 #endif

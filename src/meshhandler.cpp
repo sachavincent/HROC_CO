@@ -481,9 +481,8 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
             {
                 objOrder.push_back(keyModel);
                 temp[keyModel] = obj->getObjectData();
-                countMap[keyModel].push_back(obj);
             }
-            else
+            if(obj->isVisible())
             {
                 countMap[keyModel].push_back(obj);
             }
@@ -535,7 +534,10 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
         int nbConsecutiveObj = 0;
         while (currentKeyModel == keyModel && i < _objects.size())
         {
-            nbConsecutiveObj++;
+            if(obj->isVisible())
+            {
+                nbConsecutiveObj++;
+            }
             if (i == _objects.size() - 1)
             {
                 stop = true;

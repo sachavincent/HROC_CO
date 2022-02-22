@@ -13,18 +13,22 @@
 class Texture
 {
 private:
-    static std::map<std::string, std::vector<float>> cache;
+    static std::map<std::string, GLuint> cache;
 
     static GLuint id;
     static bool arrayInit;
-    static unsigned int currObj;
     static unsigned int maxObjects;
+    static int width;
+    static int height;
+    static unsigned int currObj;
 
 public:
-    static void createTextureArray(unsigned int nbObjects)
+    static void createTextureArray(unsigned int nbObjects, unsigned int _width, unsigned int _height)
     {
         maxObjects = nbObjects;
 
+        width = _width;
+        height = _height;
         glGenTextures(1, &id);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, id);
@@ -32,13 +36,13 @@ public:
         // Create storage for the texture. (100 layers of 1x1 texels)
         glTexStorage3D(GL_TEXTURE_2D_ARRAY,
                        1,
-                       GL_RGBA16F, // Internal format
-                       1024, 1024, // width,height
-                       maxObjects  // Number of layers
+                       GL_RGBA16F,    // Internal format
+                       width, height, // width,height
+                       maxObjects     // Number of layers
         );
         arrayInit = true;
     }
-    static void loadTexture(const std::string &_file, unsigned int _id);
+    static GLuint loadTexture(const std::string &_file, unsigned int _id);
 
     static void load();
 

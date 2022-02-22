@@ -79,7 +79,5 @@ private:
 
     int polygonMode = GL_FILL;
     double lastFrame;
-
-    bool isFirstLoop = true;
 };
 #endif

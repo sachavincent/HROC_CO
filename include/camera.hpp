@@ -6,6 +6,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 struct CameraInfo
@@ -129,7 +130,7 @@ public:
 		return this->pitch;
 	}
 
-	inline bool isMoving() const { return movingFactor == glm::vec3(0); }
+	inline bool isMoving() const { return !glm::epsilonEqual(movingFactor.x, 0.0f, glm::epsilon<float>()) || !glm::epsilonEqual(movingFactor.y, 0.0f, glm::epsilon<float>()) || !glm::epsilonEqual(movingFactor.z, 0.0f, glm::epsilon<float>()); }
 
 	//! Get camera viewport width (in px)
 	int getResWidth() const { return width; };

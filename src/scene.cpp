@@ -62,20 +62,24 @@ Scene::~Scene()
     glDeleteBuffers(1, &cmd);
 }
 
-void Scene::requestBvhUpdate()
+void Scene::requestBvhUpdate(int nbRequests)
 {
-    updateRequired = true;
+    if (updateRequired == 0)
+        updateRequired = nbRequests;
 }
 
 void Scene::stopBvhUpdate()
 {
-    updateRequired = false;
+    updateRequired = 0;
 }
 
 void Scene::updateBvh()
 {
-    if (!updateRequired)
+    if (updateRequired == 0)
         return;
+
+    updateRequired--;
+    std::cout << "Updating bvh." << std::endl;
 
     updateFrustum();
 
@@ -330,7 +334,7 @@ void Scene::renderObjects()
     bool debugVisibility = false;
     sh.loadBool("debugVisibility", debugVisibility);
 
-    //TODO: 1 draw of visible objects + 1 draw of invisible objects (if debugVisibility == true)
+    // TODO: 1 draw of visible objects + 1 draw of invisible objects (if debugVisibility == true)
 
     // draw objects if gui enables it
     if (engine->getUi().getObjectsVisMode())

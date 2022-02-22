@@ -21,7 +21,7 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
         engine->getCurrentCamera()->offsetPitch((float)yoffset, MOUSE_SENSITIVTY);
         if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getScene()->requestBvhUpdate();
+            engine->getScene()->requestBvhUpdate(1);
         }
     }
     else
@@ -49,7 +49,7 @@ void IOUtils::keyCallback(GLFWwindow *window, int key, int scancode, int action,
         IOUtils::onKeyReleased(window, key);
         break;
     case GLFW_REPEAT:
-       // IOUtils::onKeyRepeated(window, key);
+        // IOUtils::onKeyRepeated(window, key);
         break;
     default:
         // No need for now
@@ -199,7 +199,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
         engine->getCurrentCamera()->moveZ(1.0);
-        
+
         if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
             engine->getScene()->stopBvhUpdate();
@@ -208,7 +208,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
         engine->getCurrentCamera()->moveX(1.0);
-        
+
         if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
             engine->getScene()->stopBvhUpdate();
@@ -217,7 +217,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
         engine->getCurrentCamera()->moveX(-1.0);
-        
+
         if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
             engine->getScene()->stopBvhUpdate();
@@ -225,7 +225,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
         break;
     case GLFW_KEY_SPACE:
         engine->getCurrentCamera()->moveY(-1.0);
-        
+
         if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
             engine->getScene()->stopBvhUpdate();
@@ -233,7 +233,7 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
         break;
     case GLFW_KEY_LEFT_CONTROL:
         engine->getCurrentCamera()->moveY(1.0);
-        
+
         if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
             engine->getScene()->stopBvhUpdate();

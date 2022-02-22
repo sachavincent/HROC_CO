@@ -52,7 +52,7 @@ private:
 
     int *defaultVisibility;
 
-    bool updateRequired;
+    int updateRequired;
 
 public:
     // Timers for pipeline
@@ -104,7 +104,7 @@ public:
     // Called when camera moves
     void updateBvh();
 
-    void requestBvhUpdate();
+    void requestBvhUpdate(int nbRequests = INT_MAX);
     void stopBvhUpdate();
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);

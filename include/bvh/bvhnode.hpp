@@ -85,6 +85,15 @@ public:
     {
         tag = _tag;
     }
+    
+    inline void setVisibilityRecursive(const Visibility &_tag)
+    {
+        tag = _tag;
+        if(hasLeftChild())
+            leftChild->setVisibilityRecursive(_tag);
+        if(hasRightChild())
+            rightChild->setVisibilityRecursive(_tag);
+    }
 
     bool isRoot();
 
@@ -97,6 +106,24 @@ public:
 
     std::vector<std::shared_ptr<Object>> getObjectsInLeafs();
     
+
+    void RecursiveAdd(std::vector<std::shared_ptr<BvhNode>>& vec)
+    {
+        if(tag == Visibility::UNKNOWN)
+        {
+            vec.push_back(std::shared_ptr<BvhNode>(this));
+        }
+        if(hasLeftChild())
+        {
+            leftChild->RecursiveAdd(vec);
+        }
+        if(hasRightChild())
+        {
+            rightChild->RecursiveAdd(vec);
+        }
+    }
+
+
     static std::shared_ptr<BvhNode>merge(std::shared_ptr<BvhNode>_left, std::shared_ptr<BvhNode>_right, int _newId);
 };
 #endif

@@ -120,7 +120,6 @@ void Scene::updateBvh()
      * Then perform View Frustum Culling on potential occludees G
      * return indices of culled potentential occludees G
      */
-
     std::vector<std::shared_ptr<BvhNode>> occluders;
     for (unsigned int o : O)
     {
@@ -132,7 +131,7 @@ void Scene::updateBvh()
     timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
 
-    const Frustum *f = getCamera()->getFrustum();
+    const Frustum *f = engine->getStaticCamera()->getFrustum();
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees = f->ViewFrustumCulling(G);
 
     timers[2] = glfwGetTime() - timerStart; // VFC
@@ -194,6 +193,9 @@ void Scene::updateBvh()
         objectVisibility[idxObj] = true;
 
     timers[8] = glfwGetTime() - timerStart; // Merge
+
+    std::cout << "Bvh updated:\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << potentialOccludeesIndices.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
+              << "\n\t2nd Early-Z: " << drawObjects.size() << std::endl;
 }
 
 //! Load the scene models on GPU before rendering

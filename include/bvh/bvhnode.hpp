@@ -93,6 +93,8 @@ public:
         return boundingBox;
     }
 
+    inline bool isLeaf() {return !hasLeftChild() && ! hasRightChild();}
+
     std::vector<std::shared_ptr<Object>> getObjectsInLeafs();
     
     static std::shared_ptr<BvhNode>merge(std::shared_ptr<BvhNode>_left, std::shared_ptr<BvhNode>_right, int _newId);

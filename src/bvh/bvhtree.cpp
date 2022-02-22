@@ -41,11 +41,11 @@ BvhTree::~BvhTree()
         delete idGenerator;
 
     destroyRecursive(root);
-    //delete root;
+    root = std::shared_ptr<BvhNode>(nullptr);
     nodes.clear();
 }
 
-void BvhTree::destroyRecursive(BvhNode *node)
+void BvhTree::destroyRecursive(std::shared_ptr<BvhNode>node)
 {
     if (node != nullptr)
     {
@@ -58,11 +58,11 @@ void BvhTree::destroyRecursive(BvhNode *node)
         destroyRecursive(node->getRightChild());
         //str.clear();
         //printBT(str, root, true);
-        delete node;
+        node.~shared_ptr();
     }
 }
 
-void BvhTree::createMap(std::vector<BvhNode *> &_nodes)
+void BvhTree::createMap(std::vector<std::shared_ptr<BvhNode>> &_nodes)
 {
     map = new std::multimap<float, PairNode>();
 
@@ -71,7 +71,7 @@ void BvhTree::createMap(std::vector<BvhNode *> &_nodes)
 
     map->insert(PairDistanceNode(BoundingBox::distance((_nodes[0])->getBoundingBox(), (_nodes[1])->getBoundingBox()), PairNode(_nodes[0], _nodes[1])));
 
-    std::vector<BvhNode *> nodeInMap;
+    std::vector<std::shared_ptr<BvhNode>> nodeInMap;
     nodeInMap.reserve(_nodes.size());
     nodeInMap.push_back(_nodes[0]);
     nodeInMap.push_back(_nodes[1]);
@@ -82,7 +82,7 @@ void BvhTree::createMap(std::vector<BvhNode *> &_nodes)
     }
 }
 
-void BvhTree::addToMap(BvhNode *node, std::vector<BvhNode *> &nodesToCompare)
+void BvhTree::addToMap(std::shared_ptr<BvhNode>node, std::vector<std::shared_ptr<BvhNode>> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
@@ -112,15 +112,15 @@ void BvhTree::removeFromMap(BvhNode &node)
     // std::cout << "After remove : " << map->size() << std::endl;
 }
 
-void BvhTree::mergeAll(std::vector<BvhNode *> &_nodes)
+void BvhTree::mergeAll(std::vector<std::shared_ptr<BvhNode>> &_nodes)
 {
     if (map->empty())
         return;
 
     PairNode pair = requestMap();
-    BvhNode *first = pair.first;
-    BvhNode *second = pair.second;
-    BvhNode *merged = BvhNode::merge(first, second, idGenerator->GetUniqueId());
+    std::shared_ptr<BvhNode>first = pair.first;
+    std::shared_ptr<BvhNode>second = pair.second;
+    std::shared_ptr<BvhNode>merged = BvhNode::merge(first, second, idGenerator->GetUniqueId());
     if (map->size() == 1)
     {
         root = merged;
@@ -144,6 +144,8 @@ BvhTree::PairNode BvhTree::requestMap()
 std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vector<std::shared_ptr<BvhNode>> &occluders)
 {
     std::vector<std::shared_ptr<BvhNode>> occludeeGroups;
+
+    
     occludeeGroups.reserve(occluders.size());
     if (occluders.empty())
     {
@@ -157,11 +159,11 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
 
     for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
-        BvhNode *n = (*it).get();
+        std::shared_ptr<BvhNode> n = (*it);
         while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
         {
             n->setVisibility(Visibility::VISIBLE);
-            BvhNode *n2 = n->sibling();
+            std::shared_ptr<BvhNode>n2 = n->sibling();
             n2->setVisibility(Visibility::UNKNOWN);
             n = n->getParent();
         }
@@ -177,7 +179,7 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
     return occludeeGroups;
 }
 
-void BvhTree::eraseInVector(std::vector<BvhNode *> &nodes, BvhNode *node)
+void BvhTree::eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::shared_ptr<BvhNode>node)
 {
     for (auto it = nodes.begin(); it != nodes.end(); it++)
     {

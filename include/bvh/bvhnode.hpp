@@ -28,9 +28,9 @@ private:
     int id;
     NodeType type;
     Visibility tag;
-    BvhNode *leftChild;
-    BvhNode *rightChild;
-    BvhNode *parent;
+    std::shared_ptr<BvhNode>leftChild;
+    std::shared_ptr<BvhNode>rightChild;
+    std::shared_ptr<BvhNode> parent;
     std::shared_ptr<BoundingBox> boundingBox;
 
 public:
@@ -52,17 +52,17 @@ public:
         return rightChild != nullptr;
     }
 
-    inline BvhNode *getLeftChild() const
+    inline std::shared_ptr<BvhNode> getLeftChild() const
     {
         return leftChild;
     }
 
-    inline BvhNode *getRightChild() const
+    inline std::shared_ptr<BvhNode> getRightChild() const
     {
         return rightChild;
     }
 
-    inline BvhNode *getParent() const
+    inline std::shared_ptr<BvhNode> getParent() const
     {
         return parent;
     }
@@ -72,9 +72,9 @@ public:
         return type;
     }
 
-    BvhNode *sibling() const;
+    std::shared_ptr<BvhNode> sibling() const;
 
-    BvhNode *getChild(const NodeType &_type) const;
+    std::shared_ptr<BvhNode> getChild(const NodeType &_type) const;
 
     inline void setType(const NodeType &_type)
     {
@@ -95,6 +95,6 @@ public:
 
     std::vector<std::shared_ptr<Object>> getObjectsInLeafs();
     
-    static BvhNode *merge(BvhNode *_left, BvhNode *_right, int _newId);
+    static std::shared_ptr<BvhNode>merge(std::shared_ptr<BvhNode>_left, std::shared_ptr<BvhNode>_right, int _newId);
 };
 #endif

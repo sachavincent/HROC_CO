@@ -12,7 +12,7 @@ BvhNode::~BvhNode()
 {
     if(parent != nullptr)
     {
-        if(parent->leftChild == this)
+        if((BvhNode*)(parent->leftChild.get()) == this)
         {
             parent->leftChild = nullptr;
         }
@@ -24,7 +24,7 @@ BvhNode::~BvhNode()
     
 }
 
-BvhNode *BvhNode::getChild(const NodeType &_t) const
+std::shared_ptr<BvhNode>BvhNode::getChild(const NodeType &_t) const
 {
     if (_t == LEFT)
     {
@@ -36,9 +36,9 @@ BvhNode *BvhNode::getChild(const NodeType &_t) const
     }
 }
 
-BvhNode *BvhNode::sibling() const
+std::shared_ptr<BvhNode>BvhNode::sibling() const
 {
-    BvhNode *_p = parent;
+    std::shared_ptr<BvhNode> _p(parent);
     if (type == LEFT)
     {
         return _p->getRightChild();
@@ -54,7 +54,7 @@ bool BvhNode::isRoot()
     return getParent() != nullptr;
 }
 
-BvhNode *BvhNode::merge(BvhNode *_left, BvhNode *_right, int _newId)
+std::shared_ptr<BvhNode>BvhNode::merge(std::shared_ptr<BvhNode>_left, std::shared_ptr<BvhNode>_right, int _newId)
 {
     auto ptrLeftBox = _left->getBoundingBox();
     auto ptrRightBox = _right->getBoundingBox();
@@ -62,7 +62,7 @@ BvhNode *BvhNode::merge(BvhNode *_left, BvhNode *_right, int _newId)
     AxisBoundingBox *bbRight = dynamic_cast<AxisBoundingBox *>(ptrRightBox.get());
     BoundingBox *bb = bbLeft->merge(bbRight);
     std::shared_ptr<BoundingBox> bbPtr(bb);
-    BvhNode *p = new BvhNode(bbPtr, _newId);
+    std::shared_ptr<BvhNode> p(new BvhNode(bbPtr, _newId));
     p->leftChild = _left;
     p->rightChild = _right;
 

@@ -21,8 +21,8 @@ public:
 #else
 private:
 #endif
-    typedef std::pair<float, std::pair<BvhNode *, BvhNode *>> PairDistanceNode;
-    typedef std::pair<BvhNode *, BvhNode *> PairNode;
+    typedef std::pair<float, std::pair<std::shared_ptr<BvhNode>, std::shared_ptr<BvhNode>>> PairDistanceNode;
+    typedef std::pair<std::shared_ptr<BvhNode>, std::shared_ptr<BvhNode>> PairNode;
 
 #ifdef HROC_TESTS
     BvhTree() : idGenerator(nullptr), map(nullptr), root(nullptr)
@@ -33,9 +33,9 @@ private:
     BvhNode *getRoot() { return root; }
 #endif
 private:
-    BvhNode *root;
+    std::shared_ptr<BvhNode> root;
     std::multimap<float, PairNode> *map;
-    std::vector<BvhNode *> nodes;
+    std::vector<std::shared_ptr<BvhNode>> nodes;
     IdGenerator *idGenerator;
 
 public:
@@ -46,17 +46,17 @@ public:
 
     std::vector<std::shared_ptr<BvhNode>> extractOccludees(const std::vector<std::shared_ptr<BvhNode>> &occluders);
 
-    void createMap(std::vector<BvhNode *> &nodes);
+    void createMap(std::vector<std::shared_ptr<BvhNode>> &nodes);
 
-    void mergeAll(std::vector<BvhNode *> &nodes);
+    void mergeAll(std::vector<std::shared_ptr<BvhNode>> &nodes);
 
     PairNode requestMap();
 
     void removeFromMap(BvhNode &node);
 
-    void addToMap(BvhNode *node, std::vector<BvhNode *> &nodesToCompare);
+    void addToMap(std::shared_ptr<BvhNode>node, std::vector<std::shared_ptr<BvhNode>> &nodesToCompare);
 
-    void printBT(const std::string &prefix, const BvhNode *node, bool isLeft)
+    void printBT(const std::string &prefix, std::shared_ptr<BvhNode> node, bool isLeft)
     {
         if (node == nullptr)
             return;
@@ -75,7 +75,7 @@ public:
             printBT(prefix + (isLeft ? "|   " : "    "), node->getRightChild(), false);
     }
 
-    void printBT(const BvhNode *node)
+    void printBT(std::shared_ptr<BvhNode> node)
     {
         printBT("", node, false);
     }
@@ -85,7 +85,7 @@ public:
         printBT(root);
     }
 
-    void nodeDepthExploration(std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> &nodeDepths, BvhNode *node, int depth)
+    void nodeDepthExploration(std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> &nodeDepths, std::shared_ptr<BvhNode>node, int depth)
     {
         if (nodeDepths.find(depth) == nodeDepths.end())
             nodeDepths.insert(std::make_pair(depth, std::vector<std::shared_ptr<BoundingBoxObject>>()));
@@ -107,9 +107,9 @@ public:
     }
 
 private:
-    static void eraseInVector(std::vector<BvhNode *> &nodes, BvhNode *node);
+    static void eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::shared_ptr<BvhNode>node);
 
-    void destroyRecursive(BvhNode *node);
+    void destroyRecursive(std::shared_ptr<BvhNode>node);
 };
 
 #endif

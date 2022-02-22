@@ -81,11 +81,11 @@ void EXPECT_VEC3(glm::vec3 actual, glm::vec3 expected)
 TEST_F(BvhTest, Merge_Case_1)
 {
     IdGenerator idGenerator = IdGenerator();
-    BvhNode *nodeLeft = new BvhNode(simpleBBList[0], idGenerator.GetUniqueId());
+    BvhNode * nodeLeft = new BvhNode(simpleBBList[0], idGenerator.GetUniqueId());
     BvhNode *nodeRight = new BvhNode(simpleBBList[1], idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
+    std::shared_ptr<BvhNode> actual = BvhNode::merge(std::shared_ptr<BvhNode>(nodeLeft), std::shared_ptr<BvhNode>(nodeRight), idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{0, 0, 0};
@@ -106,7 +106,7 @@ TEST_F(BvhTest, Merge_Case_2)
     BvhNode *nodeRight = new BvhNode(bb, idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
+    std::shared_ptr<BvhNode>actual = BvhNode::merge((std::shared_ptr<BvhNode>)nodeLeft, (std::shared_ptr<BvhNode>)nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{4, 0, 0};
@@ -128,7 +128,7 @@ TEST_F(BvhTest, Merge_Case_3)
     BvhNode *nodeRight = new BvhNode(bb2, idGenerator.GetUniqueId());
 
     ///////////////////////////////////////
-    BvhNode *actual = BvhNode::merge(nodeLeft, nodeRight, idGenerator.GetUniqueId());
+    std::shared_ptr<BvhNode>actual = BvhNode::merge((std::shared_ptr<BvhNode>)nodeLeft, (std::shared_ptr<BvhNode>)nodeRight, idGenerator.GetUniqueId());
     ///////////////////////////////////////
 
     glm::vec3 expectedCenter = glm::vec3{-2.75, -0.75, -3.5};
@@ -144,11 +144,11 @@ TEST_F(BvhTest, Merge_Case_3)
 TEST_F(BvhTest, CreateMap_Case_1)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode *> nodes;
+    std::vector<std::shared_ptr<BvhNode>> nodes;
     nodes.reserve(simpleBBList.size());
     for (auto bb : simpleBBList)
     {
-        nodes.push_back(new BvhNode(bb, idGenerator.GetUniqueId()));
+        nodes.push_back(std::shared_ptr<BvhNode>(new BvhNode(bb, idGenerator.GetUniqueId())));
     }
 
     BvhTree tree;
@@ -180,7 +180,7 @@ TEST_F(BvhTest, CreateMap_Case_1)
 TEST_F(BvhTest, CreateMap_Case_2)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId())};
+    std::vector<std::shared_ptr<BvhNode>> nodes = {std::shared_ptr<BvhNode>(new BvhNode(simpleBBList[0], idGenerator.GetUniqueId()))};
 
     BvhTree tree;
 
@@ -200,7 +200,7 @@ TEST_F(BvhTest, CreateMap_Case_2)
  */
 TEST_F(BvhTest, CreateMap_Case_3)
 {
-    std::vector<BvhNode *> nodes;
+    std::vector<std::shared_ptr<BvhNode>> nodes;
 
     BvhTree tree;
 
@@ -221,7 +221,7 @@ TEST_F(BvhTest, CreateMap_Case_3)
 TEST_F(BvhTest, CreateMap_Case_4)
 {
     IdGenerator idGenerator = IdGenerator();
-    std::vector<BvhNode *> nodes = {new BvhNode(simpleBBList[0], idGenerator.GetUniqueId()), new BvhNode(simpleBBList[1], idGenerator.GetUniqueId())};
+    std::vector<std::shared_ptr<BvhNode>> nodes = {(std::shared_ptr<BvhNode>)new BvhNode(simpleBBList[0], idGenerator.GetUniqueId()), (std::shared_ptr<BvhNode>)new BvhNode(simpleBBList[1], idGenerator.GetUniqueId())};
 
     BvhTree tree;
 
@@ -247,7 +247,7 @@ TEST_F(BvhTest, CreateMap_Case_4)
 /**
  * @brief Parcours en profondeur
  */
-void getTreeIds(BvhNode *root, std::vector<int> &idList)
+void getTreeIds(std::shared_ptr<BvhNode> root, std::vector<int> &idList)
 {
     idList.push_back(root->getId());
     if (root->hasLeftChild())
@@ -265,7 +265,7 @@ TEST_F(BvhTest, Constructor_Case_1)
     BvhTree tree(bbs1);
     ///////////////////////////////////////
 
-    BvhNode *root = tree.getRoot();
+    std::shared_ptr<BvhNode> root = tree.getRoot();
 
     std::vector<int> expectedIdList = {12, 11, 9, 4, 0, 6, 10, 8, 7, 2, 1, 3, 5};
     std::vector<int> actualList;
@@ -306,7 +306,7 @@ TEST_F(BvhTest, Constructor_Case_2)
     BvhTree tree(boundingBoxes);
     ///////////////////////////////////////
 
-    BvhNode *root = tree.getRoot();
+    std::shared_ptr<BvhNode> root = tree.getRoot();
 
     std::vector<int> expectedIdList = {12, 11, 9, 5, 4, 8, 3, 2, 10, 7, 0, 1, 6};
     std::vector<int> actualList;
@@ -344,7 +344,7 @@ TEST_F(BvhTest, Constructor_Case_3)
     BvhTree tree(boundingBoxes);
     ///////////////////////////////////////
 
-    BvhNode *root = tree.getRoot();
+    std::shared_ptr<BvhNode> root = tree.getRoot();
 
     std::vector<int> expectedIdList = {28, 27, 24, 18, 7, 6, 17, 5, 4, 23, 16, 3, 2, 15, 0,
                                        1, 26, 25, 20, 11, 10, 19, 9, 8, 22, 21, 13, 12, 14};
@@ -372,7 +372,7 @@ TEST_F(BvhTest, Constructor_Case_4)
     BvhTree tree(boundingBoxes);
     ///////////////////////////////////////
 
-    BvhNode *root = tree.getRoot();
+    std::shared_ptr<BvhNode> root = tree.getRoot();
 
     std::vector<int> actualList;
 

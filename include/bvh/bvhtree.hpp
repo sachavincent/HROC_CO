@@ -30,7 +30,7 @@ private:
     }
 
     std::multimap<float, PairNode> getMap() const { return *map; };
-    BvhNode *getRoot() { return root.get(); }
+    std::shared_ptr<BvhNode> getRoot() { return root; }
 #endif
 private:
     std::shared_ptr<BvhNode> root;

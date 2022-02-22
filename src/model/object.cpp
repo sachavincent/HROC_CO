@@ -10,7 +10,7 @@ size_t Object::id_counter = 0;
 
 Object::~Object()
 {
-    if (boundingBox)
+    if (boundingBox != nullptr)
         boundingBox.reset();
 }
 

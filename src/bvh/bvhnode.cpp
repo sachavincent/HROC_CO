@@ -10,7 +10,7 @@ BvhNode::BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id)
 
 BvhNode::~BvhNode()
 {
-    boundingBox.reset();
+    boundingBox.~shared_ptr();
 }
 
 BvhNode *BvhNode::getChild(const NodeType &_t) const
@@ -63,22 +63,22 @@ BvhNode *BvhNode::merge(BvhNode *_left, BvhNode *_right, int _newId)
     return p;
 }
 
-std::vector<std::shared_ptr<const Object>> BvhNode::getObjectsInLeafs()
+std::vector<std::shared_ptr<Object>> BvhNode::getObjectsInLeafs()
 {
-    std::vector<std::shared_ptr<const Object>> leafs;
+    std::vector<std::shared_ptr<Object>> leafs;
 
     if (boundingBox->getObject())
         leafs.push_back(boundingBox->getObject());
 
     if (hasLeftChild())
     {
-        std::vector<std::shared_ptr<const Object>> leftLeafs = leftChild->getObjectsInLeafs();
+        std::vector<std::shared_ptr<Object>> leftLeafs = leftChild->getObjectsInLeafs();
         leafs.insert(leafs.end(), leftLeafs.begin(), leftLeafs.end());
     }
 
     if (hasRightChild())
     {
-        std::vector<std::shared_ptr<const Object>> rightLeafs = rightChild->getObjectsInLeafs();
+        std::vector<std::shared_ptr<Object>> rightLeafs = rightChild->getObjectsInLeafs();
         leafs.insert(leafs.end(), rightLeafs.begin(), rightLeafs.end());
     }
 

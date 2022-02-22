@@ -4,8 +4,10 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <vector>
 
 class BoundingBox;
+class Object;
 
 enum NodeType
 {
@@ -35,6 +37,7 @@ public:
     BvhNode(std::shared_ptr<BoundingBox> _boundingBox, int _id);
 
     ~BvhNode();
+
     inline const Visibility getVisibility() const { return tag; }
 
     inline const int getId() const { return id; }
@@ -77,6 +80,7 @@ public:
     {
         type = _type;
     }
+
     inline void setVisibility(const Visibility &_tag)
     {
         tag = _tag;
@@ -89,6 +93,8 @@ public:
         return boundingBox;
     }
 
+    std::vector<std::shared_ptr<const Object>> getObjectsInLeafs();
+    
     static BvhNode *merge(BvhNode *_left, BvhNode *_right, int _newId);
 };
 #endif

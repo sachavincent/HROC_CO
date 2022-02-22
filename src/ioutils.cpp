@@ -16,11 +16,12 @@ void IOUtils::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
         lastMouseX = xpos;
         lastMouseY = ypos;
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+
+        engine->getCurrentCamera()->offsetYaw((float)xoffset, MOUSE_SENSITIVTY);
+        engine->getCurrentCamera()->offsetPitch((float)yoffset, MOUSE_SENSITIVTY);
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->offsetYaw((float)xoffset, MOUSE_SENSITIVTY);
-            engine->getCurrentCamera()->offsetPitch((float)yoffset, MOUSE_SENSITIVTY);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
     }
     else
@@ -47,6 +48,9 @@ void IOUtils::keyCallback(GLFWwindow *window, int key, int scancode, int action,
     case GLFW_RELEASE:
         IOUtils::onKeyReleased(window, key);
         break;
+    case GLFW_REPEAT:
+       // IOUtils::onKeyRepeated(window, key);
+        break;
     default:
         // No need for now
         break;
@@ -67,6 +71,30 @@ void IOUtils::updateScreenRes(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void IOUtils::onKeyRepeated(GLFWwindow *window, int key)
+{
+    switch (key)
+    {
+    case GLFW_KEY_W:
+    case GLFW_KEY_UP:
+    case GLFW_KEY_S:
+    case GLFW_KEY_DOWN:
+    case GLFW_KEY_A:
+    case GLFW_KEY_LEFT:
+    case GLFW_KEY_D:
+    case GLFW_KEY_RIGHT:
+    case GLFW_KEY_SPACE:
+    case GLFW_KEY_LEFT_CONTROL:
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
+        {
+            engine->getScene()->requestBvhUpdate();
+        }
+        break;
+    default:
+        // Key not assigned
+        break;
+    }
+}
 void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 {
     switch (key)
@@ -77,49 +105,55 @@ void IOUtils::onKeyPressed(GLFWwindow *window, int key)
 
     case GLFW_KEY_W:
     case GLFW_KEY_UP:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveZ(1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveZ(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveZ(-1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveZ(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveX(-1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveX(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveX(1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveX(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
 
     case GLFW_KEY_SPACE:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveY(1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveY(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
     case GLFW_KEY_LEFT_CONTROL:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveY(-1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC)
         {
-            engine->getCurrentCamera()->moveY(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->requestBvhUpdate();
         }
         break;
 
@@ -155,49 +189,54 @@ void IOUtils::onKeyReleased(GLFWwindow *window, int key)
         break;
     case GLFW_KEY_W:
     case GLFW_KEY_UP:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveZ(-1.0);
+
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveZ(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
     case GLFW_KEY_S:
     case GLFW_KEY_DOWN:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveZ(1.0);
+        
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveZ(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
     case GLFW_KEY_A:
     case GLFW_KEY_LEFT:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveX(1.0);
+        
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveX(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
     case GLFW_KEY_D:
     case GLFW_KEY_RIGHT:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveX(-1.0);
+        
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveX(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
-
     case GLFW_KEY_SPACE:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveY(-1.0);
+        
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveY(-1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
     case GLFW_KEY_LEFT_CONTROL:
-        if (engine->getCurrentCameraType() == CameraType::FREE)
+        engine->getCurrentCamera()->moveY(1.0);
+        
+        if (engine->getCurrentCameraType() == CameraType::STATIC && !engine->getCurrentCamera()->isMoving())
         {
-            engine->getCurrentCamera()->moveY(1.0);
-            engine->getScene()->updateFrustum();
+            engine->getScene()->stopBvhUpdate();
         }
         break;
     default:

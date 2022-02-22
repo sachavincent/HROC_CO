@@ -11,17 +11,14 @@ float BoundingBox::distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<Bou
     return glm::distance(centerA, centerB);
 }
 
-
-bool BoundingBox::isOnOrForwardPlan(const Plan& plan) const 
+bool BoundingBox::isOnOrForwardPlan(const Plan &plan) const
 {
     // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-    glm::vec3 extends = size /2.0f;
+    glm::vec3 extends = size / 2.0f;
     const float r = extends.x / 2.0f * std::abs(plan.normal.x) +
-            extends.y * std::abs(plan.normal.y) + extends.z * std::abs(plan.normal.z);
+                    extends.y * std::abs(plan.normal.y) + extends.z * std::abs(plan.normal.z);
     return -r <= plan.getSignedDistanceToPlan(center);
 }
-
-
 
 OrientedBoundingBox::OrientedBoundingBox(const Object &_o, glm::mat3 &_transform) : BoundingBox(_o), transform(_transform)
 {
@@ -44,13 +41,13 @@ BoundingBox::BoundingBox(const Object &_o)
     glm::vec3 minPos = _o.getBounds().first;
     glm::vec3 maxPos = _o.getBounds().second;
 
-    center =  _o.getPosition();
-    size = ((maxPos-minPos));
-
-    if (size[0] < 0 || size[1] < 0 || size[2] < 0){
+    center = _o.getPosition();
+    size = ((maxPos - minPos));
+    object = std::shared_ptr<const Object>(&_o);
+    if (size[0] < 0 || size[1] < 0 || size[2] < 0)
+    {
         throw std::invalid_argument("Incorrect BoundingBox size: " + glm::to_string(size));
     }
-        
 
     wireframe = std::make_shared<BoundingBoxObject>(_o.getName(), center, glm::mat4(1.0), size);
 }

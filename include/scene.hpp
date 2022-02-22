@@ -27,6 +27,7 @@ private:
 
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<std::shared_ptr<Light>> lights;
+    std::vector<bool> objectVisibility;
 
     Shader sh;
     Shader simpleShader;
@@ -46,9 +47,12 @@ private:
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
 
     DrawElementsCommand *cmds;
-    int *visibility;
 
     FrustumObject *staticFrustumObject;
+
+    int *defaultVisibility;
+
+    bool updateRequired;
 
 public:
     // Timers for pipeline
@@ -97,28 +101,30 @@ public:
 
     void createBVH();
 
-    std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
-
-private:
-    void createFrustum();
-
     // Called when camera moves
     void updateBvh();
 
-    std::vector<std::shared_ptr<Object>> batchOcclusionTest(std::vector<std::shared_ptr<Object>> &occludeeGroups);
+    void requestBvhUpdate();
+    void stopBvhUpdate();
+private:
+    std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
+
+    void createFrustum();
+
+    std::vector<unsigned int> batchOcclusionTest(std::vector<unsigned int> occludeeGroups);
 
     void setupEarlyZCommand()
     {
-        visibility = new int[objects.size()];
+        defaultVisibility = new int[objects.size()];
 
         for (int i = 0; i < objects.size(); ++i)
         {
-            visibility[i] = 0;
+            defaultVisibility[i] = 0;
         }
 
         glGenBuffers(1, &ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), visibility, GL_DYNAMIC_COPY);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * objects.size(), defaultVisibility, GL_DYNAMIC_COPY);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     }
 };

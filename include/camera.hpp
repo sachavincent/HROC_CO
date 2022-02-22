@@ -59,11 +59,13 @@ public:
 	{
 	}
 
-	inline void setMoveSpeed(float _speed){
+	inline void setMoveSpeed(float _speed)
+	{
 		moveSpeed = _speed;
 	}
 
-	inline float getMoveSpeed(){
+	inline float getMoveSpeed()
+	{
 		return moveSpeed;
 	}
 
@@ -115,16 +117,19 @@ public:
 	inline const float &getNearDistance() const
 	{
 		return this->nearDistance;
-	}	
+	}
+
 	inline const float &getYaw() const
 	{
 		return this->yaw;
-	}	
+	}
+
 	inline const float &getPitch() const
 	{
 		return this->pitch;
 	}
-	
+
+	inline bool isMoving() const { return movingFactor == glm::vec3(0); }
 
 	//! Get camera viewport width (in px)
 	int getResWidth() const { return width; };
@@ -153,9 +158,6 @@ public:
 	inline const Frustum *getFrustum() const { return frustum; }
 
 	void setCameraInfo(CameraInfo _cameraInfo);
-
-
-
 };
 
 #endif

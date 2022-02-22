@@ -102,13 +102,15 @@ void Engine::startLoop()
         lastFrame = _currentFrame;
 
         glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
-        glDepthMask(GL_TRUE);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glDepthMask(GL_FALSE);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // glDepthMask(GL_TRUE);
+        // glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // glDepthMask(GL_FALSE);
         updateFpsCounter(500);
 
         getCurrentCamera()->move(2.0f * deltaTime);
 
+        scene->updateBvh();
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDisable(GL_DEPTH_TEST);

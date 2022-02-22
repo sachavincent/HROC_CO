@@ -482,10 +482,8 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
                 objOrder.push_back(keyModel);
                 temp[keyModel] = obj->getObjectData();
             }
-            if(obj->isVisible())
-            {
-                countMap[keyModel].push_back(obj);
-            }
+            // if (obj->isVisible())
+            countMap[keyModel].push_back(obj);
         }
     }
 
@@ -522,6 +520,8 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
 
 DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
 {
+    if (_objects.empty())
+        return nullptr;
     bool stop = false;
     std::vector<DrawElementsCommand> commands;
     size_t i = 0;
@@ -534,7 +534,7 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
         int nbConsecutiveObj = 0;
         while (currentKeyModel == keyModel && i < _objects.size())
         {
-            if(obj->isVisible())
+            if (obj->isVisible())
             {
                 nbConsecutiveObj++;
             }
@@ -556,8 +556,8 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
     } while (i < _objects.size() && !stop);
 
     DrawElementsCommand *cmds = new DrawElementsCommand[commands.size()];
-    for (size_t i = 0; i < commands.size(); i++)
-        cmds[i] = commands[i];
+    for (size_t idx = 0; idx < commands.size(); idx++)
+        cmds[idx] = commands[idx];
 
     *cmdCount = commands.size();
     return cmds;

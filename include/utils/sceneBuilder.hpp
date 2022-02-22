@@ -43,7 +43,6 @@ public:
 
         Texture::createTextureArray(1, 1024, 1024);
 
-        // Cube::create(10);
         for (size_t i = 0; i < 10; i++)
         {
             auto cube = std::make_shared<Cube>(1.0f);
@@ -55,14 +54,12 @@ public:
             sc->addObject(cube);
         }
 
-        // Plane::create(1);
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
         plane1->setRotation(-90, {1, 0, 0})
             .setTexDiffuse("textures/stoneWall/diffuse.png")
             .setTexSpecular("textures/stoneWall/roughness.png");
         sc->addObject(plane1);
 
-        // FileObject::create("models/teapot.obj", 2);
         std::string keyModel("teapot");
         auto teapot = std::make_shared<FileObject>("models/teapot.obj", keyModel);
         teapot->setScale(glm::vec3{0.6f})
@@ -76,7 +73,6 @@ public:
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot2);
 
-        // UVSphere::create(2);
         auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
         sphere1->setPosition({3.5, 0.7, 3.5})
             .setRotation(90, {1, 0, 0})

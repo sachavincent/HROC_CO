@@ -12,8 +12,10 @@ BvhTree::BvhTree(std::vector<std::shared_ptr<BoundingBox>> &objs, IdGenerator *_
     {
         BvhNode *node = new BvhNode(bb, idGenerator->GetUniqueId());
         nodes.emplace_back(node);
+#ifndef HROC_TESTS
         std::shared_ptr<BvhNode> ptrNode(node);
         bb->setNode(ptrNode);
+#endif
     }
 
     if (nodes.size() == 1) // Only one node (=root)

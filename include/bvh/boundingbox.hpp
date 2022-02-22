@@ -21,6 +21,7 @@ protected:
     glm::vec3 center;
     std::shared_ptr<BoundingBoxObject> wireframe;
     std::shared_ptr<BvhNode> node;
+    std::shared_ptr<const Object> object;
 
 public:
 #ifdef HROC_TESTS
@@ -43,7 +44,10 @@ public:
     virtual bool isOnOrForwardPlan(const Plan &plan) const;
 
     inline void setNode(std::shared_ptr<BvhNode> _node) { node = _node; }
-    inline const std::shared_ptr<BvhNode>& getNode() const { return node; }
+    inline const std::shared_ptr<BvhNode> &getNode() const { return node; }
+
+    inline const std::shared_ptr<const Object> &getObject() const { return object; }
+
     static float distance(std::shared_ptr<BoundingBox> _A, std::shared_ptr<BoundingBox> _B);
 
     //! Get a model of the BoundingBox object for debug mode rendering

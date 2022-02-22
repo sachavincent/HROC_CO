@@ -275,9 +275,9 @@ void FrustumObject::draw()
 	glBufferSubData(GL_ARRAY_BUFFER,0, vertices.size() * sizeof(GLfloat), vertices.data());
     glDrawArrays(GL_TRIANGLES, 0, 90);
 }
+
 void FrustumObject::drawOutline()
 {
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER,0, outlineVertices.size() * sizeof(GLfloat), outlineVertices.data());
     glDrawArrays(GL_LINES, 0, 24);

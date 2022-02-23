@@ -10,11 +10,6 @@ OBJECT_BOUNDS BoundingBoxObject::bounds;
 
 BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_pos, const glm::mat4 &_rotationMatrix, const glm::vec3 &_scale, std::string keyModel) : Object("BoundingBox_" + _parentName, keyModel)
 {
-	if(keyModel.size() == 0)
-    {
-        std::cout << "test" << std::endl;
-    }
-
 	setPosition(_pos);
 	setRotationMatrix(_rotationMatrix);
 	setScale(_scale);

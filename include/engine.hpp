@@ -28,8 +28,6 @@ public:
 
     void clear();
 
-    void loadScene(const std::string &_file);
-
     void loadScene(Scene *_scene);
 
     void loadScene();

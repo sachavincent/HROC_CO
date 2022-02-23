@@ -265,7 +265,7 @@ bool Benchmark::BNCH_cityLow()
     }
     if (framecount < 800)
     {
-        std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
+        //std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
         if (passNum == 0)
         {
             results["cityLow_ON"].push_back(engine->getDeltaTime());

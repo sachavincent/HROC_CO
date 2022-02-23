@@ -56,8 +56,7 @@ public:
 
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
         plane1->setRotation(-90, {1, 0, 0})
-            .setTexDiffuse("textures/stoneWall/diffuse.png")
-            .setTexSpecular("textures/stoneWall/roughness.png");
+            .setTexDiffuse("textures/stoneWall/diffuse.png");
         sc->addObject(plane1);
 
         std::string keyModel("teapot");
@@ -153,12 +152,15 @@ public:
     static Scene *buildMultiMesh(Engine *_engine, std::string _path, bool _absolutePath = false)
     {
         std::string path;
-        if(!_absolutePath){
+        if (!_absolutePath)
+        {
             path = Utils::workingDirectory() + _path;
-        } else {
+        }
+        else
+        {
             path = _path;
         }
-            
+
         Scene *scene = new Scene(_engine);
 
         auto sunLight = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.4});
@@ -168,24 +170,22 @@ public:
         auto sunLight2 = std::make_shared<Light>(glm::vec3{0, 5000, 0}, glm::vec3{0.25});
         sunLight2->setAttenuation({1.0f, 0.0f, 0.0f});
         scene->addLight(sunLight2);
-        
+
         static int mmeshinstance = 0;
         unsigned int numMeshesLoaded = 0;
-        std::string meshKey = "mmesh"+std::to_string(mmeshinstance);
-        MeshLoader::getSingleton()->loadModel(path, meshKey,&numMeshesLoaded);
+        std::string meshKey = "mmesh" + std::to_string(mmeshinstance);
+        MeshLoader::getSingleton()->loadModel(path, meshKey, &numMeshesLoaded);
 
-        Texture::createTextureArray(1, 1500, 1500);
-
-        for( size_t i = 0; i<numMeshesLoaded-1; i++){
-            auto mmesh = std::make_shared<FileObject>(path,meshKey+ "_" +std::to_string(i) );
+        for (size_t i = 0; i < numMeshesLoaded - 1; i++)
+        {
+            auto mmesh = std::make_shared<FileObject>(path, meshKey + "_" + std::to_string(i));
             mmesh->setPosition(glm::vec3{0.0});
             scene->addObject(mmesh);
         }
-        
+
         mmeshinstance++;
         return scene;
     }
-
 };
 
 #endif

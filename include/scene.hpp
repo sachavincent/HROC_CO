@@ -62,8 +62,6 @@ public:
 public:
     Scene(Engine *_engine);
 
-    Scene(Engine *_engine, const std::string &_file);
-
     ~Scene();
     //! render objects with standard shader (i.e. Phong)
     void renderObjects();
@@ -103,8 +101,6 @@ public:
 
     // Called when camera moves
     void updateBvh();
-
-    void checkForInput();
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 

@@ -63,15 +63,6 @@ void Engine::clear()
     delete scene;
 }
 
-void Engine::loadScene(const std::string &file)
-{
-    if (scene)
-    {
-        delete scene;
-    }
-    scene = new Scene(this, file);
-}
-
 void Engine::loadScene()
 {
     if (scene)
@@ -111,7 +102,6 @@ void Engine::startLoop()
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LESS);
         }
-        scene->checkForInput();
         scene->updateBvh();
 
         scene->renderObjects();
@@ -127,19 +117,21 @@ void Engine::startLoop()
 
         glEnable(GL_DEPTH_TEST);
         // imgui part
-
-        if(!guiRendered)
+        
+        if (!guiRendered)
             ui.render();
 
-        if(bench){
-
-            if(!bench->isFinished()){
+        if (bench)
+        {
+            if (!bench->isFinished())
+            {
                 bench->exec();
-            } else {
+            }
+            else
+            {
                 bench = nullptr;
             }
         }
-            
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -191,6 +183,7 @@ void Engine::setCameraType(CameraType _type)
     currentCamera = _type;
 }
 
-void Engine::resetFrametime(){
+void Engine::resetFrametime()
+{
     lastFrame = glfwGetTime();
 }

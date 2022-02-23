@@ -43,8 +43,9 @@ private:
 	float lastX;
 	float lastY;
 	Frustum *frustum;
+	bool constantSpeed = false;
 
-	void updateDirection();
+	
 
 public:
 	/**
@@ -64,6 +65,8 @@ public:
 	{
 		moveSpeed = _speed;
 	}
+
+	void updateDirection();
 
 	inline float getMoveSpeed()
 	{
@@ -159,6 +162,10 @@ public:
 	inline const Frustum *getFrustum() const { return frustum; }
 
 	void setCameraInfo(CameraInfo _cameraInfo);
+
+	void setConstantSpeed(bool _status){
+		constantSpeed = _status;
+	}
 };
 
 #endif

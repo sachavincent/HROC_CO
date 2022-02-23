@@ -101,6 +101,7 @@ std::pair<glm::vec3, glm::vec3> Object::getBounds() const
 
 void Object::flushCaches()
 {
+    Object::id_counter = 0;
     Cube::instance_counter = 0;
     FileObject::instance_counter = 0;
     // FileObject::path_cache.clear();

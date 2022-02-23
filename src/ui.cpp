@@ -43,6 +43,8 @@ void Ui::render()
     plotTimer();
     ImGui::Separator();
     plotFpsRate();
+    ImGui::Separator();
+    benchmarkParams();
     ImGui::End();
 
     ImGui::Begin("Pipeline options ");
@@ -248,7 +250,7 @@ void Ui::sceneLoading()
             }
             break;
             case 2:
-                scene = SceneBuilder::buildMultiMesh(engine, mmesh_path);
+                scene = SceneBuilder::buildMultiMesh(engine, mmesh_path,1);
                 break;
             }
             engine->loadScene(scene);
@@ -329,24 +331,21 @@ void Ui::plotFpsRate()
             fpsVecAvg30[i] = std::reduce(&fpsVec[i - 30], &fpsVec[i]) / 30;
         }
 
-        fpsVec[79] = 1 / engine->deltaTime;
+        fpsVec[79] = 1 / engine->getDeltaTime();
         refreshCounter = 0.0;
     }
-    refreshCounter += engine->deltaTime;
+    refreshCounter += engine->getDeltaTime();
 
     static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
 
     static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_LockMin;
 
-    static ImPlotLegendFlags legendFlags = ImPlotLegendFlags_None;
-
-    ImGui::SliderFloat("update speed (ms)", &updateSpeedMs, 5.0f, 200.0f);
-    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200), 0))
+    ImGui::SliderFloat("update speed (ms)",&updateSpeedMs,5.0f,200.0f);
+    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200),0))
     {
-
         ImPlot::SetupAxes("time", "FPS", xflags, yflags);
-        ImPlot::SetupLegend(ImPlotLocation_SouthWest, legendFlags);
-        std::vector<double> instantCrop(fpsVec.begin() + 30, fpsVec.end());
+        ImPlot::SetupLegend(ImPlotLocation_SouthWest,ImPlotLegendFlags_None);
+        std::vector<double> instantCrop(fpsVec.begin()+30,fpsVec.end());
         ImPlot::PlotLine("instant fps", instantCrop.data(), 50);
 
         std::vector<double> avgCrop(fpsVecAvg30.begin() + 30, fpsVecAvg30.end());
@@ -370,4 +369,53 @@ void Ui::displayPipelineOptions()
 
     ImGui::Checkbox("Second Early Z", &secondEarlyZMode);
     ImGui::Separator();
+}
+
+void Ui::benchmarkParams(){
+
+    static BenchFlags flags = 0;
+    static bool cityBench = true;
+    static bool meteoriteBench = true;
+    static bool lowBench = true;
+    static bool MediumBench = true;
+    static bool HighBench = true;
+    static bool wrongSelection = false;
+    if(wrongSelection){
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 30, 30, 255));
+        ImGui::Text("Wrong benchmark settings!");
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::Checkbox("City Benchmark", &cityBench);
+    ImGui::Checkbox("Meteorite Benchmark", &meteoriteBench);
+
+    ImGui::Text("Benchmarks Quality:");
+    ImGui::Checkbox("Low", &lowBench);
+    ImGui::SameLine();
+    ImGui::Checkbox("Medium", &MediumBench);
+    ImGui::SameLine();
+    ImGui::Checkbox("High", &HighBench);
+
+    std::cout << glm::to_string(engine->getCurrentCamera()->getPosition()) << std::endl;
+
+    if (ImGui::Button("Start Benchmark")){
+        wrongSelection = false;
+        if(cityBench == false && meteoriteBench == false){
+            wrongSelection = true;
+            return;
+        }
+
+        if(meteoriteBench) flags = flags | BenchFlags_Meteorite;
+        if(cityBench) flags = flags | BenchFlags_City;
+        if(lowBench == MediumBench == HighBench == false){
+            wrongSelection = true;
+            return;
+        }
+        if(lowBench)  flags = flags | BenchFlags_LowTests;
+        if(MediumBench)  flags = flags | BenchFlags_MediumTests;
+        if(HighBench)  flags = flags | BenchFlags_HighTests;
+
+        Benchmark* bench = new Benchmark(engine, flags);
+        engine->setBenchmark(bench);
+    }
 }

@@ -3,6 +3,11 @@
 GLuint FrustumObject::vao;
 FrustumObject::FrustumObject(std::string _parentName, const glm::vec3 _edge[8],const std::string _keyModel ) : Object("Frustum_" + _parentName,_keyModel)
 {
+
+    if(_keyModel.size() == 0)
+    {
+        std::cout << "test" << std::endl;
+    }
 	std::cout << "Created frustum object: '" << name << "'" << std::endl;
     
 		vertices = {

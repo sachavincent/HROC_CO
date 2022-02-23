@@ -7,6 +7,11 @@ UVSphere::UVSphere(float _radius, int _nCols, int _nRows, const std::string &_na
 {
     instance = instance_counter++;
 
+    
+    if(_modelkey.size() == 0)
+    {
+        std::cout << "test" << std::endl;
+    }
     //visible[instance] = true;
 }
 

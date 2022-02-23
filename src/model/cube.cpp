@@ -12,6 +12,10 @@ unsigned int Cube::instance_counter = 0;
 Cube::Cube(float _edgeSize, const std::string &_name,std::string _keyModel) 
 	: Object(_name,_keyModel)
 {
+	if(_keyModel.size() == 0)
+    {
+        std::cout << "test" << std::endl;
+    }
 	instance = instance_counter++;
 	setPosition(glm::vec3{0.0});
 	setScale(glm::vec3(_edgeSize));

@@ -44,9 +44,6 @@ Engine::Engine(float _width, float _height) : width(_width), height(_height), sc
 
     // ImGui Setup
     ui.load(window, this);
-
-    deltaTime = 0.0;
-    lastFrame = 0.0;
 }
 
 Engine::~Engine()
@@ -92,6 +89,8 @@ void Engine::loadScene(Scene *_scene)
 
 void Engine::startLoop()
 {
+    deltaTime = 0.0;
+    lastFrame = glfwGetTime();
     while (!glfwWindowShouldClose(window))
     {
         double _currentFrame = glfwGetTime();
@@ -129,7 +128,19 @@ void Engine::startLoop()
 
         glEnable(GL_DEPTH_TEST);
         // imgui part
-        ui.render();
+
+        if(!guiRendered)
+            ui.render();
+
+        if(bench){
+
+            if(!bench->isFinished()){
+                bench->exec();
+            } else {
+                bench = nullptr;
+            }
+        }
+            
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -174,4 +185,13 @@ void Engine::setResolution(int _width, int _height)
 void Engine::switchCamera()
 {
     currentCamera = currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
+}
+
+void Engine::setCameraType(CameraType _type)
+{
+    currentCamera = _type;
+}
+
+void Engine::resetFrametime(){
+    lastFrame = glfwGetTime();
 }

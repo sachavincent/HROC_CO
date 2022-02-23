@@ -51,6 +51,11 @@ public:
     Object(std::string _name = "Object", std::string _modelkey = "")
         : name(_name), boundingBox(nullptr), meshfilter(_modelkey), meshRenderer(&meshfilter)
     {
+        
+    if(_modelkey.size() == 0)
+    {
+        std::cout << "test" << std::endl;
+    }
         id = id_counter++;
     }
     ~Object();

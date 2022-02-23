@@ -105,9 +105,11 @@ void Camera::setResolution(int w, int h)
 
 void Camera::move(const float delta)
 {
-	position += movingFactor.x * moveSpeed * delta * glm::normalize(glm::cross(front, up));
-	position += movingFactor.y * moveSpeed * delta * glm::normalize(up);
-	position += movingFactor.z * moveSpeed * delta * front;
+	float d = delta;
+	if(constantSpeed) d = 0.05;
+	position += movingFactor.x * moveSpeed * d * glm::normalize(glm::cross(front, up));
+	position += movingFactor.y * moveSpeed * d * glm::normalize(up);
+	position += movingFactor.z * moveSpeed * d * front;
 
 	frustum->update(this);
 }

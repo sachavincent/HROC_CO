@@ -152,52 +152,42 @@ public:
      * @param _path The ABSOLUTE path of the .obj file
      * @return Scene* A pointer to the created scene
      */
-    static Scene *buildMultiMesh(Engine *_engine, std::string _path)
+    static Scene *buildMultiMesh(Engine *_engine, std::string _path, bool _absolutePath = false)
     {
-
+        std::string path;
+        if(!_absolutePath){
+            path = Utils::workingDirectory() + _path;
+        } else {
+            path = _path;
+        }
+            
         Scene *scene = new Scene(_engine);
-        /*
-                auto sunLight = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.5});
-                sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
-                scene->addLight(sunLight);
-                auto sunLight2 = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.4});
-                sunLight2->setAttenuation({1.0f, 0.0f, 0.0f});
-                scene->addLight(sunLight2);
-                auto sunLight3 = std::make_shared<Light>(glm::vec3{0, 5000, 0}, glm::vec3{0.25});
-                sunLight3->setAttenuation({1.0f, 0.0f, 0.0f});
-                scene->addLight(sunLight3);
 
-                std::cout << "loading city from file : " << _path << " ..." << std::endl;
+        auto sunLight = std::make_shared<Light>(glm::vec3{0, 5000, -2000}, glm::vec3{0.4});
+        sunLight->setAttenuation({1.0f, 0.0f, 0.0f});
+        scene->addLight(sunLight);
 
-                Assimp::Importer importer;
-                const aiScene *assimpScene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs |
-                                                                     aiProcess_GenNormals);
+        auto sunLight2 = std::make_shared<Light>(glm::vec3{0, 5000, 0}, glm::vec3{0.25});
+        sunLight2->setAttenuation({1.0f, 0.0f, 0.0f});
+        scene->addLight(sunLight2);
+        
+        static int mmeshinstance = 0;
+        unsigned int numMeshesLoaded = 0;
+        std::string meshKey = "mmesh"+std::to_string(mmeshinstance);
+        MeshLoader::getSingleton()->loadModel(path, meshKey,&numMeshesLoaded);
 
+        Texture::createTextureArray(1, 1500, 1500);
 
-                if (!scene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
-                {
-                    std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-                    return scene;
-                }
-
-                std::string name;
-                for(size_t i = 0; i< assimpScene->mNumMeshes;i++){
-                    name = _path+std::to_string(i);
-                    auto mesh = std::make_shared<AssimpMeshObject>(assimpScene,assimpScene->mMeshes[i],name);
-                    scene->addObject(mesh);
-                }*/
+        for( size_t i = 0; i<numMeshesLoaded-1; i++){
+            auto mmesh = std::make_shared<FileObject>(path,meshKey+ "_" +std::to_string(i) );
+            mmesh->setPosition(glm::vec3{0.0});
+            scene->addObject(mmesh);
+        }
+        
+        mmeshinstance++;
         return scene;
     }
 
-    /** ! Builds an simple city scene with given parameters
-     * \param _size Size of the city (in tiles) for each dir.
-     * \param _cityScale Overall city scale multiplier.
-     * \param _bldBaseSize Base building height
-     * \param _bldSizeMult Building height radnomness multiplier
-     * \param _bldDensity Density of buildings in city [0,1.0]
-     * \param _street2BldMult
-     * */
-    static Scene *buildForest(glm::vec3 size);
 };
 
 #endif

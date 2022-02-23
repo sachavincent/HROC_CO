@@ -9,6 +9,7 @@
 #include <GLFW/glfw3native.h>
 
 #include "camera.hpp"
+#include "utils/benchmark.hpp"
 #include "ui.hpp"
 
 class Scene;
@@ -41,6 +42,8 @@ public:
 
     void setResolution(int width, int height);
 
+    void setBenchmark(Benchmark* _bench){bench = _bench;}
+
     inline Scene *getScene() const { return scene; }
 
     inline double getDeltaTime() const { return deltaTime; }
@@ -54,8 +57,11 @@ public:
 
     inline Ui &getUi() { return ui; }
 
+    inline GLFWwindow* getWindow(){return window;}
+
     // This method switches between the two available cameras
     void switchCamera();
+    void setCameraType(CameraType _type);
 
     void switchPolygonMode()
     {
@@ -63,7 +69,11 @@ public:
     }
 
     
-    double deltaTime;
+    inline double getDeltaTime(){return deltaTime;}
+    void resetFrametime();
+
+    void disableGui(){guiRendered=true;}
+    void enableGui(){guiRendered=false;}
 
 private:
     Ui ui;
@@ -72,6 +82,9 @@ private:
     Camera *camera;
     Camera *freeCam;
 
+    double deltaTime;
+    bool guiRendered = false;
+
     CameraType currentCamera;
     Scene *scene;
     GLFWwindow *window;
@@ -79,5 +92,7 @@ private:
 
     int polygonMode = GL_FILL;
     double lastFrame;
+
+    Benchmark* bench = nullptr;
 };
 #endif

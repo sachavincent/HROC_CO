@@ -10,153 +10,66 @@ void MeshLoader::generateBaseModels()
     cubeData.bounds.min = {-0.5f, -0.5f, -0.5f};
     cubeData.bounds.max = {0.5f, 0.5f, 0.5f};
 
-    std::vector<GLfloat> vertices = {
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
+    std::vector<GLfloat> vertices = {-0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f,
+                                     0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
 
-        -0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
+                                     -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
+                                     0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,
 
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
+                                     -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+                                     -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,
 
-        0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
+                                     0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
+                                     0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
 
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f,
+                                     -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,
+                                     0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f,
 
-        -0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, -0.5f};
+                                     -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,
+                                     0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f};
 
-    std::vector<GLfloat> normals = {
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f,
+    std::vector<GLfloat> normals = {0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f,
+                                    0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f,
 
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
+                                    0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+                                    0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
 
-        -1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f,
+                                    -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,
+                                    -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,
 
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
+                                    1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+                                    1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-        0.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
+                                    0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,
+                                    0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,
 
-        0.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f};
+                                    0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+                                    0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f};
 
     std::vector<GLfloat> textureCoord = {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
+        1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
+        1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f};
+        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    std::vector<GLuint> indices = {
-        0, 2, 1,
-        3, 5, 4,
+    std::vector<GLuint> indices = {0,  2,  1,  3,  5,  4,
 
-        6, 7, 8,
-        9, 10, 11,
+                                   6,  7,  8,  9,  10, 11,
 
-        12, 13, 14,
-        15, 16, 17,
+                                   12, 13, 14, 15, 16, 17,
 
-        18, 20, 19,
-        21, 23, 22,
+                                   18, 20, 19, 21, 23, 22,
 
-        24, 25, 26,
-        27, 28, 29,
+                                   24, 25, 26, 27, 28, 29,
 
-        30, 32, 31,
-        33, 35, 34};
+                                   30, 32, 31, 33, 35, 34};
 
     cubeData.numVertices = vertices.size() / 3;
     cubeData.vertices = new Vertex[cubeData.numVertices];
@@ -180,27 +93,13 @@ void MeshLoader::generateBaseModels()
     planeData.bounds.min = {-0.5f, -0.5f, 0.0f};
     planeData.bounds.max = {0.5f, 0.5f, 0.0f};
 
-    vertices = {
-        -0.5f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f};
+    vertices = {-0.5f, 0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f};
 
-    normals = {
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f};
+    normals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
-    textureCoord = {
-        1.0f, 0.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 1.0f};
+    textureCoord = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
 
-    indices = {
-        1, 2, 0,
-        1, 3, 2};
+    indices = {1, 2, 0, 1, 3, 2};
 
     planeData.numVertices = vertices.size() / 3;
     planeData.vertices = new Vertex[planeData.numVertices];
@@ -306,41 +205,46 @@ void MeshLoader::generateBaseModels()
     handlerSingleton->addData("sphere", sphereData);
 }
 
-void MeshLoader::loadModel(const std::string &_path, const std::string &keyModel)
+void MeshLoader::loadModel(const std::string &_path, const std::string &keyModel,
+                           unsigned int *_numMeshes)
 {
-    bool _smoothNormals = true;
-
-    std::string abs_path = Utils::workingDirectory() + _path;
 
     // skip loading if same object already exists
     if (!handlerSingleton->contain(keyModel))
     {
         Assimp::Importer importer;
 
-        std::cout << "loading object from file : " << abs_path << " ..." << std::endl;
+        std::cout << "loading object from file : " << _path << " ..." << std::endl;
 
-        const aiScene *scene =
-            _smoothNormals ? importer.ReadFile(abs_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals)
-                           : importer.ReadFile(abs_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+        const aiScene *scene = importer.ReadFile(
+            _path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
             return;
         }
-        if (scene->mNumMeshes != 1)
+        if (scene->mNumMeshes == 1)
         {
-            std::cerr << "File contains too many meshes" << std::endl;
-            return;
+            aiMesh *mesh = scene->mMeshes[0];
+            OBJECT_DATA data = processMesh(mesh, scene, 1);
+            handlerSingleton->addData(keyModel, data);
         }
-
-        aiMesh *mesh = scene->mMeshes[0];
-        OBJECT_DATA data = processMesh(mesh, scene);
-        handlerSingleton->addData(keyModel, data);
+        else
+        {
+            for (int i = 0; i < scene->mNumMeshes; i++)
+            {
+                aiMesh *mesh = scene->mMeshes[i];
+                OBJECT_DATA data = processMesh(mesh, scene, 0);
+                std::string k = keyModel + "_" + std::to_string(i);
+                handlerSingleton->addData(k, data);
+            }
+            *_numMeshes = (unsigned int)scene->mNumMeshes;
+        }
     }
 }
 
-OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene)
+OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _centering)
 {
     OBJECT_DATA data;
 
@@ -355,12 +259,14 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene)
     // add vertices
     for (size_t i = 0; i < _mesh->mNumVertices; i++)
     {
-        vertices.insert(vertices.end(), {_mesh->mVertices[i].x, _mesh->mVertices[i].y, _mesh->mVertices[i].z});
+        vertices.insert(vertices.end(),
+                        {_mesh->mVertices[i].x, _mesh->mVertices[i].y, _mesh->mVertices[i].z});
     }
     // add normals
     for (size_t i = 0; i < _mesh->mNumVertices; i++)
     {
-        normals.insert(normals.end(), {_mesh->mNormals[i].x, _mesh->mNormals[i].y, _mesh->mNormals[i].z});
+        normals.insert(normals.end(),
+                       {_mesh->mNormals[i].x, _mesh->mNormals[i].y, _mesh->mNormals[i].z});
     }
     // add indices
     for (size_t i = 0; i < _mesh->mNumFaces; i++)
@@ -374,33 +280,39 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene)
     if (_mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
     {
         for (size_t i = 0; i < _mesh->mNumVertices; i++)
-            textureCoord.insert(textureCoord.end(), {_mesh->mTextureCoords[0][i].x, _mesh->mTextureCoords[0][i].y});
+            textureCoord.insert(textureCoord.end(),
+                                {_mesh->mTextureCoords[0][i].x, _mesh->mTextureCoords[0][i].y});
     }
 
     // center object so that centroid is at (0,0,0)
     // this important for scaling/rotation etc..
     double meanX = 0, meanY = 0, meanZ = 0;
-
-    for (size_t i = 0; i < vertices.size(); i += 3)
+    if (_centering)
     {
-        meanX += vertices[i];
-        meanY += vertices[i + 1];
-        meanZ += vertices[i + 2];
-    }
+        for (size_t i = 0; i < vertices.size(); i += 3)
+        {
+            meanX += vertices[i];
+            meanY += vertices[i + 1];
+            meanZ += vertices[i + 2];
+        }
 
-    size_t ptsNum = vertices.size() / 3;
-    meanX /= ptsNum;
-    meanY /= ptsNum;
-    meanZ /= ptsNum;
+        size_t ptsNum = vertices.size() / 3;
+        meanX /= ptsNum;
+        meanY /= ptsNum;
+        meanZ /= ptsNum;
+    }
 
     data.bounds.max = glm::vec3{-FLT_MAX};
     data.bounds.min = glm::vec3{FLT_MAX};
 
     for (size_t i = 0; i < vertices.size(); i += 3)
     {
-        vertices[i] -= (GLfloat)meanX;
-        vertices[i + 1] -= (GLfloat)meanY;
-        vertices[i + 2] -= (GLfloat)meanZ;
+        if (_centering)
+        {
+            vertices[i] -= (GLfloat)meanX;
+            vertices[i + 1] -= (GLfloat)meanY;
+            vertices[i + 2] -= (GLfloat)meanZ;
+        }
 
         data.bounds.max.x = std::max(data.bounds.max.x, vertices[i]);
         data.bounds.max.y = std::max(data.bounds.max.y, vertices[i + 1]);
@@ -434,7 +346,8 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene)
     return data;
 }
 
-void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects, std::vector<Vertex> &vert, std::vector<GLuint> &ind)
+void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects,
+                             std::vector<Vertex> &vert, std::vector<GLuint> &ind)
 {
     std::vector<std::string> objOrder;
     std::map<std::string, OBJECT_DATA *> temp;
@@ -463,7 +376,8 @@ void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects, std
     }
 }
 
-DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
+DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &_objects,
+                                          int *cmdCount)
 {
     GLuint baseVert = 0;
     GLuint baseIdx = 0;
@@ -517,11 +431,11 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
     return cmds;
 }
 
-DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
+DrawElementsCommand *
+MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
 {
-    if (_objects.empty())
-        return nullptr;
-        
+    if (_objects.empty()) return nullptr;
+
     bool stop = false;
     std::vector<DrawElementsCommand> commands;
     size_t i = 0;
@@ -544,8 +458,7 @@ DrawElementsCommand *MeshHandler::getCmdsForSubset(const std::vector<std::shared
             std::shared_ptr<Object> nextObj = _objects[++i];
             keyModel = nextObj->getModelKey();
             GLuint baseInstance = nextObj->getCommand().baseInstance;
-            if (keyModel == currentKeyModel && baseInstance != currentBaseInstance + 1)
-                break;
+            if (keyModel == currentKeyModel && baseInstance != currentBaseInstance + 1) break;
             currentBaseInstance++;
         }
         DrawElementsCommand command = obj->getCommand();

@@ -10,8 +10,8 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
 
-#include <implot.h>
 #include <ImGuiFileDialog.h>
+#include <implot.h>
 
 #include "utils/sceneBuilder.hpp"
 
@@ -19,10 +19,11 @@ class Scene;
 class Engine;
 class Ui
 {
-private:
+  private:
     void displayParams();
     void lightsParams();
     void sceneLoading();
+    void benchmarkParams();
 
     void newSceneWindow();
     void newLightWindow();
@@ -33,7 +34,7 @@ private:
 
     void displayPipelineOptions();
 
-private:
+  private:
     Engine *engine;
     int lightListIndex = 0;
     int lastlightListIndex = 0;
@@ -62,7 +63,7 @@ private:
     bool viewFrustumCullingMode = true;
     bool secondEarlyZMode = true;
 
-public:
+  public:
     Ui();
     void load(GLFWwindow *_window, Engine *_engine);
     void render();
@@ -71,11 +72,16 @@ public:
     int getFrustumVisMode() { return frustumMode; }
     int getFrustumOutlineVisMode() { return frustumOutlineMode; }
     int getObjectsVisMode() { return objectMode; }
+
     int getFirstEarlyZMode() { return firstEarlyZMode; }
     int getSecondEarlyZMode() { return secondEarlyZMode; }
     int getVFCMode() { return viewFrustumCullingMode; }
-
     int getExtractOccludeesMode() { return extractOccludeesMode; }
+
+    void setPipelineMode(bool _mode)
+    {
+        firstEarlyZMode = extractOccludeesMode = viewFrustumCullingMode = secondEarlyZMode = _mode;
+    }
 };
 
 #endif

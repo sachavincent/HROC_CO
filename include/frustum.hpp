@@ -69,17 +69,18 @@ public:
                 return glm::vec3(v) / v.w;
             });
         glm::vec3 *vertices = _frustumVertices.data();
-        farFace = Plan(vertices[0], vertices[1], vertices[2]);
-        nearFace = Plan(vertices[4], vertices[6], vertices[5]);
-        bottomFace = Plan(vertices[0], vertices[4], vertices[5]);
-        rightFace = Plan(vertices[1], vertices[5], vertices[6]);
-        topFace = Plan(vertices[2], vertices[7], vertices[6]);
-        leftFace = Plan(vertices[3], vertices[7], vertices[0]);
+        farFace = Plan(vertices[0],vertices[1],vertices[2]);
+        nearFace = Plan(vertices[4],vertices[6],vertices[5]);
+        bottomFace = Plan(vertices[0],vertices[4],vertices[1]);
+        rightFace = Plan(vertices[1],vertices[5],vertices[6]);
+        topFace = Plan(vertices[2],vertices[6],vertices[3]);
+        leftFace = Plan(vertices[3],vertices[7],vertices[4]);
     }
 
     bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
-        return bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace) && bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(rightFace);
+        return bb->isOnOrForwardPlan(rightFace);
+        //return bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace) && bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(rightFace);
     };
 
     std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<std::shared_ptr<BvhNode>> occludeeGroups) const

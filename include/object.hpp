@@ -37,10 +37,10 @@ protected:
     glm::mat4 position = glm::mat4{1.0};
     glm::mat4 rotation = glm::mat4{1.0};
 
-    glm::vec3 diffuse = glm::vec3(-1.0f);
-
     mutable MeshRenderer meshRenderer;
     mutable MeshFilter meshfilter;
+
+    glm::vec3 diffuse = {-1, -1, -1};
 
     DrawElementsCommand command;
 
@@ -51,14 +51,11 @@ public:
     Object(std::string _name = "Object", std::string _modelkey = "")
         : name(_name), boundingBox(nullptr), meshfilter(_modelkey), meshRenderer(&meshfilter)
     {
-        
-    if(_modelkey.size() == 0)
-    {
-        std::cout << "test" << std::endl;
-    }
         id = id_counter++;
     }
+    
     ~Object();
+
     inline size_t getId() const { return id; }
 
     Object &setPosition(const glm::vec3 &_pos);
@@ -223,6 +220,7 @@ private:
     std::vector<GLfloat> outlineVertices;
     static GLuint vao;
     GLuint vbo;
+
 public:
     FrustumObject(std::string _parentName,
                   const glm::vec3 _edge[8],

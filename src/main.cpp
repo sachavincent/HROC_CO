@@ -29,22 +29,18 @@ int main(int argc, char *argv[])
 
     Engine engine(WIDTH, HEIGHT);
 
-    // engine.loadScene("testScene.json");
-
-
-
 
     // base scene loaded in main
-    Scene* testScene = SceneBuilder::buildDefaultScene(&engine);
-    //Scene* testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{35,35,100}, glm::vec3{0.0f,0.0f,55.0f}, 250, 1.0, 0.1);
+
+    //Scene *scene = SceneBuilder::buildMultiMesh(&engine, "models/paul_sab/paul_sab_527.obj");
+    //Scene *testScene = SceneBuilder::buildDefaultScene(&engine);
+     Scene* testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{35,35,100}, glm::vec3{0.0f,0.0f,55.0f}, 250, 1.0, 0.1);
     engine.loadScene(testScene);
-    //double start = glfwGetTime();
+    // double start = glfwGetTime();
     engine.resetFrametime();
     testScene->createBVH();
-    //double elapsed = glfwGetTime() - start;
-    //std::cout << elapsed << std::endl;
-    
-
+    // double elapsed = glfwGetTime() - start;
+    // std::cout << elapsed << std::endl;
 
     //  start the render loop
     engine.resetFrametime();

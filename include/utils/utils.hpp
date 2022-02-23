@@ -30,6 +30,7 @@ struct OBJECT_DATA
     unsigned int numVertices, numIndices;
     unsigned int numInstances;
 
+    glm::vec3 color = {-1, -1, -1};
     // LOCAL object maximum and minimum bounds without transformation
     OBJECT_BOUNDS bounds;
 };

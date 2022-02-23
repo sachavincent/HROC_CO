@@ -79,7 +79,7 @@ public:
             ind.insert(ind.end(), tempind.begin(), tempind.end());
         }
     }*/
-    void getBuffers(std::vector<std::shared_ptr<Object>> &_objects, std::vector<Vertex> &vert, std::vector<GLuint> &ind);
+    void getBuffers(const std::vector<std::shared_ptr<Object>> &_objects, std::vector<Vertex> &vert, std::vector<GLuint> &ind, std::vector<glm::vec3> &colors);
 
     static MeshHandler *getSingleton()
     {
@@ -112,13 +112,14 @@ public:
         {
             return nullptr;
         }
-        
+
         return handlerSingleton->getData(key);
     };
     std::string getMeshKey() const { return key; }
-    OBJECT_BOUNDS getObjectBounds() { 
-        return getMeshData()->bounds; 
-        }
+    OBJECT_BOUNDS getObjectBounds()
+    {
+        return getMeshData()->bounds;
+    }
     bool setMesh(std::string _key)
     {
         if (handlerSingleton->contain(_key))
@@ -155,7 +156,7 @@ private:
 public:
     void generateBaseModels();
 
-    void loadModel(const std::string &_path, const std::string &keyModel,unsigned int* _numMeshes = nullptr);
+    void loadModel(const std::string &_path, const std::string &keyModel, unsigned int *_numMeshes = nullptr);
 
     OBJECT_DATA processMesh(aiMesh *_mesh, const aiScene *_scene, bool centering);
 

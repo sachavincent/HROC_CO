@@ -1,7 +1,6 @@
 #include "scene.hpp"
 #include "engine.hpp"
 #include "bvh/boundingBoxObject.hpp"
-#include "utils/jsonparser.hpp"
 #include "frustum.hpp"
 
 //#include <execution>
@@ -12,38 +11,6 @@ Scene::Scene(Engine *_engine) : engine(_engine), exposure(1.0), hierarchy(nullpt
 {
 }
 
-Scene::Scene(Engine *_engine, const std::string &_file) : engine(_engine), exposure(1.0), hierarchy(nullptr), nbObjects(0)
-{
-    const std::string path = Utils::workingDirectory() + "scenes/" + _file;
-    std::ifstream file(path);
-    if (!file.good())
-        std::cerr << "Scene file '" << path << "' could not be found!" << std::endl;
-
-    try
-    {
-        SceneData sceneData = JsonParser::parseFile(file);
-        if (sceneData.updateFreeCam)
-            sceneData.updateFreeCam.value()(_engine);
-        if (sceneData.updateStaticCam)
-            sceneData.updateStaticCam.value()(_engine);
-
-        lights = sceneData.lights;
-        objects = sceneData.objects;
-
-        load();
-
-        createBVH();
-    }
-    catch (const json::exception &e)
-    {
-        std::cerr << "Scene file '" << path << "' contains json error:\n\t" << e.what() << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Scene file '" << path << "' contains error:\n\t" << e.what() << std::endl;
-    }
-}
-
 Scene::~Scene()
 {
     objects.clear();
@@ -51,6 +18,7 @@ Scene::~Scene()
     boundingBoxes.clear();
     Object::flushCaches();
 
+    Texture::cleanUp();
     delete hierarchy;
 
     glDeleteVertexArrays(1, &vao);
@@ -62,36 +30,6 @@ Scene::~Scene()
     glDeleteBuffers(1, &cmd);
 }
 
-void Scene::checkForInput()
-{
-    auto &ui = engine->getUi();
-
-    if (ui.getVFCModeCache() != ui.getVFCMode())
-    {
-        resetRequired = true;
-        ui.getVFCModeCache() = ui.getVFCMode();
-    }
-    if (ui.getBatchOcclusionModeCache() != ui.getBatchOcclusionMode())
-    {
-        resetRequired = true;
-        ui.getBatchOcclusionModeCache() = ui.getBatchOcclusionMode();
-    }
-    if (ui.getExtractOccludeesModeCache() != ui.getExtractOccludeesMode())
-    {
-        resetRequired = true;
-        ui.getExtractOccludeesModeCache() = ui.getExtractOccludeesMode();
-    }
-    if (ui.getFirstEarlyZModeCache() != ui.getFirstEarlyZMode())
-    {
-        resetRequired = true;
-        ui.getFirstEarlyZModeCache() = ui.getFirstEarlyZMode();
-    }
-    if (ui.getSecondEarlyZModeCache() != ui.getSecondEarlyZMode())
-    {
-        resetRequired = true;
-        ui.getSecondEarlyZModeCache() = ui.getSecondEarlyZMode();
-    }
-}
 void Scene::updateBvh()
 {
     glDepthMask(GL_TRUE);
@@ -160,7 +98,8 @@ void Scene::updateBvh()
     const Frustum *f = engine->getStaticCamera()->getFrustum();
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees;
 
-    if (engine->getUi().getVFCMode()){
+    if (engine->getUi().getVFCMode())
+    {
         culledPotentialOccludees = f->ViewFrustumCulling(G);
     }
     else
@@ -224,18 +163,18 @@ void Scene::load()
     std::vector<GLuint> ids;
     for (GLuint i = 0; i < objects.size(); i++)
         ids.push_back(i);
-    std::vector<glm::vec3> colors;
-    for (auto &o : objects)
-        colors.push_back(o->getDiffuse());
 
+    std::vector<glm::vec3> colors;
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
     int cmdCount = 0;
     cmds = MeshHandler::getSingleton()->getCmds(objects, &cmdCount);
     nbObjects = cmdCount;
-    MeshHandler::getSingleton()->getBuffers(objects, vertices, indices);
-
+    MeshHandler::getSingleton()->getBuffers(objects, vertices, indices, colors);
+    // colors.clear();
+    // for (GLuint i = 0; i < objects.size(); i++)
+    // colors.push_back({0,0,0});
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vbo);
     glCreateBuffers(1, &idVBO);
@@ -336,7 +275,6 @@ void Scene::renderObjects()
     // draw objects if gui enables it
     if (engine->getUi().getObjectsVisMode())
     {
-
         glBindVertexArray(vao);
         std::vector<std::shared_ptr<Object>> listObjVisible;
         std::vector<std::shared_ptr<Object>> listObjInvisible;
@@ -421,16 +359,16 @@ void Scene::renderBoundingBoxes()
 {
     if (!hierarchy)
         return;
+    int visMode = engine->getUi().getBboxVisMode();
+    // no bbox vis mode
+    if (visMode == -1)
+        return;
 
     bbShader.start();
 
     bbShader.loadMat4("view", getCamera()->getViewMatrix());
     bbShader.loadMat4("projection", getCamera()->getProjectionMatrix());
 
-    int visMode = engine->getUi().getBboxVisMode();
-    // no bbox vis mode
-    if (visMode == -1)
-        return;
     BoundingBoxObject::bind();
     int bboxLevel;
     int maxBboxLevel = 0;

@@ -10,41 +10,41 @@ void MeshLoader::generateBaseModels()
     cubeData.bounds.min = {-0.5f, -0.5f, -0.5f};
     cubeData.bounds.max = {0.5f, 0.5f, 0.5f};
 
-    std::vector<GLfloat> vertices = {-0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f,
-                                     0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+    std::vector<GLfloat> vertices = {-0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
+                                     0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
 
-                                     -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
-                                     0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,
+                                     -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                                     0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f,
 
-                                     -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
-                                     -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,
+                                     -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
+                                     -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
 
-                                     0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
-                                     0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,
+                                     0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f,
+                                     0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
 
-                                     -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,
-                                     0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f,
+                                     -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f,
+                                     0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f,
 
-                                     -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,
-                                     0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f};
+                                     -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
+                                     0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f};
 
-    std::vector<GLfloat> normals = {0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f,
-                                    0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f,
+    std::vector<GLfloat> normals = {0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
+                                    0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
 
-                                    0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-                                    0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 
-                                    -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,
-                                    -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,
+                                    -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                                    -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-                                    1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-                                    1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+                                    1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                                    1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-                                    0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,
-                                    0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f,
+                                    0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+                                    0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
 
-                                    0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-                                    0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f};
+                                    0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
 
     std::vector<GLfloat> textureCoord = {
         0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -59,9 +59,9 @@ void MeshLoader::generateBaseModels()
 
         0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    std::vector<GLuint> indices = {0,  2,  1,  3,  5,  4,
+    std::vector<GLuint> indices = {0, 2, 1, 3, 5, 4,
 
-                                   6,  7,  8,  9,  10, 11,
+                                   6, 7, 8, 9, 10, 11,
 
                                    12, 13, 14, 15, 16, 17,
 
@@ -205,8 +205,7 @@ void MeshLoader::generateBaseModels()
     handlerSingleton->addData("sphere", sphereData);
 }
 
-void MeshLoader::loadModel(const std::string &_path, const std::string &keyModel,
-                           unsigned int *_numMeshes)
+void MeshLoader::loadModel(const std::string &_path, const std::string &keyModel, unsigned int *_numMeshes)
 {
 
     // skip loading if same object already exists
@@ -283,7 +282,16 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
             textureCoord.insert(textureCoord.end(),
                                 {_mesh->mTextureCoords[0][i].x, _mesh->mTextureCoords[0][i].y});
     }
+    if (_mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial *material = _scene->mMaterials[_mesh->mMaterialIndex];
 
+        aiColor4D color;
+        if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+        {
+            data.color = {color[0], color[1], color[2]};
+        }
+    }
     // center object so that centroid is at (0,0,0)
     // this important for scaling/rotation etc..
     double meanX = 0, meanY = 0, meanZ = 0;
@@ -346,8 +354,8 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
     return data;
 }
 
-void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects,
-                             std::vector<Vertex> &vert, std::vector<GLuint> &ind)
+void MeshHandler::getBuffers(const std::vector<std::shared_ptr<Object>> &_objects,
+                             std::vector<Vertex> &vert, std::vector<GLuint> &ind, std::vector<glm::vec3> &colors)
 {
     std::vector<std::string> objOrder;
     std::map<std::string, OBJECT_DATA *> temp;
@@ -365,6 +373,15 @@ void MeshHandler::getBuffers(std::vector<std::shared_ptr<Object>> &_objects,
         }
     }
 
+    for (auto obj : _objects)
+    {
+        OBJECT_DATA *data = obj->getObjectData();
+        glm::vec3 color = obj->getDiffuse();
+        if (data && color.z < 0)
+            color = data->color;
+
+        colors.push_back(color);
+    }
     for (auto obj : objOrder)
     {
         OBJECT_DATA *data = temp[obj];
@@ -434,7 +451,8 @@ DrawElementsCommand *MeshHandler::getCmds(std::vector<std::shared_ptr<Object>> &
 DrawElementsCommand *
 MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objects, int *cmdCount)
 {
-    if (_objects.empty()) return nullptr;
+    if (_objects.empty())
+        return nullptr;
 
     bool stop = false;
     std::vector<DrawElementsCommand> commands;
@@ -458,7 +476,8 @@ MeshHandler::getCmdsForSubset(const std::vector<std::shared_ptr<Object>> &_objec
             std::shared_ptr<Object> nextObj = _objects[++i];
             keyModel = nextObj->getModelKey();
             GLuint baseInstance = nextObj->getCommand().baseInstance;
-            if (keyModel == currentKeyModel && baseInstance != currentBaseInstance + 1) break;
+            if (keyModel == currentKeyModel && baseInstance != currentBaseInstance + 1)
+                break;
             currentBaseInstance++;
         }
         DrawElementsCommand command = obj->getCommand();

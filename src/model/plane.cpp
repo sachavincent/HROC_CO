@@ -9,11 +9,6 @@ Plane::Plane(glm::vec2 _size, int _nX, int _nY, const std::string &_name,std::st
     setScale(glm::vec3(_size, 0));
     setRotationMatrix(glm::mat4{1.0});
 
-    
-    if(_keyModel.size() == 0)
-    {
-        std::cout << "test" << std::endl;
-    }
     //visible[instance] = true;
 }
 

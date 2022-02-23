@@ -46,6 +46,7 @@ public:
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         arrayInit = true;
     }
+
     static GLuint loadTexture(const std::string &_file, unsigned int _id);
 
     static void load();
@@ -53,6 +54,15 @@ public:
     static void unload();
 
     inline static const GLuint &getId() { return id; }
+
+    static void cleanUp()
+    {
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+        glDeleteTextures(1, &id);
+        Texture::cache.clear();
+        arrayInit = false;
+        currObj = 0;
+    }
 };
 
 #endif

@@ -54,7 +54,6 @@ Object &Object::setTexSpecular(std::string _path)
 
 Object &Object::setDiffuse(glm::vec3 _color)
 {
-    // Texture::loadTextureColor(_color);
     diffuse = _color;
     return *this;
 }

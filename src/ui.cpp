@@ -252,7 +252,7 @@ void Ui::sceneLoading()
             }
             break;
             case 2:
-                scene = SceneBuilder::buildMultiMesh(engine, mmesh_path,1);
+                scene = SceneBuilder::buildMultiMesh(engine, mmesh_path, 1);
                 break;
             }
             engine->loadScene(scene);
@@ -342,12 +342,12 @@ void Ui::plotFpsRate()
 
     static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_LockMin;
 
-    ImGui::SliderFloat("update speed (ms)",&updateSpeedMs,5.0f,200.0f);
-    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200),0))
+    ImGui::SliderFloat("update speed (ms)", &updateSpeedMs, 5.0f, 200.0f);
+    if (ImPlot::BeginPlot("Fps Curves", NULL, NULL, ImVec2(350, 200), 0))
     {
         ImPlot::SetupAxes("time", "FPS", xflags, yflags);
-        ImPlot::SetupLegend(ImPlotLocation_SouthWest,ImPlotLegendFlags_None);
-        std::vector<double> instantCrop(fpsVec.begin()+30,fpsVec.end());
+        ImPlot::SetupLegend(ImPlotLocation_SouthWest, ImPlotLegendFlags_None);
+        std::vector<double> instantCrop(fpsVec.begin() + 30, fpsVec.end());
         ImPlot::PlotLine("instant fps", instantCrop.data(), 50);
 
         std::vector<double> avgCrop(fpsVecAvg30.begin() + 30, fpsVecAvg30.end());
@@ -370,12 +370,13 @@ void Ui::displayPipelineOptions()
 
     ImGui::Checkbox("Batch Occlusion Test", &batchOcclusionMode);
     ImGui::Separator();
-    
+
     ImGui::Checkbox("Second Early Z", &secondEarlyZMode);
     ImGui::Separator();
 }
 
-void Ui::benchmarkParams(){
+void Ui::benchmarkParams()
+{
 
     static BenchFlags flags = 0;
     static bool cityBench = true;
@@ -384,7 +385,8 @@ void Ui::benchmarkParams(){
     static bool MediumBench = true;
     static bool HighBench = true;
     static bool wrongSelection = false;
-    if(wrongSelection){
+    if (wrongSelection)
+    {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 30, 30, 255));
         ImGui::Text("Wrong benchmark settings!");
         ImGui::PopStyleColor();
@@ -400,26 +402,34 @@ void Ui::benchmarkParams(){
     ImGui::SameLine();
     ImGui::Checkbox("High", &HighBench);
 
-    std::cout << glm::to_string(engine->getCurrentCamera()->getPosition()) << std::endl;
+    //std::cout << glm::to_string(engine->getCurrentCamera()->getPosition()) << std::endl;
 
-    if (ImGui::Button("Start Benchmark")){
+    if (ImGui::Button("Start Benchmark"))
+    {
         wrongSelection = false;
-        if(cityBench == false && meteoriteBench == false){
+        if (cityBench == false && meteoriteBench == false)
+        {
             wrongSelection = true;
             return;
         }
 
-        if(meteoriteBench) flags = flags | BenchFlags_Meteorite;
-        if(cityBench) flags = flags | BenchFlags_City;
-        if(lowBench == MediumBench == HighBench == false){
+        if (meteoriteBench)
+            flags = flags | BenchFlags_Meteorite;
+        if (cityBench)
+            flags = flags | BenchFlags_City;
+        if (lowBench == MediumBench == HighBench == false)
+        {
             wrongSelection = true;
             return;
         }
-        if(lowBench)  flags = flags | BenchFlags_LowTests;
-        if(MediumBench)  flags = flags | BenchFlags_MediumTests;
-        if(HighBench)  flags = flags | BenchFlags_HighTests;
+        if (lowBench)
+            flags = flags | BenchFlags_LowTests;
+        if (MediumBench)
+            flags = flags | BenchFlags_MediumTests;
+        if (HighBench)
+            flags = flags | BenchFlags_HighTests;
 
-        Benchmark* bench = new Benchmark(engine, flags);
+        Benchmark *bench = new Benchmark(engine, flags);
         engine->setBenchmark(bench);
     }
 }

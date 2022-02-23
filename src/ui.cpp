@@ -292,12 +292,12 @@ void Ui::plotTimer()
 {
     Scene *scene = engine->getScene();
     double timers[9];
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 7; i++)
     {
         timers[i] = round(scene->timers[i] * 1000);
         if (timers[i] < 0)
         {
-            timers[i] = 1.0;
+            timers[i] = 0.0;
         }
     }
 
@@ -306,7 +306,7 @@ void Ui::plotTimer()
     if (ImPlot::BeginPlot("Pipeline Performance", NULL, NULL, ImVec2(350, 350)))
     {
         ImPlot::SetupAxes("", "", xflags, yflags);
-        ImPlot::PlotPieChart(scene->timerLabels, timers, 9, 0.5f, 0.5f, 0.4f);
+        ImPlot::PlotPieChart(scene->timerLabels, timers, 7, 0.5f, 0.5f, 0.4f);
         ImPlot::EndPlot();
     }
 }

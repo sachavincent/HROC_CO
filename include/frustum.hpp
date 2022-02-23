@@ -79,8 +79,7 @@ public:
 
     bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
-        return bb->isOnOrForwardPlan(rightFace);
-        //return bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace) && bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(rightFace);
+        return bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace) && bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(rightFace);
     };
 
     std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<std::shared_ptr<BvhNode>> occludeeGroups) const

@@ -62,29 +62,46 @@ Scene::~Scene()
     glDeleteBuffers(1, &cmd);
 }
 
-void Scene::requestBvhUpdate(int nbRequests)
+void Scene::checkForInput()
 {
-    if (updateRequired == 0)
-        updateRequired = nbRequests;
-}
+    if (engine->getCurrentCameraType() != CameraType::FREE)
+        return;
 
-void Scene::stopBvhUpdate()
-{
-    updateRequired = 0;
-}
+    auto &ui = engine->getUi();
 
+    if (ui.getVFCModeCache() != ui.getVFCMode())
+    {
+        resetRequired = true;
+        ui.getVFCModeCache() = ui.getVFCMode();
+    }
+    if (ui.getBatchOcclusionModeCache() != ui.getBatchOcclusionMode())
+    {
+        resetRequired = true;
+        ui.getBatchOcclusionModeCache() = ui.getBatchOcclusionMode();
+    }
+    if (ui.getExtractOccludeesModeCache() != ui.getExtractOccludeesMode())
+    {
+        resetRequired = true;
+        ui.getExtractOccludeesModeCache() = ui.getExtractOccludeesMode();
+    }
+    if (ui.getFirstEarlyZModeCache() != ui.getFirstEarlyZMode())
+    {
+        resetRequired = true;
+        ui.getFirstEarlyZModeCache() = ui.getFirstEarlyZMode();
+    }
+    if (ui.getSecondEarlyZModeCache() != ui.getSecondEarlyZMode())
+    {
+        resetRequired = true;
+        ui.getSecondEarlyZModeCache() = ui.getSecondEarlyZMode();
+    }
+}
 void Scene::updateBvh()
 {
-    // if (updateRequired == 0)
-    //   return;
-
-    updateRequired--;
-
-    updateFrustum();
-
     glDepthMask(GL_TRUE);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDepthMask(GL_FALSE);
+
+    updateFrustum();
 
     double timerStart;
 
@@ -98,29 +115,24 @@ void Scene::updateBvh()
      * return list of indices of effectives occluders O
      */
 
+    if (resetRequired)
+    {
+        // Pipeline is reset to original state
+        objectVisibility = std::vector<bool>(objects.size(), true);
+        resetRequired = false;
+    }
+    
     std::vector<unsigned int> V;
-    V.reserve(objects.size());
-    for (auto obj : objects)
-        V.push_back(obj->getId());
+    for (size_t i = 0; i < objectVisibility.size(); i++)
+        if (objectVisibility[i])
+            V.push_back(i);
 
-    // TODO: Early-Z with V (at first = everything) => returns effectiveOccluders
-    // TODO store depth map
     timerStart = glfwGetTime();
     std::vector<unsigned int> O;
-    /*std::sort(V.begin(), V.end(),
-              [&](unsigned int a, unsigned int b)
-              {
-                  return glm::distance(engine->getStaticCamera()->getPosition(), objects[a]->getBoundingBox()->getCenter()) <
-                         glm::distance(engine->getStaticCamera()->getPosition(), objects[b]->getBoundingBox()->getCenter());
-              });*/
     if (engine->getUi().getFirstEarlyZMode())
-    {
         O = doEarlyZ(V);
-    }
     else
-    {
         O = V;
-    }
 
     timers[0] = glfwGetTime() - timerStart; // Early-Z
     /*
@@ -135,21 +147,15 @@ void Scene::updateBvh()
     std::vector<std::shared_ptr<BvhNode>> occluders;
     occluders.reserve(O.size());
     for (unsigned int o : O)
-    {
         occluders.push_back(objects[o]->getBoundingBox()->getNode()); // Object idx => BvhNode
-    }
 
     timerStart = glfwGetTime();
 
     std::vector<std::shared_ptr<BvhNode>> G;
     if (engine->getUi().getExtractOccludeesMode())
-    {
         G = hierarchy->extractOccludees(occluders);
-    }
     else
-    {
         G = occluders;
-    }
 
     timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
@@ -158,28 +164,12 @@ void Scene::updateBvh()
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees;
 
     if (engine->getUi().getVFCMode())
-    {
         culledPotentialOccludees = f->ViewFrustumCulling(G);
-    }
     else
-    {
         culledPotentialOccludees = G;
-    }
 
     timers[2] = glfwGetTime() - timerStart; // VFC
     timerStart = glfwGetTime();
-
-    /*
-     * 3 - Batch Occlusion Test (Paper Original)
-     * in OM occlusion map
-     * Using the previously calculated occlusion map OM to start conservatives rays (from fragments) testing intersection with
-     * bvhTree.
-     * Explore bvh by starting from "leafest" (closest from leaf) node trigerring early-Z to add intersecting
-     * objects to potentially visibles occludees U to be drawn.
-     * return indices of potential visible occludees U
-     */
-
-    // TODO Raycast with aabb on GPU to extract U
 
     timers[3] = glfwGetTime() - timerStart; // Raycast
     timerStart = glfwGetTime();
@@ -211,7 +201,6 @@ void Scene::updateBvh()
      * Make a new pass of early-Z on U and add passing objects to drawn objects D and draw them.
      * Merge D with potential occluders O to initialize V for the next frame.
      */
-    // TODO Early Z on potentiallyVisibleOccludees to initialize drawnObjects
 
     glDepthMask(GL_TRUE);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -220,34 +209,21 @@ void Scene::updateBvh()
     std::vector<unsigned int> drawObjects;
 
     if (engine->getUi().getSecondEarlyZMode())
-    {
-        /*std::sort(potentiallyVisibleOccludees.begin(), potentiallyVisibleOccludees.end(),
-                  [&](unsigned int a, unsigned int b)
-                  {
-                      return glm::distance(engine->getStaticCamera()->getPosition(), objects[a]->getBoundingBox()->getCenter()) <
-                             glm::distance(engine->getStaticCamera()->getPosition(), objects[b]->getBoundingBox()->getCenter());
-                  });*/
         drawObjects = doEarlyZ(potentiallyVisibleOccludees);
-    }
     else
-    {
         drawObjects = potentiallyVisibleOccludees;
-    }
+
     timers[6] = glfwGetTime() - timerStart; // Early Z on Rendering
     timerStart = glfwGetTime();
 
     timers[7] = glfwGetTime() - timerStart; // Draw objects
     timerStart = glfwGetTime();
 
-    // TODO merge drawnObjects & effectiveOccluders to initialize previously drawn objects V
     objectVisibility = std::vector<bool>(objects.size(), false);
     for (unsigned int idxObj : drawObjects)
         objectVisibility[idxObj] = true;
 
     timers[8] = glfwGetTime() - timerStart; // Merge
-
-    //std::cout << "Bvh updated: Initially " << objects.size() << " Objects\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << culledPotentialOccludees.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
-     //         << "\n\t2nd Early-Z: " << drawObjects.size() << std::endl;
 }
 
 //! Load the scene models on GPU before rendering
@@ -334,7 +310,7 @@ void Scene::load()
 
     createFrustum();
     setupEarlyZCommand();
-    updateRequired = true;
+    resetRequired = true;
 }
 
 void Scene::createBVH()
@@ -394,7 +370,7 @@ void Scene::renderObjects()
         std::vector<std::shared_ptr<Object>> listObjInvisible;
         for (size_t i = 0; i < objectVisibility.size(); i++)
         {
-            if (objectVisibility[i] == 1)
+            if (objectVisibility[i])
                 listObjVisible.push_back(objects[i]);
             else if (engine->getUi().getOccludeeColorMode())
                 listObjInvisible.push_back(objects[i]);
@@ -402,8 +378,7 @@ void Scene::renderObjects()
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glDepthMask(GL_FALSE);
-        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
         int cmdCount;
         if (engine->getUi().getOccludeeColorMode() && !listObjInvisible.empty())
         {
@@ -426,6 +401,7 @@ void Scene::renderObjects()
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid *)0, cmdCount, 0);
 
         glBindVertexArray(0);
+        glDepthMask(GL_FALSE);
     }
     // unload shader
     sh.stop();
@@ -531,7 +507,7 @@ void Scene::renderBoundingBoxes()
     for (auto entry : boundingBoxes)
     {
         int numBB = 0;
-        bboxLevel = entry.first;
+        bboxLevel = entry.first + 1;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
         auto bboxs = entry.second;
         if (visMode == 0 || bboxLevel == visMode)
@@ -750,7 +726,6 @@ std::vector<unsigned int> Scene::doEarlyZ(std::vector<unsigned int> _idObjects)
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
 
-    std::vector<unsigned int> test(_visibility, _visibility + objects.size());
     std::vector<unsigned int> visibleObjects;
     delete earlyZcmds;
 

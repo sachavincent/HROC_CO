@@ -111,8 +111,8 @@ void Engine::startLoop()
             glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LESS);
+            scene->checkForInput();
         }
-        // else
         scene->updateBvh();
 
         scene->renderObjects();
@@ -174,6 +174,7 @@ void Engine::switchCamera()
 {
     currentCamera = currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
 }
-void Engine::resetFrametime(){
+void Engine::resetFrametime()
+{
     lastFrame = glfwGetTime();
 }

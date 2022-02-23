@@ -22,11 +22,12 @@ public:
         pos = p1;
     }
 
-    Plan(const glm::vec3 &p1,const glm::vec3 &p2,const glm::vec3 &p3){
-        glm::vec3 x = p2-p1;
-        glm::vec3 y = p3-p1;
-        normal = glm::normalize(glm::cross(x,y));
-        distance = glm::dot(normal,p1)/sqrt(normal.x*normal.x + normal.y * normal.y +normal.z*normal.z);
+    Plan(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3)
+    {
+        glm::vec3 x = p2 - p1;
+        glm::vec3 y = p3 - p1;
+        normal = glm::normalize(glm::cross(x, y));
+        distance = glm::dot(normal, p1) / sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
     }
     float getSignedDistanceToPlan(const glm::vec3 &point) const
     {
@@ -68,17 +69,17 @@ public:
                 return glm::vec3(v) / v.w;
             });
         glm::vec3 *vertices = _frustumVertices.data();
-        farFace = Plan(vertices[0],vertices[1],vertices[2]);
-        nearFace = Plan(vertices[4],vertices[6],vertices[5]);
-        bottomFace = Plan(vertices[0],vertices[4],vertices[5]);
-        rightFace = Plan(vertices[1],vertices[5],vertices[6]);
-        topFace = Plan(vertices[2],vertices[7],vertices[6]);
-        leftFace = Plan(vertices[3],vertices[7],vertices[0]);
+        farFace = Plan(vertices[0], vertices[1], vertices[2]);
+        nearFace = Plan(vertices[4], vertices[6], vertices[5]);
+        bottomFace = Plan(vertices[0], vertices[4], vertices[5]);
+        rightFace = Plan(vertices[1], vertices[5], vertices[6]);
+        topFace = Plan(vertices[2], vertices[7], vertices[6]);
+        leftFace = Plan(vertices[3], vertices[7], vertices[0]);
     }
 
     bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
-        return bb->isOnOrForwardPlan(farFace)&& bb->isOnOrForwardPlan(nearFace)&& bb->isOnOrForwardPlan(topFace)&& bb->isOnOrForwardPlan(bottomFace)&& bb->isOnOrForwardPlan(leftFace)&& bb->isOnOrForwardPlan(rightFace);
+        return bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace) && bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(rightFace);
     };
 
     std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<std::shared_ptr<BvhNode>> occludeeGroups) const
@@ -103,6 +104,5 @@ public:
     Plan farFace;
     Plan nearFace;
 };
-
 
 #endif

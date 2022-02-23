@@ -1,6 +1,6 @@
 #version 460 core
 
-const vec3 OCCLUDER_COLOR = vec3(0.82, 0.17, 0.19);
+const vec3 OCCLUDER_COLOR = vec3(0.88, 0.07, 0.11);
 const vec3 OCCLUDEE_COLOR = vec3(0.17, 0.03, 0.72);
 
 out vec4 FragColor;

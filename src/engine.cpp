@@ -111,8 +111,8 @@ void Engine::startLoop()
             glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LESS);
-            scene->checkForInput();
         }
+            scene->checkForInput();
         scene->updateBvh();
 
         scene->renderObjects();

@@ -57,7 +57,7 @@ private:
 public:
     // Timers for pipeline
     double timers[7];
-    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering","Merge"};
+    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Merge"};
 
 public:
     Scene(Engine *_engine);
@@ -101,6 +101,8 @@ public:
 
     // Called when camera moves
     void updateBvh();
+    void checkForInput();
+
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 

@@ -65,6 +65,14 @@ private:
   bool secondEarlyZMode = true;
   bool batchOcclusionMode = true;
 
+  // Cache
+
+  bool firstEarlyZModeCache = firstEarlyZMode;
+  bool extractOccludeesModeCache = extractOccludeesMode;
+  bool viewFrustumCullingModeCache = viewFrustumCullingMode;
+  bool secondEarlyZModeCache = secondEarlyZMode;
+  bool batchOcclusionModeCache = batchOcclusionMode;
+
 public:
   Ui();
   void load(GLFWwindow *_window, Engine *_engine);
@@ -82,6 +90,12 @@ public:
   bool getSecondEarlyZMode() { return secondEarlyZMode; }
   bool getBatchOcclusionMode() { return batchOcclusionMode; }
 
+  bool &getFirstEarlyZModeCache() { return firstEarlyZModeCache; }
+  bool &getExtractOccludeesModeCache() { return extractOccludeesModeCache; }
+  bool &getVFCModeCache() { return viewFrustumCullingModeCache; }
+  bool &getSecondEarlyZModeCache() { return secondEarlyZModeCache; }
+  bool &getBatchOcclusionModeCache() { return batchOcclusionModeCache; }
+  
   void setPipelineMode(bool _mode)
   {
     batchOcclusionMode = _mode;

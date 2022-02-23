@@ -72,7 +72,6 @@ public:
 
     
     inline double getDeltaTime(){return deltaTime;}
-    void resetFrametime();
 
     void disableGui(){guiRendered=true;}
     void enableGui(){guiRendered=false;}

@@ -156,6 +156,8 @@ public:
 	void moveY(float _offset);
 	//! Move camera in Z axis my an offset
 	void moveZ(float _offset);
+
+	void resetMovement(){movingFactor  = {0.0,0.0,0.0};}
 	//! change
 	void setResolution(int _w, int _h);
 

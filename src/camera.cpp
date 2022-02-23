@@ -106,7 +106,8 @@ void Camera::setResolution(int w, int h)
 void Camera::move(const float delta)
 {
 	float d = delta;
-	if(constantSpeed) d = 0.05;
+	if(constantSpeed) 
+		d = 0.05;
 	position += movingFactor.x * moveSpeed * d * glm::normalize(glm::cross(front, up));
 	position += movingFactor.y * moveSpeed * d * glm::normalize(up);
 	position += movingFactor.z * moveSpeed * d * front;

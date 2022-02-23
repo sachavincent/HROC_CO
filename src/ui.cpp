@@ -418,7 +418,7 @@ void Ui::benchmarkParams()
             flags = flags | BenchFlags_Meteorite;
         if (cityBench)
             flags = flags | BenchFlags_City;
-        if (lowBench == MediumBench == HighBench == false)
+        if (lowBench == false && MediumBench == false && HighBench == false)
         {
             wrongSelection = true;
             return;
@@ -437,7 +437,7 @@ void Ui::benchmarkParams()
 
     if(messageCounter<6.0){
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(30, 255, 30, 255));
-        ImGui::Text("Saved scene to CSV!");
+        ImGui::Text("Saved benchmarks results to /benchmarks !");
         ImGui::PopStyleColor();
         
         messageCounter += engine->getDeltaTime();

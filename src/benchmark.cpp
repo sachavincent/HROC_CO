@@ -18,6 +18,7 @@ Benchmark::Benchmark(Engine *_engine, BenchFlags _flags) : engine(_engine)
     _engine->disableGui();
     _engine->setCameraType(CameraType::STATIC);
     _engine->getStaticCamera()->setConstantSpeed(true);
+    _engine->getStaticCamera()->resetMovement();
 
     // setup benchmark steps
     if ((_flags & BenchFlags_Meteorite) == BenchFlags_Meteorite)
@@ -81,7 +82,7 @@ bool Benchmark::BNCH_asteroidLow()
         {
             delete engine->getScene();
             Scene *scene =
-                SceneBuilder::buildAsteroidField(engine, {40, 40, 100}, {0, 0, 70}, 100, 1.0, 0.1);
+                SceneBuilder::buildAsteroidField(engine, {50, 50, 90}, {0, 0, 45}, 300, 1.1, 0.1);
             engine->loadScene(scene);
             engine->getUi().setPipelineMode(true);
             results["asteroidLow_ON"] = {};
@@ -94,13 +95,15 @@ bool Benchmark::BNCH_asteroidLow()
         }
         
         engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+        engine->getStaticCamera()->updateDirection();
         engine->resetFrametime(); // reset frame time after scene buider hanging (fixes camera jump)
-        engine->getStaticCamera()->moveZ(-moveSpeed);
+        engine->getStaticCamera()->moveZ(-moveSpeed*0.3);
 
         framecount++;
         return 0;
     }
-    if (framecount < 800)
+    
+    if (framecount < 1000)
     {
         if (passNum == 0)
         {
@@ -113,14 +116,17 @@ bool Benchmark::BNCH_asteroidLow()
         framecount++;
         return 0;
     }
-    engine->getStaticCamera()->moveZ(moveSpeed);
-    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->resetMovement();
+    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 2.0, 0.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->updateDirection();
+
     framecount = 0;
     if (passNum == 0)
     {
         passNum++;
         return 0;
     }
+
     passNum = 0;
     return 1;
 }
@@ -136,10 +142,10 @@ bool Benchmark::BNCH_asteroidMedium()
         {
             delete engine->getScene();
             Scene *scene =
-                SceneBuilder::buildAsteroidField(engine, {40, 40, 100}, {0, 0, 70}, 300, 1.0, 0.1);
+                SceneBuilder::buildAsteroidField(engine, {50, 50, 100}, {0, 0, 50}, 600, 1.1, 0.1);
             engine->loadScene(scene);
             engine->getUi().setPipelineMode(true);
-            results["asteroidLMedium_ON"] = {};
+            results["asteroidMedium_ON"] = {};
             engine->getScene()->createBVH();
         }
         else
@@ -149,13 +155,14 @@ bool Benchmark::BNCH_asteroidMedium()
         }
         
         engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+        engine->getStaticCamera()->updateDirection();
         engine->resetFrametime(); // reset frame time after scene buider hanging (fixes camera jump)
-        engine->getStaticCamera()->moveZ(-moveSpeed);
+        engine->getStaticCamera()->moveZ(-moveSpeed*0.5);
 
         framecount++;
         return 0;
     }
-    if (framecount < 800)
+    if (framecount < 1000)
     {
         if (passNum == 0)
         {
@@ -168,8 +175,10 @@ bool Benchmark::BNCH_asteroidMedium()
         framecount++;
         return 0;
     }
-    engine->getStaticCamera()->moveZ(moveSpeed);
-    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->resetMovement();
+    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 2.0, 0.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->updateDirection();
+    
     framecount = 0;
     if (passNum == 0)
     {
@@ -190,7 +199,7 @@ bool Benchmark::BNCH_asteroidHigh()
         {
             delete engine->getScene();
             Scene *scene =
-                SceneBuilder::buildAsteroidField(engine, {40, 40, 100}, {0, 0, 70}, 500, 1.0, 0.1);
+                SceneBuilder::buildAsteroidField(engine, {50, 50, 120}, {0, 0, 60}, 1000, 1.0, 0.1);
             engine->loadScene(scene);
             engine->getUi().setPipelineMode(true);
             results["asteroidHigh_ON"] = {};
@@ -203,13 +212,14 @@ bool Benchmark::BNCH_asteroidHigh()
         }
         
         engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+        engine->getStaticCamera()->updateDirection();
         engine->resetFrametime(); // reset frame time after scene buider hanging (fixes camera jump)
-        engine->getStaticCamera()->moveZ(-moveSpeed);
+        engine->getStaticCamera()->moveZ(-moveSpeed*0.3);
 
         framecount++;
         return 0;
     }
-    if (framecount < 800)
+    if (framecount < 1000)
     {
         if (passNum == 0)
         {
@@ -222,8 +232,9 @@ bool Benchmark::BNCH_asteroidHigh()
         framecount++;
         return 0;
     }
-    engine->getStaticCamera()->moveZ(moveSpeed);
-    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 0.0, 15.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->resetMovement();
+    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 2.0, 0.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->updateDirection();
     framecount = 0;
     if (passNum == 0)
     {
@@ -256,14 +267,13 @@ bool Benchmark::BNCH_cityLow()
         }
         engine->getStaticCamera()->setCameraInfo({glm::vec3{14.6, 8.0, -285.0}, 60.0, 60.0, 0.0});
         engine->getStaticCamera()->updateDirection();
-        engine->getStaticCamera()->moveZ(moveSpeed * 1.88);
-        //engine->getStaticCamera()->moveZ(moveSpeed * 0.01);
-        engine->resetFrametime(); // reset frame time after scene buider hanging (fixes camera jump)
+        engine->getStaticCamera()->moveZ(moveSpeed);
+        engine->resetFrametime(); 
 
         framecount++;
         return 0;
     }
-    if (framecount < 800)
+    if (framecount < 1500)
     {
         //std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
         if (passNum == 0)
@@ -277,9 +287,10 @@ bool Benchmark::BNCH_cityLow()
         framecount++;
         return 0;
     }
-    engine->getStaticCamera()->moveZ(-moveSpeed * 1.88);
-    //engine->getStaticCamera()->moveZ(-moveSpeed * 0.01);
-    engine->getStaticCamera()->setCameraInfo({glm::vec3{14.6, 8.0, -285.0}, 60.0, 60.0, 0.0});
+
+    engine->getStaticCamera()->resetMovement();
+    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 2.0, 0.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->updateDirection();
     framecount = 0;
     if (passNum == 0)
     {

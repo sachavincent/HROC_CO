@@ -84,7 +84,11 @@ public:
 
   void setPipelineMode(bool _mode)
   {
-    batchOcclusionMode = firstEarlyZMode = extractOccludeesMode = viewFrustumCullingMode = secondEarlyZMode = _mode;
+    batchOcclusionMode = _mode;
+    firstEarlyZMode = _mode;
+    extractOccludeesMode = _mode;
+    viewFrustumCullingMode = _mode;
+    secondEarlyZMode = _mode;
   }
 };
 

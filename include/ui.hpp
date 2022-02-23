@@ -98,7 +98,7 @@ class Ui
 
     void setPipelineMode(bool _mode)
     {
-        firstEarlyZMode = extractOccludeesMode = viewFrustumCullingMode = secondEarlyZMode = _mode;
+        firstEarlyZMode = extractOccludeesMode = viewFrustumCullingMode = secondEarlyZMode = batchOcclusionMode =  _mode;
     }
 };
 

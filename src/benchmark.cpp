@@ -2,6 +2,9 @@
 #include "engine.hpp"
 #include "utils/ioutils.hpp"
 
+#include <fstream>
+#include <algorithm>
+
 Benchmark::Benchmark(Engine *_engine, BenchFlags _flags) : engine(_engine)
 {
 
@@ -43,7 +46,7 @@ void Benchmark::exec()
     // bench finished
     if (benchStep == benchFuns.size())
     {
-        if (saveResults) saveAsCsv();
+        saveAsCsv();
         finishedSignal = true;
 
         GLFWwindow *win = engine->getWindow();
@@ -97,7 +100,7 @@ bool Benchmark::BNCH_asteroidLow()
         framecount++;
         return 0;
     }
-    if (framecount < 500)
+    if (framecount < 800)
     {
         if (passNum == 0)
         {
@@ -152,7 +155,7 @@ bool Benchmark::BNCH_asteroidMedium()
         framecount++;
         return 0;
     }
-    if (framecount < 500)
+    if (framecount < 800)
     {
         if (passNum == 0)
         {
@@ -206,7 +209,7 @@ bool Benchmark::BNCH_asteroidHigh()
         framecount++;
         return 0;
     }
-    if (framecount < 500)
+    if (framecount < 800)
     {
         if (passNum == 0)
         {
@@ -260,7 +263,7 @@ bool Benchmark::BNCH_cityLow()
         framecount++;
         return 0;
     }
-    if (framecount < 500)
+    if (framecount < 800)
     {
         std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
         if (passNum == 0)
@@ -291,4 +294,30 @@ bool Benchmark::BNCH_cityMedium() { return 1; }
 
 bool Benchmark::BNCH_cityHigh() { return 1; }
 
-void Benchmark::saveAsCsv() {}
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
+
+void Benchmark::saveAsCsv() {
+
+    for(auto const& result: results){
+        std::fstream fs;
+        
+        std::string fname = Utils::workingDirectory()+"benchmarks\\"+result.first+".csv";
+        fname = ReplaceAll( fname, "\\", "/");
+        
+
+        fs.open(fname.c_str(), std::fstream::in | std::fstream::out | std::fstream::trunc);
+        fs << "frameNum" <<";"<< "delaTime" << "\r";
+        for(int i = 0; i<result.second.size();i++){
+            fs << i <<";"<<result.second[i] << "\r";
+        }
+        std::cout << fname;
+        fs.close();
+    }
+}

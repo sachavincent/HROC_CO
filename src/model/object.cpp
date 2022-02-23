@@ -68,7 +68,7 @@ Object &Object::setSpecular(glm::vec3 _color)
 std::pair<glm::vec3, glm::vec3> Object::getBounds() const
 {
     OBJECT_BOUNDS bounds = meshfilter.getObjectBounds();
-    glm::mat4 tmat = rotation * scale;
+    glm::mat4 tmat = position * rotation * scale;
     // get 8 transformed corners
     std::vector<glm::vec4> boundsCorners = {
         {tmat * glm::vec4{bounds.max.x, bounds.max.y, bounds.max.z, 1.0}},

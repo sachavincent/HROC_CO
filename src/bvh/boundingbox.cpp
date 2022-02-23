@@ -40,8 +40,9 @@ BoundingBox::BoundingBox(std::shared_ptr<Object> _o)
 {
     glm::vec3 minPos = _o->getBounds().first;
     glm::vec3 maxPos = _o->getBounds().second;
+    
 
-    center = _o->getPosition();
+    center = (minPos + maxPos)*0.5f;
     size = ((maxPos - minPos));
     object = _o;
     if (size[0] < 0 || size[1] < 0 || size[2] < 0)

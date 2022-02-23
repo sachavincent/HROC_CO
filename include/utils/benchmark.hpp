@@ -35,8 +35,7 @@ class Benchmark
     bool finishedSignal = false;
 
     int benchStep = 0;
-    bool saveResults = false;
-    inline static float moveSpeed = 1.0;
+    inline static float moveSpeed = 0.6;
 
     Engine *engine;
 

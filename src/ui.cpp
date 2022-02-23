@@ -384,6 +384,7 @@ void Ui::benchmarkParams(){
     static bool MediumBench = true;
     static bool HighBench = true;
     static bool wrongSelection = false;
+    static float messageCounter = 6.0;
     if(wrongSelection){
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 30, 30, 255));
         ImGui::Text("Wrong benchmark settings!");
@@ -399,8 +400,6 @@ void Ui::benchmarkParams(){
     ImGui::Checkbox("Medium", &MediumBench);
     ImGui::SameLine();
     ImGui::Checkbox("High", &HighBench);
-
-    std::cout << glm::to_string(engine->getCurrentCamera()->getPosition()) << std::endl;
 
     if (ImGui::Button("Start Benchmark")){
         wrongSelection = false;
@@ -421,5 +420,14 @@ void Ui::benchmarkParams(){
 
         Benchmark* bench = new Benchmark(engine, flags);
         engine->setBenchmark(bench);
+        messageCounter = 0.0;
+    }
+
+    if(messageCounter<6.0){
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(30, 255, 30, 255));
+        ImGui::Text("Saved scene to CSV!");
+        ImGui::PopStyleColor();
+        
+        messageCounter += engine->getDeltaTime();
     }
 }

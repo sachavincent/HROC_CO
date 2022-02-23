@@ -57,10 +57,10 @@ TEST_F(VfcTest, Vfc_Case_1)
 
     const Frustum* frustum =  camera.getFrustum();
 
-    EXPECT_EQ(frustum->isInFrustum(bb1),true);
-    EXPECT_EQ(frustum->isInFrustum(bb2),false);
-    EXPECT_EQ(frustum->isInFrustum(bb3),false);
-    EXPECT_EQ(frustum->isInFrustum(bb4),false);
+    EXPECT_EQ(frustum->isInFrustum(bb1),false);
+    EXPECT_EQ(frustum->isInFrustum(bb2),true);
+    EXPECT_EQ(frustum->isInFrustum(bb3),true);
+    EXPECT_EQ(frustum->isInFrustum(bb4),true);
 }
 
 

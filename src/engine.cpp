@@ -112,7 +112,7 @@ void Engine::startLoop()
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LESS);
         }
-            scene->checkForInput();
+        scene->checkForInput();
         scene->updateBvh();
 
         scene->renderObjects();

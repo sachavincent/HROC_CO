@@ -64,9 +64,6 @@ Scene::~Scene()
 
 void Scene::checkForInput()
 {
-    if (engine->getCurrentCameraType() != CameraType::FREE)
-        return;
-
     auto &ui = engine->getUi();
 
     if (ui.getVFCModeCache() != ui.getVFCMode())

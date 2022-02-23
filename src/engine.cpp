@@ -174,3 +174,6 @@ void Engine::switchCamera()
 {
     currentCamera = currentCamera == CameraType::STATIC ? CameraType::FREE : CameraType::STATIC;
 }
+void Engine::resetFrametime(){
+    lastFrame = glfwGetTime();
+}

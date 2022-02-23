@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     Scene* testScene =  SceneBuilder::buildAsteroidField(&engine, glm::vec3{35,35,100}, glm::vec3{0.0f,0.0f,55.0f}, 300, 1.0, 0.1);
     engine.loadScene(testScene);
     //double start = glfwGetTime();
+    engine.resetFrametime();
     testScene->createBVH();
     //double elapsed = glfwGetTime() - start;
     //std::cout << elapsed << std::endl;
@@ -47,6 +48,7 @@ int main(int argc, char *argv[])
 
 
     //  start the render loop
+    engine.resetFrametime();
     engine.startLoop();
 
     return 0;

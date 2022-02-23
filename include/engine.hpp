@@ -35,6 +35,8 @@ public:
 
     void startLoop();
 
+    void resetFrametime();
+
     void endLoop();
 
     void updateFpsCounter(double _updateRateMs);

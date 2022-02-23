@@ -5,6 +5,7 @@
 #include "bvh/boundingbox.hpp"
 #include "bvh/bvhnode.hpp"
 #include "object.hpp"
+#include <array>
 #include <vector>
 
 struct Plan
@@ -21,6 +22,12 @@ public:
         pos = p1;
     }
 
+    Plan(const glm::vec3 &p1,const glm::vec3 &p2,const glm::vec3 &p3){
+        glm::vec3 x = p2-p1;
+        glm::vec3 y = p3-p1;
+        normal = glm::normalize(glm::cross(x,y));
+        distance = glm::dot(normal,p1)/sqrt(normal.x*normal.x + normal.y * normal.y +normal.z*normal.z);
+    }
     float getSignedDistanceToPlan(const glm::vec3 &point) const
     {
         return glm::dot(normal, point) - distance;
@@ -34,31 +41,47 @@ public:
 
     void update(Camera *camera)
     {
-        float fov = camera->getFov();
-        float aspect = (double)camera->getResWidth() / camera->getResHeight();
-        float halfVSide = camera->getFarDistance() * tanf(fov * .5f);
-        float halfHSide = halfVSide * aspect;
-        glm::vec3 frontMultFar = camera->getFarDistance() * camera->getDirection();
+        auto proj = camera->getProjectionMatrix();
+        auto view = camera->getViewMatrix();
+        std::array<glm::vec3, 8> _cameraFrustumCornerVertices{
+            {
+                {-1.0f, -1.0f, 1.0f},
+                {1.0f, -1.0f, 1.0f},
+                {1.0f, 1.0f, 1.0f},
+                {-1.0f, 1.0f, 1.0f},
+                {-1.0f, -1.0f, -1.0f},
+                {1.0f, -1.0f, -1.0f},
+                {1.0f, 1.0f, -1.0f},
+                {-1.0f, 1.0f, -1.0f},
+            }};
 
-        nearFace = Plan(camera->getPosition() + camera->getNearDistance() * camera->getDirection(),
-                        camera->getDirection());
-        farFace = Plan(camera->getPosition() + frontMultFar, -camera->getDirection());
-        rightFace = Plan(camera->getPosition(),
-                         glm::cross(camera->getUpVector(), frontMultFar + camera->getRightVector() * halfHSide));
-        leftFace = Plan(camera->getPosition(),
-                        glm::cross(frontMultFar - camera->getRightVector() * halfHSide, camera->getUpVector()));
-        topFace = Plan(camera->getPosition(),
-                       glm::cross(camera->getRightVector(), frontMultFar - camera->getUpVector() * halfVSide));
-        bottomFace = Plan(camera->getPosition(),
-                          glm::cross(frontMultFar + camera->getUpVector() * halfVSide, camera->getRightVector()));
+        const auto inv = glm::inverse(proj * view);
+        std::array<glm::vec3, 8> _frustumVertices;
+
+        std::transform(
+            _cameraFrustumCornerVertices.begin(),
+            _cameraFrustumCornerVertices.end(),
+            _frustumVertices.begin(),
+            [&](glm::vec3 p)
+            {
+                auto v = inv * glm::vec4(p, 1.0f);
+                return glm::vec3(v) / v.w;
+            });
+        glm::vec3 *vertices = _frustumVertices.data();
+        farFace = Plan(vertices[0],vertices[1],vertices[2]);
+        nearFace = Plan(vertices[4],vertices[6],vertices[5]);
+        bottomFace = Plan(vertices[0],vertices[4],vertices[5]);
+        rightFace = Plan(vertices[1],vertices[5],vertices[6]);
+        topFace = Plan(vertices[2],vertices[7],vertices[6]);
+        leftFace = Plan(vertices[3],vertices[7],vertices[0]);
     }
 
     bool isInFrustum(std::shared_ptr<BoundingBox> bb) const
     {
-        return !(bb->isOnOrForwardPlan(topFace) && bb->isOnOrForwardPlan(bottomFace) && bb->isOnOrForwardPlan(rightFace) && bb->isOnOrForwardPlan(leftFace) && bb->isOnOrForwardPlan(farFace) && bb->isOnOrForwardPlan(nearFace));
+        return bb->isOnOrForwardPlan(farFace)&& bb->isOnOrForwardPlan(nearFace)&& bb->isOnOrForwardPlan(topFace)&& bb->isOnOrForwardPlan(bottomFace)&& bb->isOnOrForwardPlan(leftFace)&& bb->isOnOrForwardPlan(rightFace);
     };
 
-    std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(const std::vector<std::shared_ptr<BvhNode>> &occludeeGroups) const
+    std::vector<std::shared_ptr<BvhNode>> ViewFrustumCulling(std::vector<std::shared_ptr<BvhNode>> occludeeGroups) const
     {
         std::vector<std::shared_ptr<BvhNode>> occ;
         for (auto it = occludeeGroups.begin(); it != occludeeGroups.end(); it++)
@@ -80,5 +103,6 @@ public:
     Plan farFace;
     Plan nearFace;
 };
+
 
 #endif

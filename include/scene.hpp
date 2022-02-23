@@ -30,8 +30,8 @@ private:
     std::vector<std::shared_ptr<Light>> lights;
     std::vector<bool> objectVisibility;
 
-    Shader sh;
     Shader simpleShader;
+    Shader queryShader;
     Shader earlyZShader;
     Shader bbShader;
     Shader frustumShader;

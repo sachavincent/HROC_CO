@@ -121,7 +121,7 @@ void Scene::updateBvh()
         objectVisibility = std::vector<bool>(objects.size(), true);
         resetRequired = false;
     }
-    
+
     std::vector<unsigned int> V;
     for (size_t i = 0; i < objectVisibility.size(); i++)
         if (objectVisibility[i])
@@ -184,13 +184,13 @@ void Scene::updateBvh()
     timerStart = glfwGetTime();
 
     glDisable(GL_DEPTH_TEST);
-    simpleShader.start();
-    simpleShader.loadMat4("view", engine->getStaticCamera()->getViewMatrix());
-    simpleShader.loadMat4("projection", engine->getStaticCamera()->getProjectionMatrix());
+    queryShader.start();
+    queryShader.loadMat4("view", engine->getStaticCamera()->getViewMatrix());
+    queryShader.loadMat4("projection", engine->getStaticCamera()->getProjectionMatrix());
     std::set<int> cache;
     std::vector<unsigned int> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees, cache);
 
-    simpleShader.stop();
+    queryShader.stop();
     glEnable(GL_DEPTH_TEST);
 
     timers[5] = glfwGetTime() - timerStart; // Batch occlusion Test
@@ -302,8 +302,8 @@ void Scene::load()
     glVertexArrayVertexBuffer(vao, 3, colorVBO, 0, sizeof(glm::vec3));
     glVertexArrayBindingDivisor(vao, 3, 1);
 
-    sh = {"shaders/default.vert", "shaders/simple.frag"};
-    simpleShader = {"shaders/boundingBox.vert", "shaders/query.frag"};
+    simpleShader = {"shaders/simple.vert", "shaders/simple.frag"};
+    queryShader = {"shaders/boundingBox.vert", "shaders/query.frag"};
     earlyZShader = {"shaders/early.vert", "shaders/early.frag"};
     bbShader = {"shaders/boundingBox.vert", "shaders/boundingBox.frag"};
     frustumShader = {"shaders/frustum.vert", "shaders/frustum.frag"};
@@ -333,33 +333,13 @@ void Scene::createBVH()
 void Scene::renderObjects()
 {
     // set shaders params
-    sh.start();
+    simpleShader.start();
 
-    sh.loadMat4("view", getCamera()->getViewMatrix());
-    sh.loadMat4("projection", getCamera()->getProjectionMatrix());
-    sh.loadFloat("exposure", exposure);
-    sh.loadVec3("viewPos", getCamera()->getPosition());
+    simpleShader.loadMat4("view", getCamera()->getViewMatrix());
+    simpleShader.loadMat4("projection", getCamera()->getProjectionMatrix());
+    simpleShader.loadFloat("exposure", exposure);
 
-    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
-    {
-        sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].position",
-                    lights[i]->getPosition());
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].color",
-                    lights[i]->getColor());
-        sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
-                    lights[i]->getAttenuation());
-    }
-    if (lights.size() < MAXLIGHTS)
-    {
-        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
-        {
-            sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
-        }
-    }
-    sh.loadBool("debugVisibility", engine->getUi().getOccludeeColorMode());
+    simpleShader.loadBool("debugVisibility", engine->getUi().getOccludeeColorMode());
 
     // draw objects if gui enables it
     if (engine->getUi().getObjectsVisMode())
@@ -382,7 +362,7 @@ void Scene::renderObjects()
         int cmdCount;
         if (engine->getUi().getOccludeeColorMode() && !listObjInvisible.empty())
         {
-            sh.loadBool("visible", false);
+            simpleShader.loadBool("visible", false);
 
             auto newCmdsInvis = MeshHandler::getSingleton()->getCmdsForSubset(listObjInvisible, &cmdCount);
             glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), newCmdsInvis, GL_DYNAMIC_DRAW);
@@ -393,7 +373,7 @@ void Scene::renderObjects()
         if (listObjVisible.empty())
             return;
         if (engine->getUi().getOccludeeColorMode())
-            sh.loadBool("visible", true);
+            simpleShader.loadBool("visible", true);
         auto newCmds = MeshHandler::getSingleton()->getCmdsForSubset(listObjVisible, &cmdCount);
 
         glNamedBufferData(cmd, cmdCount * sizeof(DrawElementsCommand), newCmds, GL_DYNAMIC_DRAW);
@@ -404,39 +384,18 @@ void Scene::renderObjects()
         glDepthMask(GL_FALSE);
     }
     // unload shader
-    sh.stop();
+    simpleShader.stop();
 }
 
 //! Render all objects of given vector
 void Scene::renderObjects(std::vector<Object *> &_objects)
 {
     // set shaders params
-    sh.start();
+    simpleShader.start();
 
-    sh.loadMat4("view", getCamera()->getViewMatrix());
-    sh.loadMat4("projection", getCamera()->getProjectionMatrix());
-    sh.loadFloat("exposure", exposure);
-    sh.loadVec3("viewPos", getCamera()->getPosition());
-
-    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
-    {
-        sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].position",
-                    lights[i]->getPosition());
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].color",
-                    lights[i]->getColor());
-        sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
-                    lights[i]->getAttenuation());
-    }
-    if (lights.size() < MAXLIGHTS)
-    {
-        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
-        {
-            sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
-        }
-    }
+    simpleShader.loadMat4("view", getCamera()->getViewMatrix());
+    simpleShader.loadMat4("projection", getCamera()->getProjectionMatrix());
+    simpleShader.loadFloat("exposure", exposure);
 
     // draw objects if gui enables it
     if (engine->getUi().getObjectsVisMode())
@@ -448,43 +407,22 @@ void Scene::renderObjects(std::vector<Object *> &_objects)
     }
 
     // unload shader
-    sh.stop();
+    simpleShader.stop();
 }
 
 //! Render one object
 void Scene::renderObject(Object &obj)
 {
     // set shaders params
-    sh.start();
+    simpleShader.start();
 
-    sh.loadMat4("view", getCamera()->getViewMatrix());
-    sh.loadMat4("projection", getCamera()->getProjectionMatrix());
-    sh.loadFloat("exposure", exposure);
-    sh.loadVec3("viewPos", getCamera()->getPosition());
-
-    for (uint32_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
-    {
-        sh.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].position",
-                    lights[i]->getPosition());
-
-        sh.loadVec3("lights[" + std::to_string(i) + "].color",
-                    lights[i]->getColor());
-        sh.loadVec3("lights[" + std::to_string(i) + "].attenuation",
-                    lights[i]->getAttenuation());
-    }
-    if (lights.size() < MAXLIGHTS)
-    {
-        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
-        {
-            sh.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
-        }
-    }
+    simpleShader.loadMat4("view", getCamera()->getViewMatrix());
+    simpleShader.loadMat4("projection", getCamera()->getProjectionMatrix());
+    simpleShader.loadFloat("exposure", exposure);
 
     // obj.draw(sh);
     //  unload shader
-    sh.stop();
+    simpleShader.stop();
 }
 
 void Scene::renderBoundingBoxes()
@@ -642,7 +580,7 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
     {
         cache.insert(node->getId());
         glBeginQuery(GL_SAMPLES_PASSED, queries[i++]);
-        node->getBoundingBox()->getWireframe()->drawQuery(simpleShader);
+        node->getBoundingBox()->getWireframe()->drawQuery(queryShader);
         glEndQuery(GL_SAMPLES_PASSED);
     }
 

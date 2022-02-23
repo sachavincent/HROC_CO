@@ -36,7 +36,7 @@ public:
         //####################### creating objects ###########################
 
         std::random_device device;
-        std::mt19937 gen(3);
+        std::mt19937 gen(device());
         std::uniform_real_distribution<float> dist(5, 20);
         std::uniform_real_distribution<float> distScale(1, 2);
         std::uniform_real_distribution<float> distRot(-1, 1);
@@ -85,7 +85,6 @@ public:
             .setDiffuse({1.0, 0.0, 0.0});
 
         sc->addObject(sphere2);
-
         return sc;
     }
 
@@ -140,7 +139,6 @@ public:
                 .setScale({distScale(gen), distScale(gen), distScale(gen)})
                 .setRotation(distRot(gen) * 90.0f, {rotvalue == 0 ? 1.0f : 0.0f, rotvalue == 1 ? 1.0f : 0.0f, rotvalue == 2 ? 1.0f : 0.0f})
                 .setTexDiffuse("models/asteroid/asteroidDiffuse.jpg");
-            //.setTexSpecular("models/asteroid/asteroidSpecular.png");
             scene->addObject(asteroid);
         }
         return scene;

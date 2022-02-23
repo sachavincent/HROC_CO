@@ -43,13 +43,12 @@ Object &Object::setPosition(const glm::vec3 &_pos)
 
 Object &Object::setTexDiffuse(std::string _path)
 {
-    diffuse.z = Texture::loadTexture(_path, id); // Are you confused yet?
+    diffuse.z = Texture::loadTexture(_path, id);
     return *this;
 }
 
 Object &Object::setTexSpecular(std::string _path)
 {
-    // Texture::loadTexture(_path);
     return *this;
 }
 

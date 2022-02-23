@@ -54,13 +54,16 @@ TEST_F(VfcTest, Vfc_Case_1)
 
     std::shared_ptr<BoundingBox> bb4
         = std::shared_ptr<BoundingBox>(new AxisBoundingBox(glm::vec3(0,0,-5),glm::vec3(2,2,2)));
+            std::shared_ptr<BoundingBox> bb5
+        = std::shared_ptr<BoundingBox>(new AxisBoundingBox(glm::vec3(10,10,10),glm::vec3(2,2,2)));
 
     const Frustum* frustum =  camera.getFrustum();
 
-    EXPECT_EQ(frustum->isInFrustum(bb1),true);
+    EXPECT_EQ(frustum->isInFrustum(bb1),false);
     EXPECT_EQ(frustum->isInFrustum(bb2),false);
     EXPECT_EQ(frustum->isInFrustum(bb3),false);
     EXPECT_EQ(frustum->isInFrustum(bb4),false);
+    EXPECT_EQ(frustum->isInFrustum(bb5),true);
 }
 
 

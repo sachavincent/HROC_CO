@@ -30,8 +30,8 @@ private:
     std::vector<std::shared_ptr<Light>> lights;
     std::vector<bool> objectVisibility;
 
-    Shader sh;
     Shader simpleShader;
+    Shader queryShader;
     Shader earlyZShader;
     Shader bbShader;
     Shader frustumShader;
@@ -53,12 +53,11 @@ private:
 
     int *defaultVisibility;
 
-    int updateRequired;
-
+    bool resetRequired; // If true, pipeline needs to be reset (<=> V = objects)
 public:
     // Timers for pipeline
-    double timers[9];
-    const char *timerLabels[9]{"EarlyZ", "Extract", "VFC", "Raycast", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Draw objects", "Merge"};
+    double timers[7];
+    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering","Merge"};
 
 public:
     Scene(Engine *_engine);
@@ -105,9 +104,7 @@ public:
     // Called when camera moves
     void updateBvh();
 
-    void requestBvhUpdate(int nbRequests = INT_MAX);
-    void stopBvhUpdate();
-
+    void checkForInput();
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 
@@ -120,9 +117,7 @@ private:
         defaultVisibility = new int[objects.size()];
 
         for (int i = 0; i < objects.size(); ++i)
-        {
             defaultVisibility[i] = 0;
-        }
 
         glGenBuffers(1, &ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);

@@ -1,6 +1,6 @@
 #version 460 core
 
-const vec3 OCCLUDER_COLOR = vec3(0.82, 0.17, 0.19);
+const vec3 OCCLUDER_COLOR = vec3(0.88, 0.07, 0.11);
 const vec3 OCCLUDEE_COLOR = vec3(0.17, 0.03, 0.72);
 
 out vec4 FragColor;
@@ -15,21 +15,26 @@ layout (binding = 0) uniform sampler2DArray textureArray;
 
 uniform bool debugVisibility;
 uniform bool visible;
+uniform float exposure;
 
 void main()
 {
+    vec3 color;
     if(debugVisibility)
     {
         if(visible)
-            FragColor = vec4(OCCLUDER_COLOR, 1.0);
+            color = OCCLUDER_COLOR;
         else
-            FragColor = vec4(OCCLUDEE_COLOR, 1.0);
+            color = OCCLUDEE_COLOR;
     }
     else
     {
         if(Diffuse_in.x < 0)
-            FragColor = texture(textureArray, vec3(TexCoords_in.x, TexCoords_in.y, Diffuse_in.z));
+            color = texture(textureArray, vec3(TexCoords_in.x, TexCoords_in.y, Diffuse_in.z)).rgb;
         else
-            FragColor = vec4(Diffuse_in, 1.0);
+            color = Diffuse_in;
     }
+    color = vec3(1.0) - exp(-color * exposure);
+
+    FragColor = vec4(color, 1.0);
 }

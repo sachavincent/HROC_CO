@@ -55,6 +55,7 @@ class Ui
     bool frustumMode = true;
     bool frustumOutlineMode = true;
     bool objectMode = true;
+    bool occludeeColorMode = false;
 
     // pipelines
 
@@ -62,6 +63,15 @@ class Ui
     bool extractOccludeesMode = true;
     bool viewFrustumCullingMode = true;
     bool secondEarlyZMode = true;
+    bool batchOcclusionMode = true;
+
+    // Cache
+
+    bool firstEarlyZModeCache = firstEarlyZMode;
+    bool extractOccludeesModeCache = extractOccludeesMode;
+    bool viewFrustumCullingModeCache = viewFrustumCullingMode;
+    bool secondEarlyZModeCache = secondEarlyZMode;
+    bool batchOcclusionModeCache = batchOcclusionMode;
 
   public:
     Ui();
@@ -69,14 +79,22 @@ class Ui
     void render();
     void setBboxMaxLevel(int _level) { bboxMaxLevel = _level; }
     int getBboxVisMode() { return bboxMode; }
-    int getFrustumVisMode() { return frustumMode; }
-    int getFrustumOutlineVisMode() { return frustumOutlineMode; }
-    int getObjectsVisMode() { return objectMode; }
+    bool getFrustumVisMode() { return frustumMode; }
+    bool getFrustumOutlineVisMode() { return frustumOutlineMode; }
+    bool getObjectsVisMode() { return objectMode; }
+    bool getOccludeeColorMode() { return occludeeColorMode; }
 
-    int getFirstEarlyZMode() { return firstEarlyZMode; }
-    int getSecondEarlyZMode() { return secondEarlyZMode; }
-    int getVFCMode() { return viewFrustumCullingMode; }
-    int getExtractOccludeesMode() { return extractOccludeesMode; }
+    bool getFirstEarlyZMode() { return firstEarlyZMode; }
+    bool getExtractOccludeesMode() { return extractOccludeesMode; }
+    bool getVFCMode() { return viewFrustumCullingMode; }
+    bool getSecondEarlyZMode() { return secondEarlyZMode; }
+    bool getBatchOcclusionMode() { return batchOcclusionMode; }
+
+    bool &getFirstEarlyZModeCache() { return firstEarlyZModeCache; }
+    bool &getExtractOccludeesModeCache() { return extractOccludeesModeCache; }
+    bool &getVFCModeCache() { return viewFrustumCullingModeCache; }
+    bool &getSecondEarlyZModeCache() { return secondEarlyZModeCache; }
+    bool &getBatchOcclusionModeCache() { return batchOcclusionModeCache; }
 
     void setPipelineMode(bool _mode)
     {

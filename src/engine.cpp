@@ -111,10 +111,9 @@ void Engine::startLoop()
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LESS);
         }
-        else
-        {
-            scene->updateBvh();
-        }
+        scene->checkForInput();
+        scene->updateBvh();
+
         scene->renderObjects();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDisable(GL_DEPTH_TEST);

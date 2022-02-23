@@ -22,6 +22,8 @@ public:
 
     void draw(Shader &_shader, int _num);
 
+    static void preDrawQuery();
+    
     void drawQuery(Shader &_shader);
 
     static inline void bind() { glBindVertexArray(vao); }

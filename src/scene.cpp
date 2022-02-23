@@ -183,8 +183,9 @@ void Scene::updateBvh()
     queryShader.loadMat4("view", engine->getStaticCamera()->getViewMatrix());
     queryShader.loadMat4("projection", engine->getStaticCamera()->getProjectionMatrix());
     std::set<int> cache;
+    BoundingBoxObject::preDrawQuery();
     std::vector<unsigned int> potentiallyVisibleOccludees = batchOcclusionTest(culledPotentialOccludees, cache);
-
+    
     queryShader.stop();
     glEnable(GL_DEPTH_TEST);
 

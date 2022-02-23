@@ -147,7 +147,6 @@ BoundingBoxObject::BoundingBoxObject(std::string _parentName, const glm::vec3 &_
 		// Unbind the VAO
 		unbind();
 
-
 		std::vector<GLfloat> verticesFull = {
 			-0.5f, -0.5f, -0.5f,
 			0.5f, -0.5f, -0.5f,
@@ -250,16 +249,20 @@ void BoundingBoxObject::draw(Shader &_shader, int _numBB)
 	glDrawElements(GL_LINES, numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
+void BoundingBoxObject::preDrawQuery()
+{
+	if (!loaded)
+		return;
+		
+	glBindVertexArray(vaoFull);
+}
+
 void BoundingBoxObject::drawQuery(Shader &_shader)
 {
 	if (!loaded)
 		return;
-
-	glBindVertexArray(vaoFull);
-
+		
 	_shader.loadMat4("model", getTransformationMatrix());
 
 	glDrawElements(GL_TRIANGLES, numIndicesFull, GL_UNSIGNED_INT, nullptr);
-
-	glBindVertexArray(0);
 }

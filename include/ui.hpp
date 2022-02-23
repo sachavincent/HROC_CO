@@ -54,6 +54,7 @@ private:
     bool frustumMode = true;
     bool frustumOutlineMode = true;
     bool objectMode = true;
+    bool occludeeColorMode = false;
 
     // pipelines
 
@@ -61,6 +62,7 @@ private:
     bool extractOccludeesMode = true;
     bool viewFrustumCullingMode = true;
     bool secondEarlyZMode = true;
+    bool batchOcclusionMode = true;
 
 public:
     Ui();
@@ -76,6 +78,8 @@ public:
     int getVFCMode() { return viewFrustumCullingMode; }
 
     int getExtractOccludeesMode() { return extractOccludeesMode; }
+    int getOccludeeColorMode() { return occludeeColorMode; }
+    int getBatchOcclusionMode() { return batchOcclusionMode; }
 };
 
 #endif

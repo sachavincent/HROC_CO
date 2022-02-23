@@ -103,6 +103,8 @@ void Ui::displayParams()
     {
         bboxMode = -1; // none
     }
+    ImGui::Separator();
+    ImGui::Checkbox("Display occludees/occluders", &occludeeColorMode);
 }
 
 //! Parameters for lights in the scene
@@ -358,7 +360,6 @@ void Ui::plotFpsRate()
 
 void Ui::displayPipelineOptions()
 {
-
     ImGui::Checkbox("First Early Z", &firstEarlyZMode);
     ImGui::Separator();
 
@@ -368,6 +369,9 @@ void Ui::displayPipelineOptions()
     ImGui::Checkbox("View Frustum Culling", &viewFrustumCullingMode);
     ImGui::Separator();
 
+    ImGui::Checkbox("Batch Occlusion Test", &batchOcclusionMode);
+    ImGui::Separator();
+    
     ImGui::Checkbox("Second Early Z", &secondEarlyZMode);
     ImGui::Separator();
 }

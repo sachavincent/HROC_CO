@@ -45,19 +45,19 @@ BvhTree::~BvhTree()
     nodes.clear();
 }
 
-void BvhTree::destroyRecursive(std::shared_ptr<BvhNode>node)
+void BvhTree::destroyRecursive(std::shared_ptr<BvhNode> node)
 {
     if (node != nullptr)
     {
         std::string str;
-        //printBT(str,root, true);
+        // printBT(str,root, true);
         destroyRecursive(node->getLeftChild());
-        //node->
-        //str.clear();
-        //printBT(str, root, true);
+        // node->
+        // str.clear();
+        // printBT(str, root, true);
         destroyRecursive(node->getRightChild());
-        //str.clear();
-        //printBT(str, root, true);
+        // str.clear();
+        // printBT(str, root, true);
         node.~shared_ptr();
     }
 }
@@ -82,7 +82,7 @@ void BvhTree::createMap(std::vector<std::shared_ptr<BvhNode>> &_nodes)
     }
 }
 
-void BvhTree::addToMap(std::shared_ptr<BvhNode>node, std::vector<std::shared_ptr<BvhNode>> &nodesToCompare)
+void BvhTree::addToMap(std::shared_ptr<BvhNode> node, std::vector<std::shared_ptr<BvhNode>> &nodesToCompare)
 {
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
@@ -118,9 +118,9 @@ void BvhTree::mergeAll(std::vector<std::shared_ptr<BvhNode>> &_nodes)
         return;
 
     PairNode pair = requestMap();
-    std::shared_ptr<BvhNode>first = pair.first;
-    std::shared_ptr<BvhNode>second = pair.second;
-    std::shared_ptr<BvhNode>merged = BvhNode::merge(first, second, idGenerator->GetUniqueId());
+    std::shared_ptr<BvhNode> first = pair.first;
+    std::shared_ptr<BvhNode> second = pair.second;
+    std::shared_ptr<BvhNode> merged = BvhNode::merge(first, second, idGenerator->GetUniqueId());
     if (map->size() == 1)
     {
         root = merged;
@@ -145,10 +145,10 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
 {
     std::vector<std::shared_ptr<BvhNode>> occludeeGroups;
 
-    
     occludeeGroups.reserve(occluders.size());
     if (occluders.empty())
     {
+        root->setVisibility(Visibility::VISIBLE);
         occludeeGroups.push_back(std::shared_ptr<BvhNode>(root));
         return occludeeGroups;
     }
@@ -163,7 +163,7 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
         while (n->getVisibility() != Visibility::VISIBLE && n->getId() != root->getId())
         {
             n->setVisibility(Visibility::VISIBLE);
-            std::shared_ptr<BvhNode>n2 = n->sibling();
+            std::shared_ptr<BvhNode> n2 = n->sibling();
             n2->setVisibility(Visibility::UNKNOWN);
             n = n->getParent();
         }
@@ -180,7 +180,7 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
     return occludeeGroups;
 }
 
-void BvhTree::eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::shared_ptr<BvhNode>node)
+void BvhTree::eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::shared_ptr<BvhNode> node)
 {
     for (auto it = nodes.begin(); it != nodes.end(); it++)
     {

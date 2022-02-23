@@ -120,9 +120,7 @@ private:
         defaultVisibility = new int[objects.size()];
 
         for (int i = 0; i < objects.size(); ++i)
-        {
             defaultVisibility[i] = 0;
-        }
 
         glGenBuffers(1, &ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);

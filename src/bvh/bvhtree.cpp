@@ -152,10 +152,6 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
         occludeeGroups.push_back(std::shared_ptr<BvhNode>(root));
         return occludeeGroups;
     }
-    // for (auto it = occluders.begin(); it != occluders.end(); it++)
-    // {
-    //     (*it)->setVisibility(Visibility::null);
-    // }
     root->setVisibilityRecursive(Visibility::null);
     for (auto it = occluders.begin(); it != occluders.end(); it++)
     {
@@ -166,17 +162,10 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
             std::shared_ptr<BvhNode> n2 = n->sibling();
             n2->setVisibility(Visibility::UNKNOWN);
             n = n->getParent();
-        }
+        }       
     }
+    root->setVisibility(Visibility::UNKNOWN);
     root->RecursiveAdd(occludeeGroups);
-    // for (auto it = occluders.begin(); it != occluders.end(); it++)
-    // {
-    //     if ((*it)->getVisibility() == Visibility::UNKNOWN)
-    //     {
-    //         occludeeGroups.push_back(std::shared_ptr<BvhNode>(*it));
-    //     }
-    // }
-
     return occludeeGroups;
 }
 

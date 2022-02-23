@@ -246,8 +246,8 @@ void Scene::updateBvh()
 
     timers[8] = glfwGetTime() - timerStart; // Merge
 
-    std::cout << "Bvh updated: Initially " << objects.size() << " Objects\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << culledPotentialOccludees.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
-              << "\n\t2nd Early-Z: " << drawObjects.size() << std::endl;
+    //std::cout << "Bvh updated: Initially " << objects.size() << " Objects\n\t1st Early-Z: " << O.size() << "\n\tExtractOccludees: " << G.size() << "\n\tVFC: " << culledPotentialOccludees.size() << "\n\tbatchOcclusionTest: " << potentiallyVisibleOccludees.size()
+     //         << "\n\t2nd Early-Z: " << drawObjects.size() << std::endl;
 }
 
 //! Load the scene models on GPU before rendering
@@ -352,7 +352,6 @@ void Scene::createBVH()
     hierarchy = new BvhTree(bbs);
 
     boundingBoxes = hierarchy->getDebugData();
-    hierarchy->print();
 }
 //! Render all objects of scene
 void Scene::renderObjects()

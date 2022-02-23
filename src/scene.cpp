@@ -1,10 +1,10 @@
 #include "scene.hpp"
 #include "engine.hpp"
-#include "bvh/boundingBoxObject.hpp"
 #include "utils/jsonparser.hpp"
 #include "frustum.hpp"
-
-//#include <execution>
+#include "bvh/locally_ordered_clustering_builder.hpp"
+//#include "bvh/bounding_box.hpp"
+//#include "bvh/bvh.hpp"
 #include <string>
 #include <map>
 
@@ -144,7 +144,9 @@ void Scene::updateBvh()
     std::vector<std::shared_ptr<BvhNode>> occluders;
     occluders.reserve(O.size());
     for (unsigned int o : O)
+    {
         occluders.push_back(objects[o]->getBoundingBox()->getNode()); // Object idx => BvhNode
+    }
 
     timerStart = glfwGetTime();
 
@@ -308,7 +310,9 @@ void Scene::load()
 
 void Scene::createBVH()
 {
+    double start = glfwGetTime();
     std::vector<std::shared_ptr<BoundingBox>> bbs;
+
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
     for (auto obj : _objects)
     {
@@ -318,9 +322,15 @@ void Scene::createBVH()
             bbs.push_back(obj->getBoundingBox());
     }
 
-    hierarchy = new BvhTree(bbs);
+    hierarchy = new Bvh();
+    LocallyOrderedClusteringBuilder<Bvh, uint32_t> builder(*hierarchy);
 
+    BoundingBox globalBox = compute_bounding_boxes_union(bbs);
+    builder.build(globalBox, bbs);
     boundingBoxes = hierarchy->getDebugData();
+    hierarchy->print();
+    double stop = glfwGetTime();
+    std::cout << "BVH constructed in " << (stop - start) << " seconds" << std::endl;
 }
 //! Render all objects of scene
 void Scene::renderObjects()
@@ -588,14 +598,14 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
 
         if (nbSamples >= THRESHOLD)
         {
-            if (occludeeGroups[j]->isLeaf())
+            if (occludeeGroups[j]->is_leaf())
                 potentiallyVisibleOccludees.push_back(occludeeGroups[j]->getBoundingBox()->getObject()->getId());
             else
             {
-                if (occludeeGroups[j]->hasLeftChild() && cache.count(occludeeGroups[j]->getLeftChild()->getId()) == 0)
-                    nextOccludeeGroups.push_back(occludeeGroups[j]->getLeftChild());
-                if (occludeeGroups[j]->hasRightChild() && cache.count(occludeeGroups[j]->getRightChild()->getId()) == 0)
-                    nextOccludeeGroups.push_back(occludeeGroups[j]->getRightChild());
+                if (occludeeGroups[j]->hasLeftChild(hierarchy->getNodes()) && cache.count(occludeeGroups[j]->getLeftChild(hierarchy->getNodes()).getId()) == 0)
+                    nextOccludeeGroups.push_back(std::shared_ptr<BvhNode>(&occludeeGroups[j]->getLeftChild(hierarchy->getNodes())));
+                if (occludeeGroups[j]->hasRightChild(hierarchy->getNodes()) && cache.count(occludeeGroups[j]->getRightChild(hierarchy->getNodes()).getId()) == 0)
+                    nextOccludeeGroups.push_back(std::shared_ptr<BvhNode>(&occludeeGroups[j]->getRightChild(hierarchy->getNodes())));
             }
         }
     }

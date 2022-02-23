@@ -253,7 +253,7 @@ void BoundingBoxObject::preDrawQuery()
 {
 	if (!loaded)
 		return;
-		
+
 	glBindVertexArray(vaoFull);
 }
 
@@ -261,7 +261,7 @@ void BoundingBoxObject::drawQuery(Shader &_shader)
 {
 	if (!loaded)
 		return;
-		
+
 	_shader.loadMat4("model", getTransformationMatrix());
 
 	glDrawElements(GL_TRIANGLES, numIndicesFull, GL_UNSIGNED_INT, nullptr);

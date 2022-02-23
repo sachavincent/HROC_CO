@@ -12,15 +12,19 @@
 #include "meshhandler.hpp"
 #include "camera.hpp"
 #include "light.hpp"
-#include "bvh/boundingbox.hpp"
-#include "bvh/bvhtree.hpp"
+#include "bvh/boundingBoxObject.hpp"
+#include "bvh/utilities.hpp"
 #include <string>
 #include <time.h>
 #include <chrono>
 #include <ctime>
 #include <set>
-class Engine;
 
+struct BoundingBox;
+struct Bvh;
+struct BvhNode;
+
+class Engine;
 class Scene
 {
 private:
@@ -44,7 +48,7 @@ private:
 
     std::vector<glm::mat4> models;
 
-    BvhTree *hierarchy;
+    Bvh *hierarchy;
     std::map<int, std::vector<std::shared_ptr<BoundingBoxObject>>, std::greater<int>> boundingBoxes;
 
     DrawElementsCommand *cmds;
@@ -57,7 +61,7 @@ private:
 public:
     // Timers for pipeline
     double timers[7];
-    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering","Merge"};
+    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Merge"};
 
 public:
     Scene(Engine *_engine);
@@ -105,6 +109,7 @@ public:
     void updateBvh();
 
     void checkForInput();
+
 private:
     std::vector<unsigned int> doEarlyZ(std::vector<unsigned int> _objects);
 

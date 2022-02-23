@@ -13,17 +13,18 @@ private:
     static OBJECT_BOUNDS bounds;
 
     glm::mat4 transformationMatrix;
+
 public:
-    BoundingBoxObject(std::string _parentName, 
-                    const glm::vec3 &_pos, 
-                    const glm::mat4 &_rotationMatrix, 
-                    const glm::vec3 &_scale,
-				    std::string keyModel = "boundingbox");
+    BoundingBoxObject(std::string _parentName,
+                      const glm::vec3 &_pos,
+                      const glm::mat4 &_rotationMatrix,
+                      const glm::vec3 &_scale,
+                      std::string keyModel = "boundingbox");
 
     void draw(Shader &_shader, int _num);
 
     static void preDrawQuery();
-    
+
     void drawQuery(Shader &_shader);
 
     static inline void bind() { glBindVertexArray(vao); }

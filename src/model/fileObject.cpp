@@ -8,14 +8,13 @@
 
 // std::map<const std::string, bool *> FileObject::visible;
 
- unsigned int FileObject::instance_counter = 0;
+unsigned int FileObject::instance_counter = 0;
 
 // std::map<const std::string, OBJECT_DATA> FileObject::path_cache;
 
-
-FileObject::FileObject(const std::string &_path,std::string _modelkey) 
+FileObject::FileObject(const std::string &_path, std::string _modelkey)
     : Object(_path.substr(_path.find_last_of("/") + 1) + "_" + std::to_string(instance_counter),
-    _modelkey)
+             _modelkey)
 {
     instance = instance_counter++;
 
@@ -146,7 +145,6 @@ FileObject::FileObject(const std::string &_path,std::string _modelkey)
 //         }
 
 //         aiMesh *mesh = scene->mMeshes[0];
-//         OBJECT_DATA data = processMesh(mesh, scene);
 //         data.numInstances = nbInstances;
 //         path_cache[_path] = data;
 //         visible[_path] = new bool[nbInstances];

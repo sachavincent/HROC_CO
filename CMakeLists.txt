@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9)
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -33,9 +33,10 @@ add_subdirectory(external/nlohmann_json)
 add_subdirectory(test)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018 /DUSE_BOOKMARK")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /DGLFW_INCLUDE_NONE /std:c++17 /openmp:llvm /MP8 /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare  -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC -DUSE_BOOKMARK ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -openmp:llvm -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC -DUSE_BOOKMARK")
+
 endif()
 
 include_directories(include/
@@ -57,7 +58,6 @@ file(GLOB VENDORS_SOURCES external/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS include/*.hpp )
 file(GLOB PROJECT_SOURCES src/*.cpp
                           src/model/*.cpp
-                          src/bvh/*.cpp
                           external/imgui/*.cpp
                           external/imgui/backends/*opengl3.cpp
                           external/imgui/backends/*glfw.cpp
@@ -80,9 +80,12 @@ add_definitions(-DGLFW_INCLUDE_NONE
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES}  "src/main.cpp")
+                  
+
+find_package(OpenMP)
 
 target_link_libraries(${PROJECT_NAME} glfw assimp
-                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} nlohmann_json::nlohmann_json)
+                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} nlohmann_json::nlohmann_json OpenMP::OpenMP_CXX)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

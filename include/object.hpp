@@ -22,8 +22,8 @@
 #include "texture.hpp"
 #include "meshhandler.hpp"
 
+struct BoundingBox;
 class Scene;
-class BoundingBox;
 
 class Object
 {
@@ -118,6 +118,7 @@ private:
 
     unsigned int instance;
     std::string path;
+
 
     // static std::map<const std::string, OBJECT_DATA> path_cache; // TODO: reset this field in scene destructor
 

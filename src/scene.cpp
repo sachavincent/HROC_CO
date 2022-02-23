@@ -29,7 +29,36 @@ Scene::~Scene()
     glDeleteBuffers(1, &inst);
     glDeleteBuffers(1, &cmd);
 }
+void Scene::checkForInput()
+{
+    auto &ui = engine->getUi();
 
+    if (ui.getVFCModeCache() != ui.getVFCMode())
+    {
+        resetRequired = true;
+        ui.getVFCModeCache() = ui.getVFCMode();
+    }
+    if (ui.getBatchOcclusionModeCache() != ui.getBatchOcclusionMode())
+    {
+        resetRequired = true;
+        ui.getBatchOcclusionModeCache() = ui.getBatchOcclusionMode();
+    }
+    if (ui.getExtractOccludeesModeCache() != ui.getExtractOccludeesMode())
+    {
+        resetRequired = true;
+        ui.getExtractOccludeesModeCache() = ui.getExtractOccludeesMode();
+    }
+    if (ui.getFirstEarlyZModeCache() != ui.getFirstEarlyZMode())
+    {
+        resetRequired = true;
+        ui.getFirstEarlyZModeCache() = ui.getFirstEarlyZMode();
+    }
+    if (ui.getSecondEarlyZModeCache() != ui.getSecondEarlyZMode())
+    {
+        resetRequired = true;
+        ui.getSecondEarlyZModeCache() = ui.getSecondEarlyZMode();
+    }
+}
 void Scene::updateBvh()
 {
     glDepthMask(GL_TRUE);
@@ -265,11 +294,30 @@ void Scene::renderObjects()
 {
     // set shaders params
     simpleShader.start();
-
     simpleShader.loadMat4("view", getCamera()->getViewMatrix());
     simpleShader.loadMat4("projection", getCamera()->getProjectionMatrix());
     simpleShader.loadFloat("exposure", exposure);
+    simpleShader.loadVec3("viewPos", getCamera()->getPosition());
 
+    for (size_t i = 0; i < std::min(lights.size(), (size_t)MAXLIGHTS); i++)
+    {
+        simpleShader.loadBool("lights[" + std::to_string(i) + "].enabled", 1);
+
+        simpleShader.loadVec3("lights[" + std::to_string(i) + "].position",
+                              lights[i]->getPosition());
+
+        simpleShader.loadVec3("lights[" + std::to_string(i) + "].color",
+                              lights[i]->getColor());
+        simpleShader.loadVec3("lights[" + std::to_string(i) + "].attenuation",
+                              lights[i]->getAttenuation());
+    }
+    if (lights.size() < MAXLIGHTS)
+    {
+        for (size_t i = lights.size(); i < MAXLIGHTS; i++)
+        {
+            simpleShader.loadBool("lights[" + std::to_string(i) + "].enabled", 0);
+        }
+    }
     simpleShader.loadBool("debugVisibility", engine->getUi().getOccludeeColorMode());
 
     // draw objects if gui enables it

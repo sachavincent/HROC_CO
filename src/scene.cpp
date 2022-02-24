@@ -121,9 +121,7 @@ void Scene::updateBvh()
     else
         G = occluders;
 
-    timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
-
     const Frustum *f = engine->getStaticCamera()->getFrustum();
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees;
 
@@ -134,7 +132,7 @@ void Scene::updateBvh()
     else
         culledPotentialOccludees = G;
 
-    timers[2] = glfwGetTime() - timerStart; // VFC
+    timers[1] = glfwGetTime() - timerStart; // VFC
     timerStart = glfwGetTime();
 
     /*
@@ -143,8 +141,6 @@ void Scene::updateBvh()
      * return indices of potential visible occludees U
      */
 
-    timers[3] = timerStart - glfwGetTime(); // Bb extract
-    timerStart = glfwGetTime();
 
     glDisable(GL_DEPTH_TEST);
     queryShader.start();
@@ -156,7 +152,7 @@ void Scene::updateBvh()
     queryShader.stop();
     glEnable(GL_DEPTH_TEST);
 
-    timers[4] = glfwGetTime() - timerStart; // Batch occlusion Test
+    timers[2] = glfwGetTime() - timerStart; // Batch occlusion Test
     timerStart = glfwGetTime();
 
     /*
@@ -176,14 +172,12 @@ void Scene::updateBvh()
     else
         drawObjects = potentiallyVisibleOccludees;
 
-    timers[5] = glfwGetTime() - timerStart; // Early Z on Rendering
+    timers[3] = glfwGetTime() - timerStart; // Early Z on Rendering
     timerStart = glfwGetTime();
 
     objectVisibility = std::vector<bool>(objects.size(), false);
     for (unsigned int idxObj : drawObjects)
         objectVisibility[idxObj] = true;
-
-    timers[6] = glfwGetTime() - timerStart; // Merge
 }
 
 //! Load the scene models on GPU before rendering

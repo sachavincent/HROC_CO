@@ -268,7 +268,7 @@ void Scene::load()
 
 void Scene::createBVH()
 {
-    
+
     std::vector<std::shared_ptr<BoundingBox>> bbs;
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
     for (int i = 0; i < _objects.size(); i++)
@@ -401,6 +401,8 @@ void Scene::renderObject(Object &obj)
 void Scene::renderBoundingBoxes()
 {
     if (!hierarchy)
+        return;
+    if (engine->getCurrentCameraType() == CameraType::STATIC)
         return;
     int visMode = engine->getUi().getBboxVisMode();
     // no bbox vis mode

@@ -217,6 +217,10 @@ void Scene::updateBvh()
     objectVisibility = std::vector<bool>(objects.size(), false);
     for (unsigned int idxObj : drawObjects)
         objectVisibility[idxObj] = true;
+    for (unsigned int idxObj : O)
+        objectVisibility[idxObj] = true;
+
+
 
     timers[6] = glfwGetTime() - timerStart; // Merge
 }

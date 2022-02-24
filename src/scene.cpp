@@ -35,8 +35,8 @@ void Scene::checkForInput()
 
     if (ui.getVFCModeCache() != ui.getVFCMode())
     {
-        resetRequired = true;
         ui.getVFCModeCache() = ui.getVFCMode();
+        resetRequired = true;
     }
     if (ui.getBatchOcclusionModeCache() != ui.getBatchOcclusionMode())
     {
@@ -127,7 +127,10 @@ void Scene::updateBvh()
 
     if (engine->getUi().getVFCMode())
     {
+        std::cout <<"VFC" << G.size()<< std::endl;
         culledPotentialOccludees = f->ViewFrustumCulling(G);
+        
+        std::cout <<culledPotentialOccludees.size()<< std::endl;
     }
     else
         culledPotentialOccludees = G;
@@ -177,8 +180,10 @@ void Scene::updateBvh()
     objectVisibility = std::vector<bool>(objects.size(), false);
     for (unsigned int idxObj : drawObjects)
         objectVisibility[idxObj] = true;
-    for (unsigned int idxObj : O)
-        objectVisibility[idxObj] = true;
+    
+    if (engine->getUi().getFirstEarlyZMode())
+        for (unsigned int idxObj : O)
+            objectVisibility[idxObj] = true;
 }
 
 //! Load the scene models on GPU before rendering

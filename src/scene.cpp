@@ -121,9 +121,7 @@ void Scene::updateBvh()
     else
         G = occluders;
 
-    timers[1] = glfwGetTime() - timerStart; // Extract
     timerStart = glfwGetTime();
-
     const Frustum *f = engine->getStaticCamera()->getFrustum();
     std::vector<std::shared_ptr<BvhNode>> culledPotentialOccludees;
 
@@ -134,7 +132,7 @@ void Scene::updateBvh()
     else
         culledPotentialOccludees = G;
 
-    timers[2] = glfwGetTime() - timerStart; // VFC
+    timers[1] = glfwGetTime() - timerStart; // VFC
     timerStart = glfwGetTime();
 
     /*
@@ -143,8 +141,6 @@ void Scene::updateBvh()
      * return indices of potential visible occludees U
      */
 
-    timers[3] = timerStart - glfwGetTime(); // Bb extract
-    timerStart = glfwGetTime();
 
     glDisable(GL_DEPTH_TEST);
     queryShader.start();
@@ -156,7 +152,7 @@ void Scene::updateBvh()
     queryShader.stop();
     glEnable(GL_DEPTH_TEST);
 
-    timers[4] = glfwGetTime() - timerStart; // Batch occlusion Test
+    timers[2] = glfwGetTime() - timerStart; // Batch occlusion Test
     timerStart = glfwGetTime();
 
     /*
@@ -176,14 +172,12 @@ void Scene::updateBvh()
     else
         drawObjects = potentiallyVisibleOccludees;
 
-    timers[5] = glfwGetTime() - timerStart; // Early Z on Rendering
+    timers[3] = glfwGetTime() - timerStart; // Early Z on Rendering
     timerStart = glfwGetTime();
 
     objectVisibility = std::vector<bool>(objects.size(), false);
     for (unsigned int idxObj : drawObjects)
         objectVisibility[idxObj] = true;
-
-    timers[6] = glfwGetTime() - timerStart; // Merge
 }
 
 //! Load the scene models on GPU before rendering
@@ -277,6 +271,7 @@ void Scene::createBVH()
 {
     std::vector<std::shared_ptr<BoundingBox>> bbs;
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
+    #pragma omp for
     for (auto obj : _objects)
     {
         auto newBoundingBox = std::make_shared<AxisBoundingBox>(obj);
@@ -284,6 +279,7 @@ void Scene::createBVH()
         if (obj)
             bbs.push_back(obj->getBoundingBox());
     }
+    #pragma omp barrier
 
     hierarchy = new BvhTree(bbs);
 
@@ -420,6 +416,7 @@ void Scene::renderBoundingBoxes()
     BoundingBoxObject::bind();
     int bboxLevel;
     int maxBboxLevel = 0;
+    #pragma omp for
     for (auto entry : boundingBoxes)
     {
         int numBB = 0;
@@ -432,6 +429,7 @@ void Scene::renderBoundingBoxes()
                 bbox.get()->draw(bbShader, numBB++);
         }
     }
+    #pragma omp barrier
     BoundingBoxObject::unbind();
     engine->getUi().setBboxMaxLevel(maxBboxLevel);
     bbShader.stop();
@@ -554,6 +552,7 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
+    #pragma omp for
     for (std::shared_ptr<BvhNode> node : occludeeGroups)
     {
         cache.insert(node->getId());
@@ -561,6 +560,7 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
         node->getBoundingBox()->getWireframe()->drawQuery(queryShader);
         glEndQuery(GL_SAMPLES_PASSED);
     }
+    #pragma omp barrier
 
     for (unsigned int j = 0; j < i; j++)
     {

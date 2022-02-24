@@ -42,7 +42,7 @@ public:
         std::uniform_real_distribution<float> distRot(-1, 1);
 
         Texture::createTextureArray(1, 1024, 1024);
-
+        #pragma omp for
         for (size_t i = 0; i < 10; i++)
         {
             auto cube = std::make_shared<Cube>(1.0f);
@@ -53,6 +53,7 @@ public:
                 .setSpecular(glm::vec3{0.8});
             sc->addObject(cube);
         }
+        #pragma omp barrier
 
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
         plane1->setRotation(-90, {1, 0, 0})
@@ -130,6 +131,7 @@ public:
         MeshLoader::getSingleton()->loadModel("models/asteroid/Asteroid1.obj", modelKey);
 
         Texture::createTextureArray(1, 1500, 1500);
+        #pragma omp for
         for (size_t i = 0; i < _aCount; i++)
         {
             auto asteroid = std::make_shared<FileObject>("models/asteroid/Asteroid1.obj", modelKey);
@@ -140,6 +142,7 @@ public:
                 .setTexDiffuse("models/asteroid/asteroidDiffuse.jpg");
             scene->addObject(asteroid);
         }
+        #pragma omp barrier
         return scene;
     }
     /**

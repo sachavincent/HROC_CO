@@ -56,8 +56,8 @@ private:
     bool resetRequired; // If true, pipeline needs to be reset (<=> V = objects)
 public:
     // Timers for pipeline
-    double timers[7];
-    const char *timerLabels[7]{"EarlyZ", "Extract", "VFC", "Bb extract", "Batch occlusion Test", "Early Z on Rendering", "Merge"};
+    double timers[4];
+    const char *timerLabels[4]{"EarlyZ", "VFC", "Batch occlusion Test", "Early Z on Rendering"};
 
 public:
     Scene(Engine *_engine);

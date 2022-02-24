@@ -31,7 +31,7 @@ protected:
     std::string name;
 
     size_t id;
-    static size_t id_counter; // TODO: reset this field in scene destructor
+    static size_t id_counter;
 
     glm::mat4 scale = glm::mat4{1.0};
     glm::mat4 position = glm::mat4{1.0};
@@ -53,7 +53,7 @@ public:
     {
         id = id_counter++;
     }
-    
+
     ~Object();
 
     inline size_t getId() const { return id; }
@@ -102,11 +102,11 @@ private:
     unsigned int instance;
 
 protected:
-    static unsigned int instance_counter; // TODO: reset this field in scene destructor
+    static unsigned int instance_counter;
+
 public:
     //! Create a cube of size _edgeSize.
-    Cube(float _edgeSize = 1.0f,
-         const std::string &_name = "Cube_" + std::to_string(instance_counter),
+    Cube(const std::string &_name = "Cube_" + std::to_string(instance_counter),
          std::string _keyModel = "cube");
 };
 
@@ -116,69 +116,28 @@ class FileObject : public Object
     friend class Object;
 
 private:
-    // static std::map<const std::string, bool *> visible;
-
     unsigned int instance;
     std::string path;
 
-    // static std::map<const std::string, OBJECT_DATA> path_cache; // TODO: reset this field in scene destructor
-
-    // static OBJECT_DATA processMesh(aiMesh *_mesh, const aiScene *_scene);
-
 protected:
-    static unsigned int instance_counter; // TODO: reset this field in scene destructor
+    static unsigned int instance_counter;
+
 public:
-    // static void create(const std::string &_path, int nbInstances);
-
-    // static std::vector<OBJECT_DATA> getData();
-
     FileObject(const std::string &_path, std::string _modelkey = "");
-    // OBJECT_DATA* getMeshData()  override {return nullptr;}
-
-    // bool hasTextures() { return diffuseMapPath != ""; }
-    // inline void setVisible(bool _visible) { visible[path][instance] = _visible; }
-    // inline bool isVisible() { return visible[path][instance]; }
 };
-/*
-//! Load an assimp mesh as an object
-class AssimpMeshObject : public Object
-{
-private:
-    friend class Object;
-    static int instance_counter; // TODO: reset this field in scene destructor
-    int instance;
-
-    using Object::setPosition; // AssimpMeshObject cannot be transformed
-    using Object::setRotation;
-    using Object::setRotationMatrix;
-    using Object::setScale;
-
-public:
-    AssimpMeshObject(const aiScene *_scene, aiMesh *_mesh, std::string _name = "");
-
-    bool hasTextures() { return diffuseMapPath != ""; }
-};
-*/
 class UVSphere : public Object
 {
     friend class Object;
 
 private:
-    unsigned int instance; // TODO: reset this field in scene destructor
+    unsigned int instance;
 
 protected:
-    static unsigned int instance_counter; // TODO: reset this field in scene destructor
+    static unsigned int instance_counter;
+
 public:
-    // static void create(int nbInstances);
-
-    // OBJECT_DATA& getMeshData()  {return OBJECT_DATA();} override;
-
-    UVSphere(float _radius, int _nCols, int _nRows,
-             const std::string &_name = "UVSphere_" + std::to_string(instance_counter),
+    UVSphere(const std::string &_name = "UVSphere_" + std::to_string(instance_counter),
              std::string _modelkey = "sphere");
-
-    // inline void setVisible(bool _visible) { /*visible[instance] = _visible;*/ }
-    // inline bool isVisible() { return true;/*visible[instance];*/ }
 };
 
 class Plane : public Object
@@ -186,31 +145,17 @@ class Plane : public Object
     friend class Object;
 
 private:
-    // static bool *visible;
-
-    // static OBJECT_DATA data;
-
-    unsigned int instance; // TODO: reset this field in scene destructor
+    unsigned int instance;
 
     glm::vec2 size;
     int nX, nY;
 
 protected:
-    static unsigned int instance_counter; // TODO: reset this field in scene destructor
+    static unsigned int instance_counter;
+
 public:
-    // OBJECT_DATA& getMeshData()  {return OBJECT_DATA();} override;
-
-    // static void create(int nbInstances);
-
-    // static OBJECT_DATA getData();
-
-    Plane(glm::vec2 _size, int _nCols, int _nRows,
-          const std::string &_name = "Plane_" + std::to_string(instance_counter),
+    Plane(const std::string &_name = "Plane_" + std::to_string(instance_counter),
           std::string _keyModel = "plane");
-
-    // inline void setVisible(bool _visible) {  /*visible[instance] = _visible;*/ }
-    // inline bool isVisible() { return true;/*return visible[instance];*/ }
-    // inline OBJECT_BOUNDS getObjectBounds() const { /*return getMeshData().bounds;*/return OBJECT_BOUNDS(); }
 };
 
 class FrustumObject : public Object

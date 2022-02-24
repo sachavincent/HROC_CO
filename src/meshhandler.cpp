@@ -73,7 +73,7 @@ void MeshLoader::generateBaseModels()
 
     cubeData.numVertices = vertices.size() / 3;
     cubeData.vertices = new Vertex[cubeData.numVertices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < cubeData.numVertices; i++)
     {
         Vertex vertex;
@@ -82,24 +82,24 @@ void MeshLoader::generateBaseModels()
         vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
         cubeData.vertices[i] = vertex;
     }
-    #pragma omp barrier
+#pragma omp barrier
 
     cubeData.numIndices = indices.size();
     cubeData.indices = new GLuint[cubeData.numIndices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < cubeData.numIndices; i++)
         cubeData.indices[i] = indices[i];
-    #pragma omp barrier
+#pragma omp barrier
 
     handlerSingleton->addData("cube", cubeData);
 
     OBJECT_DATA planeData;
-    planeData.bounds.min = {-0.5f, -0.5f, 0.0f};
-    planeData.bounds.max = {0.5f, 0.5f, 0.0f};
+    planeData.bounds.min = {-0.5f, 0.0f, -0.5f};
+    planeData.bounds.max = {0.5f, 0.0f, 0.5f};
 
-    vertices = {-0.5f, 0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f};
+    vertices = {0.5f, 0.0f, 0.5f, 0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f};
 
-    normals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
+    normals = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
 
     textureCoord = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
 
@@ -107,7 +107,7 @@ void MeshLoader::generateBaseModels()
 
     planeData.numVertices = vertices.size() / 3;
     planeData.vertices = new Vertex[planeData.numVertices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < planeData.numVertices; i++)
     {
         Vertex vertex;
@@ -116,14 +116,14 @@ void MeshLoader::generateBaseModels()
         vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
         planeData.vertices[i] = vertex;
     }
-    #pragma omp barrier
+#pragma omp barrier
 
     planeData.numIndices = indices.size();
     planeData.indices = new GLuint[planeData.numIndices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < planeData.numIndices; i++)
         planeData.indices[i] = indices[i];
-    #pragma omp barrier
+#pragma omp barrier
 
     handlerSingleton->addData("plane", planeData);
 
@@ -196,7 +196,7 @@ void MeshLoader::generateBaseModels()
 
     sphereData.numVertices = vertices.size() / 3;
     sphereData.vertices = new Vertex[sphereData.numVertices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < sphereData.numVertices; i++)
     {
         Vertex vertex;
@@ -205,14 +205,14 @@ void MeshLoader::generateBaseModels()
         vertex.TexCoord = {textureCoord[i * 2], textureCoord[i * 2 + 1]};
         sphereData.vertices[i] = vertex;
     }
-    #pragma omp barrier
+#pragma omp barrier
 
     sphereData.numIndices = indices.size();
     sphereData.indices = new GLuint[sphereData.numIndices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < sphereData.numIndices; i++)
         sphereData.indices[i] = indices[i];
-    #pragma omp barrier
+#pragma omp barrier
 
     handlerSingleton->addData("sphere", sphereData);
 }
@@ -345,7 +345,7 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
 
     data.numVertices = vertices.size() / 3;
     data.vertices = new Vertex[data.numVertices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < data.numVertices; i++)
     {
         Vertex vertex;
@@ -358,16 +358,16 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
 
         data.vertices[i] = vertex;
     }
-    #pragma omp barrier
+#pragma omp barrier
 
     data.numIndices = indices.size();
     data.indices = new GLuint[data.numIndices];
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < data.numIndices; i++)
         data.indices[i] = indices[i];
 
+#pragma omp barrier
     return data;
-    #pragma omp barrier
 }
 
 void MeshHandler::getBuffers(const std::vector<std::shared_ptr<Object>> &_objects,

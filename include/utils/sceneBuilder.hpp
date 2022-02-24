@@ -44,8 +44,8 @@ public:
         Texture::createTextureArray(1, 1024, 1024);
         for (int i = 0; i < 10; i++)
         {
-            auto cube = std::make_shared<Cube>(1.0f);
-            cube->setPosition({dist(gen), -dist(gen), dist(gen)})
+            auto cube = std::make_shared<Cube>();
+            cube->setPosition({dist(gen), dist(gen), dist(gen)})
                 .setScale({distScale(gen), distScale(gen), distScale(gen)})
                 .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
                 .setDiffuse({0.0f, 1.0f, 0.3f})
@@ -53,33 +53,33 @@ public:
             sc->addObject(cube);
         }
 
-        auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
-        plane1->setPosition({0.0f, -3.0f, 0.0f})
-            .setRotation(-90, {1, 0, 0})
+        auto plane1 = std::make_shared<Plane>();
+        plane1->setPosition({10.0f, -3.0f, 0.0f})
+            .setScale({20, 1, 20})
             .setTexDiffuse("textures/stoneWall/diffuse.png");
         sc->addObject(plane1);
 
         std::string keyModel("teapot");
         auto teapot = std::make_shared<FileObject>("models/teapot.obj", keyModel);
         teapot->setScale(glm::vec3{0.6f})
-            .setPosition({0.0f, -1.5f, 0.0f})
+            .setPosition({10.0f, -1.5f, 0.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot);
 
         auto teapot2 = std::make_shared<FileObject>("models/teapot.obj", keyModel);
         teapot2->setScale(glm::vec3{0.7f})
-            .setPosition({-3.0f, -1.5f, 2.0f})
-            .setDiffuse({0.55f, 0.5f, 0.0f});
+            .setPosition({7.0f, -1.5f, -2.0f})
+            .setDiffuse({0.12f, 0.1f, 0.7f});
         sc->addObject(teapot2);
 
-        auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere1->setPosition({3.5, -2.8f, 3.5})
+        auto sphere1 = std::make_shared<UVSphere>();
+        sphere1->setPosition({16.5, -1.8f, 3.5})
             .setRotation(90, {1, 0, 0})
             .setDiffuse({1.0, 0.0, 0.8f});
 
         sc->addObject(sphere1);
-        auto sphere2 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere2->setPosition({-3.5, -2.8f, 3.5})
+        auto sphere2 = std::make_shared<UVSphere>();
+        sphere2->setPosition({7.5, -1.8f, 5.5})
             .setRotation(90, {1, 0, 0})
             .setDiffuse({1.0, 0.0, 0.0});
 

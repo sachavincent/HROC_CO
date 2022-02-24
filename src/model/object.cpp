@@ -102,8 +102,6 @@ void Object::flushCaches()
     Object::id_counter = 0;
     Cube::instance_counter = 0;
     FileObject::instance_counter = 0;
-    // FileObject::path_cache.clear();
     UVSphere::instance_counter = 0;
     Plane::instance_counter = 0;
-    // AssimpMeshObject::instance_counter = 0;
 }

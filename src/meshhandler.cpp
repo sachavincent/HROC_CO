@@ -73,8 +73,8 @@ void MeshLoader::generateBaseModels()
 
     cubeData.numVertices = vertices.size() / 3;
     cubeData.vertices = new Vertex[cubeData.numVertices];
-    #pragma omp for
-    for (size_t i = 0; i < cubeData.numVertices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < cubeData.numVertices; i++)
     {
         Vertex vertex;
         vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
@@ -86,8 +86,8 @@ void MeshLoader::generateBaseModels()
 
     cubeData.numIndices = indices.size();
     cubeData.indices = new GLuint[cubeData.numIndices];
-    #pragma omp for
-    for (size_t i = 0; i < cubeData.numIndices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < cubeData.numIndices; i++)
         cubeData.indices[i] = indices[i];
     #pragma omp barrier
 
@@ -107,8 +107,8 @@ void MeshLoader::generateBaseModels()
 
     planeData.numVertices = vertices.size() / 3;
     planeData.vertices = new Vertex[planeData.numVertices];
-    #pragma omp for
-    for (size_t i = 0; i < planeData.numVertices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < planeData.numVertices; i++)
     {
         Vertex vertex;
         vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
@@ -120,8 +120,8 @@ void MeshLoader::generateBaseModels()
 
     planeData.numIndices = indices.size();
     planeData.indices = new GLuint[planeData.numIndices];
-    #pragma omp for
-    for (size_t i = 0; i < planeData.numIndices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < planeData.numIndices; i++)
         planeData.indices[i] = indices[i];
     #pragma omp barrier
 
@@ -196,8 +196,8 @@ void MeshLoader::generateBaseModels()
 
     sphereData.numVertices = vertices.size() / 3;
     sphereData.vertices = new Vertex[sphereData.numVertices];
-    #pragma omp for
-    for (size_t i = 0; i < sphereData.numVertices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < sphereData.numVertices; i++)
     {
         Vertex vertex;
         vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
@@ -209,8 +209,8 @@ void MeshLoader::generateBaseModels()
 
     sphereData.numIndices = indices.size();
     sphereData.indices = new GLuint[sphereData.numIndices];
-    #pragma omp for
-    for (size_t i = 0; i < sphereData.numIndices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < sphereData.numIndices; i++)
         sphereData.indices[i] = indices[i];
     #pragma omp barrier
 
@@ -345,8 +345,8 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
 
     data.numVertices = vertices.size() / 3;
     data.vertices = new Vertex[data.numVertices];
-    #pragma omp for
-    for (size_t i = 0; i < data.numVertices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < data.numVertices; i++)
     {
         Vertex vertex;
         vertex.Position = {vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]};
@@ -362,8 +362,8 @@ OBJECT_DATA MeshLoader::processMesh(aiMesh *_mesh, const aiScene *_scene, bool _
 
     data.numIndices = indices.size();
     data.indices = new GLuint[data.numIndices];
-    #pragma omp for
-    for (size_t i = 0; i < data.numIndices; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < data.numIndices; i++)
         data.indices[i] = indices[i];
 
     return data;

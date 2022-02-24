@@ -42,9 +42,13 @@ file(GLOB APP_SOURCES   ${PROJECT_SOURCE_DIR}/src/bvh/bvhtree.cpp
 )
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /openmp /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /W4 /DGLFW_INCLUDE_NONE /std:c++17 /MP8 /wd4100 /wd4505 /wd4201 /wd4305 /wd4267 /wd4244 /wd4996 /wd4018")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-unused-variable -Wno-reorder -Wno-return-local-addr -Wno-format-security -std=c++17 -DNOT_MSVC")
+endif()
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include

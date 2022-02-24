@@ -74,30 +74,24 @@ void BvhTree::createMap(std::vector<std::shared_ptr<BvhNode>> &_nodes)
     nodeInMap.reserve(_nodes.size());
     nodeInMap.push_back(_nodes[0]);
     nodeInMap.push_back(_nodes[1]);
-    #pragma omp for
     for (auto it = _nodes.begin() + 2; it != _nodes.end(); ++it)
     {
         addToMap(*it, nodeInMap);
         nodeInMap.emplace_back(*it);
     }
-    #pragma omp barrier
 }
 
 void BvhTree::addToMap(std::shared_ptr<BvhNode> node, std::vector<std::shared_ptr<BvhNode>> &nodesToCompare)
 {
-    #pragma omp for
     for (auto it = nodesToCompare.begin(); it != nodesToCompare.end(); ++it)
     {
         map->insert(PairDistanceNode(BoundingBox::distance(node->getBoundingBox(), (*it)->getBoundingBox()), PairNode(node, *it)));
     }
-    
-    #pragma omp barrier
 }
 
 void BvhTree::removeFromMap(BvhNode &node)
 {
     // std::cout << "B4 remove " << map->size() << std::endl;
-    #pragma omp for
     for (auto it = map->begin(); it != map->end();)
     {
         if ((it->second.first->getId() == node.getId()) || (it->second.second->getId()) == node.getId())
@@ -113,7 +107,7 @@ void BvhTree::removeFromMap(BvhNode &node)
             ++it;
         }
     }
-    #pragma omp barrier
+#pragma omp barrier
 
     // std::cout << "After remove : " << map->size() << std::endl;
 }
@@ -168,7 +162,7 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
             std::shared_ptr<BvhNode> n2 = n->sibling();
             n2->setVisibility(Visibility::UNKNOWN);
             n = n->getParent();
-        }       
+        }
     }
     root->setVisibility(Visibility::UNKNOWN);
     root->RecursiveAdd(occludeeGroups);
@@ -177,7 +171,6 @@ std::vector<std::shared_ptr<BvhNode>> BvhTree::extractOccludees(const std::vecto
 
 void BvhTree::eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::shared_ptr<BvhNode> node)
 {
-    #pragma omp for
     for (auto it = nodes.begin(); it != nodes.end(); it++)
     {
         if ((*it)->getId() == node->getId())
@@ -186,5 +179,4 @@ void BvhTree::eraseInVector(std::vector<std::shared_ptr<BvhNode>> &nodes, std::s
             return;
         }
     }
-    #pragma omp barrier
 }

@@ -141,7 +141,6 @@ void Scene::updateBvh()
      * return indices of potential visible occludees U
      */
 
-
     glDisable(GL_DEPTH_TEST);
     queryShader.start();
     queryShader.loadMat4("view", engine->getStaticCamera()->getViewMatrix());
@@ -269,17 +268,17 @@ void Scene::load()
 
 void Scene::createBVH()
 {
+    
     std::vector<std::shared_ptr<BoundingBox>> bbs;
     const std::vector<std::shared_ptr<Object>> &_objects = getObjects();
-    #pragma omp for
-    for (auto obj : _objects)
+    for (int i = 0; i < _objects.size(); i++)
     {
+        auto obj = _objects[i];
         auto newBoundingBox = std::make_shared<AxisBoundingBox>(obj);
         obj->setBoundingBox(newBoundingBox);
         if (obj)
             bbs.push_back(obj->getBoundingBox());
     }
-    #pragma omp barrier
 
     hierarchy = new BvhTree(bbs);
 
@@ -416,20 +415,18 @@ void Scene::renderBoundingBoxes()
     BoundingBoxObject::bind();
     int bboxLevel;
     int maxBboxLevel = 0;
-    #pragma omp for
-    for (auto entry : boundingBoxes)
+    for (int i = 0; i < boundingBoxes.size(); i++)
     {
+        bboxLevel = i + 1;
         int numBB = 0;
-        bboxLevel = entry.first + 1;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
-        auto bboxs = entry.second;
+        auto bboxs = boundingBoxes[i];
         if (visMode == 0 || bboxLevel == visMode)
         {
             for (auto bbox : bboxs)
                 bbox.get()->draw(bbShader, numBB++);
         }
     }
-    #pragma omp barrier
     BoundingBoxObject::unbind();
     engine->getUi().setBboxMaxLevel(maxBboxLevel);
     bbShader.stop();
@@ -552,7 +549,6 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
     glGenQueries(nbQueries, queries);
 
     unsigned int i = 0;
-    #pragma omp for
     for (std::shared_ptr<BvhNode> node : occludeeGroups)
     {
         cache.insert(node->getId());
@@ -560,7 +556,6 @@ std::vector<unsigned int> Scene::batchOcclusionTest(std::vector<std::shared_ptr<
         node->getBoundingBox()->getWireframe()->drawQuery(queryShader);
         glEndQuery(GL_SAMPLES_PASSED);
     }
-    #pragma omp barrier
 
     for (unsigned int j = 0; j < i; j++)
     {

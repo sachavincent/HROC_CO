@@ -404,8 +404,6 @@ void Scene::renderBoundingBoxes()
 {
     if (!hierarchy)
         return;
-    if (engine->getCurrentCameraType() == CameraType::STATIC)
-        return;
     int visMode = engine->getUi().getBboxVisMode();
     // no bbox vis mode
     if (visMode == -1)
@@ -425,10 +423,14 @@ void Scene::renderBoundingBoxes()
         bboxLevel = entry.first + 1;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
         auto bboxs = entry.second;
-        if (visMode == 0 || bboxLevel == visMode)
+
+        if (engine->getCurrentCameraType() == CameraType::FREE)
         {
-            for (auto bbox : bboxs)
-                bbox.get()->draw(bbShader, numBB++);
+            if (visMode == 0 || bboxLevel == visMode)
+            {
+                for (auto bbox : bboxs)
+                    bbox.get()->draw(bbShader, numBB++);
+            }
         }
     }
     BoundingBoxObject::unbind();

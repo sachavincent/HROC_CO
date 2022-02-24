@@ -107,11 +107,11 @@ bool Benchmark::BNCH_asteroidLow()
     {
         if (passNum == 0)
         {
-            results["asteroidLow_ON"].push_back(engine->getDeltaTime());
+            results["asteroidLow_ON"].push_back(1/engine->getDeltaTime());
         }
         else
         {
-            results["asteroidLow_OFF"].push_back(engine->getDeltaTime());
+            results["asteroidLow_OFF"].push_back(1/engine->getDeltaTime());
         }
         framecount++;
         return 0;
@@ -166,11 +166,11 @@ bool Benchmark::BNCH_asteroidMedium()
     {
         if (passNum == 0)
         {
-            results["asteroidMedium_ON"].push_back(engine->getDeltaTime());
+            results["asteroidMedium_ON"].push_back(1/engine->getDeltaTime());
         }
         else
         {
-            results["asteroidMedium_OFF"].push_back(engine->getDeltaTime());
+            results["asteroidMedium_OFF"].push_back(1/engine->getDeltaTime());
         }
         framecount++;
         return 0;
@@ -223,11 +223,11 @@ bool Benchmark::BNCH_asteroidHigh()
     {
         if (passNum == 0)
         {
-            results["asteroidHigh_ON"].push_back(engine->getDeltaTime());
+            results["asteroidHigh_ON"].push_back(1/engine->getDeltaTime());
         }
         else
         {
-            results["asteroidHigh_OFF"].push_back(engine->getDeltaTime());
+            results["asteroidHigh_OFF"].push_back(1/engine->getDeltaTime());
         }
         framecount++;
         return 0;
@@ -278,11 +278,11 @@ bool Benchmark::BNCH_cityLow()
         //std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
         if (passNum == 0)
         {
-            results["cityLow_ON"].push_back(engine->getDeltaTime());
+            results["cityLow_ON"].push_back(1/engine->getDeltaTime());
         }
         else
         {
-            results["cityLow_OFF"].push_back(engine->getDeltaTime());
+            results["cityLow_OFF"].push_back(1/engine->getDeltaTime());
         }
         framecount++;
         return 0;
@@ -301,7 +301,60 @@ bool Benchmark::BNCH_cityLow()
     return 1;
 }
 
-bool Benchmark::BNCH_cityMedium() { return 1; }
+bool Benchmark::BNCH_cityMedium() {
+        static int framecount = 0;
+    static int passNum = 0;
+    if (framecount == 0)
+    {
+        if (passNum == 0)
+        {
+            delete engine->getScene();
+            Scene *scene = SceneBuilder::buildMultiMesh(engine, "models/paul_sab/paul_sab_2088.obj");
+            engine->loadScene(scene);
+            engine->getUi().setPipelineMode(true);
+            results["cityLow_ON"] = {};
+            engine->getScene()->createBVH();
+        }
+        else
+        {
+            engine->getUi().setPipelineMode(false);
+            results["cityLow_OFF"] = {};
+        }
+        engine->getStaticCamera()->setCameraInfo({glm::vec3{14.6, 8.0, -285.0}, 60.0, 60.0, 0.0});
+        engine->getStaticCamera()->updateDirection();
+        engine->getStaticCamera()->moveZ(moveSpeed);
+        engine->resetFrametime(); 
+
+        framecount++;
+        return 0;
+    }
+    if (framecount < 1500)
+    {
+        //std::cout << glm::to_string(engine->getStaticCamera()->getPosition()) << std::endl;
+        if (passNum == 0)
+        {
+            results["cityLow_ON"].push_back(1/engine->getDeltaTime());
+        }
+        else
+        {
+            results["cityLow_OFF"].push_back(1/engine->getDeltaTime());
+        }
+        framecount++;
+        return 0;
+    }
+
+    engine->getStaticCamera()->resetMovement();
+    engine->getStaticCamera()->setCameraInfo({glm::vec3{0.0, 2.0, 0.0}, 50.0, 90.0, 0.0});
+    engine->getStaticCamera()->updateDirection();
+    framecount = 0;
+    if (passNum == 0)
+    {
+        passNum++;
+        return 0;
+    }
+    passNum = 0;
+    return 1;
+ }
 
 bool Benchmark::BNCH_cityHigh() { return 1; }
 

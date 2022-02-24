@@ -45,7 +45,7 @@ public:
         for (int i = 0; i < 10; i++)
         {
             auto cube = std::make_shared<Cube>(1.0f);
-            cube->setPosition({dist(gen), dist(gen), dist(gen)})
+            cube->setPosition({dist(gen), -dist(gen), dist(gen)})
                 .setScale({distScale(gen), distScale(gen), distScale(gen)})
                 .setRotation(distRot(gen) * 45, glm::vec3{distRot(gen), distRot(gen), distRot(gen)})
                 .setDiffuse({0.0f, 1.0f, 0.3f})
@@ -54,31 +54,32 @@ public:
         }
 
         auto plane1 = std::make_shared<Plane>(glm::vec2{20, 20}, 30, 30);
-        plane1->setRotation(-90, {1, 0, 0})
+        plane1->setPosition({0.0f, -3.0f, 0.0f})
+            .setRotation(-90, {1, 0, 0})
             .setTexDiffuse("textures/stoneWall/diffuse.png");
         sc->addObject(plane1);
 
         std::string keyModel("teapot");
         auto teapot = std::make_shared<FileObject>("models/teapot.obj", keyModel);
         teapot->setScale(glm::vec3{0.6f})
-            .setPosition({0.0f, 1.5f, 0.0f})
+            .setPosition({0.0f, -1.5f, 0.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot);
 
         auto teapot2 = std::make_shared<FileObject>("models/teapot.obj", keyModel);
         teapot2->setScale(glm::vec3{0.7f})
-            .setPosition({-3.0f, 1.5f, 2.0f})
+            .setPosition({-3.0f, -1.5f, 2.0f})
             .setDiffuse({0.55f, 0.5f, 0.0f});
         sc->addObject(teapot2);
 
         auto sphere1 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere1->setPosition({3.5, 0.7, 3.5})
+        sphere1->setPosition({3.5, -2.8f, 3.5})
             .setRotation(90, {1, 0, 0})
             .setDiffuse({1.0, 0.0, 0.8f});
 
         sc->addObject(sphere1);
         auto sphere2 = std::make_shared<UVSphere>(1.0, 25, 20);
-        sphere2->setPosition({-3.5, 0.7, 3.5})
+        sphere2->setPosition({-3.5, -2.8f, 3.5})
             .setRotation(90, {1, 0, 0})
             .setDiffuse({1.0, 0.0, 0.0});
 

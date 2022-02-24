@@ -92,5 +92,5 @@ vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 diffus
     diffuse  /= attenuation;
     specular /= attenuation;
 
-    return (ambient + diffuse + specular);
+    return ambient + diffuse + specular;
 }

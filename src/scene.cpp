@@ -417,12 +417,12 @@ void Scene::renderBoundingBoxes()
     BoundingBoxObject::bind();
     int bboxLevel;
     int maxBboxLevel = 0;
-    for (int i = 0; i < boundingBoxes.size(); i++)
+    for (auto entry : boundingBoxes)
     {
-        bboxLevel = i + 1;
         int numBB = 0;
+        bboxLevel = entry.first + 1;
         maxBboxLevel = std::max(maxBboxLevel, bboxLevel);
-        auto bboxs = boundingBoxes[i];
+        auto bboxs = entry.second;
         if (visMode == 0 || bboxLevel == visMode)
         {
             for (auto bbox : bboxs)
